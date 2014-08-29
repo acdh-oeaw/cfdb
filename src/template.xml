@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TEI xmlns="http://www.tei-c.org/ns/1.0" version="5.0" xml:id="id">
+  <teiHeader>
+    <fileDesc>
+      <titleStmt>
+        <title/>
+      </titleStmt>
+      
+      <publicationStmt>
+        <p/>
+      </publicationStmt>
+      <sourceDesc>
+        <msDesc>
+          <msIdentifier>
+            
+            <region/>
+            <collection type="archive"/>
+            <collection type="dossier"/>
+            
+            <idno/>
+            <altIdentifier type="CDLI">
+              <idno/>
+            </altIdentifier>
+            <altIdentifier type="NABUCCO">
+              <idno/>
+            </altIdentifier>
+          </msIdentifier>
+          <physDesc>
+            <handDesc>
+              <handNote>
+                <persName role="scribe">Marduka/Eppe§Ili</persName>
+                <fs>
+                  <f name="ductus">
+                    <symbol value="normal"/>
+                  </f>
+                </fs>
+              </handNote>
+            </handDesc>
+            <scriptDesc>
+              <scriptNote>
+                
+              </scriptNote>
+            </scriptDesc>
+          </physDesc>
+          <additional>
+            <surrogates>
+              <listBibl type="transliterations">
+              </listBibl>
+            </surrogates>
+          </additional>
+        </msDesc>
+      </sourceDesc>
+    </fileDesc>
+    <profileDesc>
+      <creation>
+        <origPlace cert="">
+          <placeName/>
+        </origPlace>
+        <origDate>
+          <date period="" cert=""/>
+        </origDate>
+      </creation>
+      <particDesc>
+        
+      </particDesc>
+      <!-- texttyp -->
+      <textClass>
+        <keywords scheme="local">
+          <term/>
+        </keywords>
+      </textClass>
+      <!-- paraphrase -->
+      <abstract xml:lang="">
+        <ab/>
+      </abstract>
+    </profileDesc>
+    <encodingDesc>
+      <tagsDecl xml:id="imtAnnotationCategories">
+        <rendition xml:id="cuneiform">
+          <label>Marks up a single cuneiform on a tablet</label>
+          <code rend="rectangle" lang="text/css">color: #00ff00</code>
+        </rendition>
+      </tagsDecl>
+      <appInfo>
+        <application ident="ImageMarkupTool01" version="1.8.2.2" notAfter="2014-08-21T11:41:06">
+          <label>
+            Image Markup Tool</label>
+          <desc>
+            Tool for annotating images using TEI</desc>
+          <ref type="appURI" target="http://hcmc.uvic.ca/~mholmes/image_markup/">
+          </ref>
+          <ptr target="#imtAnnotatedImage"/>
+          <ptr target="#imtImageAnnotations"/>
+          <ptr target="#imtAnnotationCategories"/>
+        </application>      
+      </appInfo>
+      <charDecl>
+        <glyph>
+          <!-- to be completed by IMT2TEI.xsl -->
+        </glyph>
+      </charDecl>
+    </encodingDesc>
+    <revisionDesc>
+      <listChange>
+        <change>
+          <!-- to be replaced by seed.xsl -->
+        </change>
+      </listChange>
+    </revisionDesc>
+  </teiHeader>
+  <facsimile xml:id="imtAnnotatedImage">
+    <surface>
+      <graphic url="FILEPATH.JPG" width="0px" height="0px"/>
+      <zone xml:id="imtArea_0" rendition="cuneiform" ulx="10" uly="10" lrx="20" lry="20" rend="visible"/>
+    </surface>
+  </facsimile>
+  <text type="tablet">
+    <body>
+      <div xml:id="imtImageAnnotations">
+        <div corresp="#imtArea_0" type="imtAnnotation">
+          <head>SIGN NAME</head>
+          <div>
+            <p xml:space="preserve">
+line:     XXXX
+reading:  XXXX
+context:  XXXX
+sequence: XXXX
+note:     XXXX
+</p>
+          </div>
+        </div>
+      </div>
+    </body>
+  </text>
+</TEI>

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TEI xmlns="http://www.tei-c.org/ns/1.0">
+  <teiHeader>
+      <fileDesc>
+         <titleStmt>
+            <title>Title</title>
+         </titleStmt>
+         <publicationStmt>
+            <p>Publication Information</p>
+         </publicationStmt>         
+         <sourceDesc>
+            <p>Information about the source</p>
+         </sourceDesc>
+      </fileDesc>
+     <encodingDesc>
+        <charDecl>
+                <char xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:xf="http://www.w3.org/2002/xforms" n="52" xml:id="sign_52">
+                <charName>IT</charName>
+                <figure>
+                    <graphic url="imgs/sign_52.jpg"/>
+                </figure>
+            </char>
+                <char xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:xf="http://www.w3.org/2002/xforms" n="1" xml:id="sign_5">
+                <charName>test</charName>
+                <figure>
+                    <graphic url="imgs/sign_5.jpg"/>
+                </figure>
+            </char>
+                <char xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:xf="http://www.w3.org/2002/xforms" n="4" xml:id="sign_5">
+                <charName>KUR</charName>
+                <figure>
+                    <graphic url="imgs/sign_5.jpg"/>
+                </figure>
+            </char>
+                <char xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:xf="http://www.w3.org/2002/xforms" n="6" xml:id="sign_6">
+                <charName>test 6</charName>
+                <figure>
+                    <graphic url="imgs/sign_6.jpg"/>
+                </figure>
+            </char>
+                <char xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:xf="http://www.w3.org/2002/xforms" n="5" xml:id="sign_5">
+                <charName>test 5</charName>
+                <figure>
+                    <graphic url="imgs/sign_5.jpg"/>
+                </figure>
+            </char>
+                
+                
+                
+                
+                
+                <char xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:xf="http://www.w3.org/2002/xforms" n="52" xml:id="sign_52">
+                <charName>ITU</charName>
+                <figure>
+                    <graphic url="imgs/sign_52.jpg"/>
+                </figure>
+            </char>
+                
+                
+                <char xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:xf="http://www.w3.org/2002/xforms" n="533" xml:id="sign_533">
+                <charName>MESH</charName>
+                <figure>
+                    <graphic url="imgs/sign_533.jpg"/>
+                </figure>
+            </char>
+                <char xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:xf="http://www.w3.org/2002/xforms" n="328" xml:id="sign_328">
+                <charName>RA</charName>
+                <figure>
+                    <graphic url="imgs/sign_328.jpg"/>
+                </figure>
+            </char>
+                
+                
+                
+           
+           
+        </charDecl>
+     </encodingDesc>
+  </teiHeader>
+  <text>
+      <body>
+        <ab>this document contains a list of standard signs.</ab>
+      </body>
+  </text>
+</TEI>
