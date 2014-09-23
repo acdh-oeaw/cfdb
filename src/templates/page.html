@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:bf="http://betterform.sourceforge.net/xforms" tei:dummy="xx" bf:evalAVTs="src">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:api="http://www.oeaw.ac.at/acdh/cuneidb/api" tei:dummy="xx" bfc:dummy="XXX" api:dummy="xx">
     <head>
         <title data-template="config:app-title">App Title</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -16,7 +16,7 @@
         </script>
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/4.5.0/codemirror.min.js"/>
     </head>
-    <body id="body">
+    <body id="body" bf:evalAVTs="src">
         <div id="overlay" class="invisible"/>
         <div class="navbar">
             <div class="navbar-inner">
@@ -29,23 +29,23 @@
                                 <li>
                                     <a href="index.html">Home</a>
                                 </li>
-                                <li>
+                                <!--<li>
                                     <a href="search.html">Search</a>
-                                </li>
+                                </li>-->
                             </ul>
                         </li>
                         <li class="dropdown" id="edit">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">Edit</a>
                             <ul class="dropdown-menu">
                                 <li>
-                                    <a href="edit/tablet.html">Tablets</a>
+                                    <a href="editTablets.html">Tablets</a>
                                 </li>
                                 <li>
-                                    <a href="edit/stdSigns.html">Standard Signs</a>
+                                    <a href="editStdSigns.html">Standard Signs</a>
                                 </li>
-                                <!--<li>
-                                    <a href="edit/collections.html">Collections</a>
-                                </li>-->
+                                <li>
+                                    <a href="editArchives.html">Regions, Archives and Dossiers</a>
+                                </li>
                             </ul>
                         </li>
                     </ul>
