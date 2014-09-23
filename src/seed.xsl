@@ -14,10 +14,17 @@
         <xd:desc>the filename of the image</xd:desc>
     </xd:doc>
     <xsl:param name="filename"/>
-    <xd:doc scope="component">
+	
+	<xd:doc scope="component">
+		<xd:desc>the id of the tablet the image belongs to</xd:desc>
+	</xd:doc>
+	<xsl:param name="tablet-id"/>
+	
+	<xd:doc scope="component">
         <xd:desc>the title of the Image Markup Tool Document</xd:desc>
     </xd:doc>
     <xsl:param name="title"/>
+	
     <xd:doc scope="component">
         <xd:desc>the height of the image to mark up</xd:desc>
     </xd:doc>
@@ -35,12 +42,17 @@
     
     <xsl:template match="/tei:TEI">
        <xsl:copy>
-           <xsl:attribute name="xml:id" select="translate($title,' ','')"/>
+<!--           <xsl:attribute name="xml:id" select="translate($title,' ','')"/>-->
+       	<xsl:attribute name="xml:id" select="concat(replace($tablet-id,'^tablet','surface'),'_',translate($title,' ',''))"/>
            <xsl:copy-of select="@* except @xml:id"/>
            <xsl:apply-templates/>
        </xsl:copy>
     </xsl:template>
-    
+	
+	<xsl:template match="/tei:TEI/tei:text/@type[. = 'tablet']">
+		<xsl:attribute name="type">surface</xsl:attribute>
+	</xsl:template>
+	
     <xsl:template match="/tei:TEI/tei:teiHeader[1]/tei:revisionDesc/tei:listChange[1]">
         <xsl:copy>
             <xsl:copy-of select="@*"/>
