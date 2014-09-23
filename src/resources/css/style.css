@@ -67,3 +67,18 @@
     padding-top: 10px;
     width: 100%;
 }
+
+
+#editGlyphMenuShown {
+    width: 75%;
+}
+
+#signImg {
+    float: right;
+    margin-bottom: 1em;
+}
+
+#signImg img {
+    width: 180px;
+    height: auto;
+}
