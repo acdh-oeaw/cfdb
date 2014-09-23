@@ -23,35 +23,35 @@ if ($exist:path eq "/") then
 else if (contains($exist:path,"$app-root")) then
     <dispatch xmlns="http://exist.sourceforge.net/NS/exist">
         <forward url="{$exist:controller}/{substring-after($exist:path, '$app-root/')}">
-            <set-header name="Cache-Control" value="max-age=3600, must-revalidate"/>
+            <set-header name="Cache-Control" value="no"/>
         </forward>
     </dispatch>
-else if (starts-with($exist:path,"/edit") and ends-with($exist:resource, '.html')) then
-    if (not($exist:resource = ('tablet.html', 'stdSigns.html')))
+(:else if (starts-with($exist:path,"/edit") and ends-with($exist:resource, '.html')) then
+    if (not($exist:resource = ('tablet.html', 'stdSigns.html', 'archives.html')))
     then
         <dispatch xmlns="http://exist.sourceforge.net/NS/exist">
-            <redirect  url="{replace(request:get-url(),'/edit/','/')}"/>
+            <redirect url="{replace(request:get-url(),'/edit/','/')}"/>
         </dispatch>
     else 
-    if ($authorized-user)
-    then 
-        <dispatch xmlns="http://exist.sourceforge.net/NS/exist">
-            <forward url="{$exist:controller}/edit-{$exist:resource}"/>
-            <view>
-                <forward url="{$exist:controller}/modules/view.xql"/>
-            </view>
-        </dispatch>
-    else 
-         <dispatch xmlns="http://exist.sourceforge.net/NS/exist">
-            <forward url="{$exist:controller}/login.html"/>
-            <view>
-                <forward url="{$exist:controller}/modules/view.xql"/>
-            </view>
-            <error-handler>
-                <forward url="{$exist:controller}/error-page.html" method="get"/>
-                <forward url="{$exist:controller}/modules/view.xql"/>
-            </error-handler>
-        </dispatch>
+        if ($authorized-user)
+        then 
+            <dispatch xmlns="http://exist.sourceforge.net/NS/exist">
+                <forward url="{$exist:controller}/edit-{$exist:resource}"/>
+                <view>
+                    <forward url="{$exist:controller}/modules/view.xql"/>
+                </view>
+            </dispatch>
+        else 
+             <dispatch xmlns="http://exist.sourceforge.net/NS/exist">
+                <forward url="{$exist:controller}/login.html"/>
+                <view>
+                    <forward url="{$exist:controller}/modules/view.xql"/>
+                </view>
+                <error-handler>
+                    <forward url="{$exist:controller}/error-page.html" method="get"/>
+                    <forward url="{$exist:controller}/modules/view.xql"/>
+                </error-handler>
+            </dispatch>:)
 else if (ends-with($exist:resource, ".html")) then
     (: the html page is run through view.xql to expand templates :)
     if ($authorized-user)
@@ -86,5 +86,5 @@ else if (contains($exist:path, "/$shared/")) then
 else
     (: everything else is passed through :)
     <dispatch xmlns="http://exist.sourceforge.net/NS/exist">
-        <cache-control cache="yes"/>
+        <cache-control cache="no"/>
     </dispatch>
