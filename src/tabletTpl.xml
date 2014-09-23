@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TEI xmlns="http://www.tei-c.org/ns/1.0" version="5.0" xml:id="id">
+  <teiHeader>
+    <fileDesc>
+      <titleStmt>
+        <title/>
+      </titleStmt>
+      
+      <publicationStmt>
+        <p/>
+      </publicationStmt>
+      <sourceDesc>
+        <msDesc>
+          <msIdentifier>
+            
+            <region/>
+            <collection type="archive"/>
+            <collection type="dossier"/>
+            
+            <idno/>
+            <altIdentifier type="CDLI">
+              <idno/>
+            </altIdentifier>
+            <altIdentifier type="NABUCCO">
+              <idno/>
+            </altIdentifier>
+          </msIdentifier>
+          <physDesc>
+            <handDesc>
+              <handNote>
+                <persName role="scribe"/>
+                <fs>
+                  <f name="ductus">
+                    <symbol value="normal"/>
+                  </f>
+                </fs>
+              </handNote>
+            </handDesc>
+            <scriptDesc>
+              <scriptNote>
+                
+              </scriptNote>
+            </scriptDesc>
+          </physDesc>
+          <additional>
+            <surrogates>
+              <listBibl type="transliterations">
+              </listBibl>
+            </surrogates>
+          </additional>
+        </msDesc>
+      </sourceDesc>
+    </fileDesc>
+    <profileDesc>
+      <creation>
+        <origPlace cert="">
+          <placeName/>
+        </origPlace>
+        <origDate>
+          <date period="" cert=""/>
+        </origDate>
+      </creation>
+      <particDesc>
+        
+      </particDesc>
+      <!-- texttyp -->
+      <textClass>
+        <keywords scheme="local">
+          <term/>
+        </keywords>
+      </textClass>
+      <!-- paraphrase -->
+      <abstract xml:lang="">
+        <ab/>
+      </abstract>
+    </profileDesc>
+    <encodingDesc>
+      <charDecl>
+      </charDecl>
+    </encodingDesc>
+    <revisionDesc>
+      <listChange>
+        <change>
+          <!-- to be replaced by seed.xsl -->
+        </change>
+      </listChange>
+    </revisionDesc>
+  </teiHeader>
+  <sourceDoc/>
+   <text>
+     <body>
+       <ab/>
+     </body>
+     <back/>
+   </text>
+</TEI>

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TEI xmlns="http://www.tei-c.org/ns/1.0" version="5.0" xml:id="id">
+	<teiHeader>
+		<fileDesc>
+			<titleStmt>
+				<title/>
+			</titleStmt>
+
+			<publicationStmt>
+				<p/>
+			</publicationStmt>
+			<sourceDesc>
+				<p/>
+			</sourceDesc>
+		</fileDesc>
+		<encodingDesc>
+			<tagsDecl xml:id="imtAnnotationCategories">
+				<rendition xml:id="cuneiform">
+					<label>Marks up a single cuneiform on a tablet</label>
+					<code lang="text/css" rend="rectangle">color: #00ff00</code> </rendition>
+			</tagsDecl>
+			<appInfo>
+				<application ident="ImageMarkupTool01" notAfter="2014-08-21T11:41:06" version="1.8.2.2">
+					<label>Image Markup Tool</label>
+					<desc>Tool for annotating images using TEI</desc>
+					<ref target="http://hcmc.uvic.ca/~mholmes/image_markup/" type="appURI"> </ref>
+					<ptr target="#imtAnnotatedImage"/>
+					<ptr target="#imtImageAnnotations"/>
+					<ptr target="#imtAnnotationCategories"/>
+				</application>
+			</appInfo>
+		</encodingDesc>
+		<revisionDesc>
+			<listChange>
+				<change>
+					<!-- to be replaced by seed.xsl --> </change>
+			</listChange>
+		</revisionDesc>
+	</teiHeader>
+	<facsimile xml:id="imtAnnotatedImage">
+		<surface>
+			<graphic height="0px" url="FILEPATH.JPG" width="0px"/>
+			<zone lrx="200" lry="200" rend="visible" rendition="cuneiform" ulx="100" uly="100" xml:id="imtArea_0"/>
+		</surface>
+	</facsimile>
+	<text>
+		<body>
+			<div xml:id="imtImageAnnotations">
+				<div corresp="#imtArea_0" type="imtAnnotation">
+					<head>SIGN NAME</head>
+					<div>
+						<p xml:space="preserve">
+reading:  XXXX
+context:  XXXX
+sequence: XXXX
+note:     XXXX
+</p>
+					</div>
+				</div>
+			</div>
+		</body>
+	</text>
+</TEI>
