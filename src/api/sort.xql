@@ -17,8 +17,10 @@ return
     if ($by != '')
     then
         <data by="{$by}">{
-            for $c in $content
-            order by util:eval("$c/"||$by) collation "?strength=primary"
+            for $c in $content  
+            order by 
+                if (util:eval("$c/"||$by) castable as xs:integer) then xs:integer(util:eval("$c/"||$by))
+                else util:eval("$c/"||$by)
             return $c
         }</data>
         
