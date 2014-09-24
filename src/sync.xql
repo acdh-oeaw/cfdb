@@ -4,7 +4,8 @@ import module namespace config="http://www.oeaw.ac.at/acdh/cuneidb/config" at "m
 
 let $target-base-default := "/opt/repo"
 return 
-    
+
+<response>{
 try{
     let $source  := request:get-parameter("source",$config:app-root)
     let $target-base := request:get-parameter("target-base",$target-base-default)
@@ -16,4 +17,5 @@ try{
 } catch * {
     let $log := util:log("ERROR", ($err:code, $err:description) )
     return <ERROR>{($err:code, $err:description)}</ERROR>
-}   
+}
+}</response>
