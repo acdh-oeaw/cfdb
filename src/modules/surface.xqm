@@ -24,7 +24,7 @@ declare variable $surface:seed-xsl := doc($tablet:seed-xsl-filepath);
  :
 ~:)
 declare function surface:new($path-to-img as xs:anyURI) {
-    let $log := util:log("INFO",$path-to-img)
+    let $log := util:log-app("INFO",$config:app-name,$path-to-img)
     let $filename := tokenize($path-to-img,'/')[last()], 
         $suffix := "."||tokenize($filename,'\.')[last()],
         $collection := substring-before($path-to-img,$filename),
@@ -50,8 +50,8 @@ declare function surface:new($path-to-img as xs:anyURI) {
     
     return 
         (:switch(true())
-            case (not(util:binary-doc-available($path-to-img))) return util:log("INFO",$path-to-img||" is not available")
-            case (doc-available($collection||"/"||replace($filename,'\..+$','.xml'))) return util:log("INFO",$path-to-img||" file already exists")
+            case (not(util:binary-doc-available($path-to-img))) return util:log-app("INFO",$config:app-name,$path-to-img||" is not available")
+            case (doc-available($collection||"/"||replace($filename,'\..+$','.xml'))) return util:log-app("INFO",$config:app-name,$path-to-img||" file already exists")
             default return :)
          xmldb:store($collection, substring-before($filename,$suffix)||".xml", $IMT-file)
 };
@@ -76,7 +76,7 @@ declare function surface:remove($path as xs:anyURI) {
     
     let $mainTEI := collection($collection)//tei:TEI[tei:sourceDoc],
     	$surfaceInTablet := $mainTEI//tei:surface[tei:graphic/@url = $filename]
-    let $log := for $x in ("$filename","$IMT-filename","$surfaceInTablet","exists($mainTEI)") return util:log("INFO",$x||" "||util:eval($x))
+    let $log := for $x in ("$filename","$IMT-filename","$surfaceInTablet","exists($mainTEI)") return util:log-app("INFO",$config:app-name,$x||" "||util:eval($x))
 
     (: remove glyph and glyph images :)
     let $rmGlyphs := 

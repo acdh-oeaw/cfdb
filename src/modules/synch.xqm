@@ -147,12 +147,12 @@ declare function local:extractGlyph($zone as element(tei:zone), $id as xs:string
 	let $graphic := $zone/parent::*/tei:graphic
 	return
 	   switch(true())
-	       case (not(exists($graphic))) return util:log("INFO","no element tei:graphic")
-	       case (not(exists($graphic/@url))) return util:log("INFO","$graphic is missing @url attribute")
-	       case (not(exists($zone/@ulx))) return util:log("INFO","$zone is missing @ulx attribute")
-	       case (not(exists($zone/@uly))) return util:log("INFO","$zone is missing @uly attribute")
-	       case (not(exists($zone/@lrx))) return util:log("INFO","$zone is missing @lrx attribute")
-	       case (not(exists($zone/@lry))) return util:log("INFO","$zone is missing @lry attribute")
+	       case (not(exists($graphic))) return util:log-app("INFO",$config:app-name,"no element tei:graphic")
+	       case (not(exists($graphic/@url))) return util:log-app("INFO",$config:app-name,"$graphic is missing @url attribute")
+	       case (not(exists($zone/@ulx))) return util:log-app("INFO",$config:app-name,"$zone is missing @ulx attribute")
+	       case (not(exists($zone/@uly))) return util:log-app("INFO",$config:app-name,"$zone is missing @uly attribute")
+	       case (not(exists($zone/@lrx))) return util:log-app("INFO",$config:app-name,"$zone is missing @lrx attribute")
+	       case (not(exists($zone/@lry))) return util:log-app("INFO",$config:app-name,"$zone is missing @lry attribute")
 	       default return
 	           let $collection := util:collection-name($zone)
 	           let $img := image:crop(
@@ -222,13 +222,13 @@ declare function local:updateTablet($surface as element(tei:TEI)) as empty() {
  : values in the $tablet file. 
 ~:)
 declare function local:updateSurfaces($tablet as element(tei:TEI)) as empty() {
-    let $log:= (util:log("INFO",""),util:log("INFO","local:updateSurfaces("||base-uri($tablet)||")"))
+    let $log:= (util:log-app("INFO",$config:app-name,""),util:log-app("INFO",$config:app-name,"local:updateSurfaces("||base-uri($tablet)||")"))
     return
     for $c at $pos in $tablet//tei:seg[@type = 'context']
-        let $count:= util:log("INFO","context "||$pos||" of "||count($tablet//tei:seg[@type = 'context'])||" - "||$c/@xml:id)
+        let $count:= util:log-app("INFO",$config:app-name,"context "||$pos||" of "||count($tablet//tei:seg[@type = 'context'])||" - "||$c/@xml:id)
         (: we assume one context for each glyph :)
         let $unique-g := if (count($c/tei:g) gt 1)
-                         then (util:log("INFO","beware: more than one tei:g in context "||$c/@xml:id),false())
+                         then (util:log-app("INFO",$config:app-name,"beware: more than one tei:g in context "||$c/@xml:id),false())
                          else true()
         let $g := $c/tei:g[1],
             $gID := $c/tei:g[1]/@xml:id
@@ -251,9 +251,9 @@ declare function local:updateSurfaces($tablet as element(tei:TEI)) as empty() {
             $arrangement := root($c)//tei:glyph[@xml:id = substring-after($g/@ana,'#')]/tei:charProp[tei:localName = "arrangement"]/tei:value,
             $note := root($c)//tei:note[@target = $gID]
         
-        let $log := for $x in ("$type","$reading","$context","$sequence","$arrangement","$note") return util:log("INFO",concat($x," '",util:eval($x),"'"))
+        let $log := for $x in ("$type","$reading","$context","$sequence","$arrangement","$note") return util:log-app("INFO",$config:app-name,concat($x," '",util:eval($x),"'"))
         let $sDiv := collection(util:collection-name($tablet))//tei:div[@corresp = concat('#',$gID)]
-        let $log := util:log("INFO",exists($sDiv))
+        let $log := util:log-app("INFO",$config:app-name,exists($sDiv))
         let $newAn :=
             <div type="imtAnnotation" corresp="{concat('#',$gID)}" xmlns="http://www.tei-c.org/ns/1.0">
                 <head>{xs:string($type)}</head>
@@ -270,11 +270,11 @@ declare function local:updateSurfaces($tablet as element(tei:TEI)) as empty() {
 
 (:~ "main" functions that are called by the trigger. :)
 declare function trigger:after-update-document($uri as xs:anyURI) {
-    let $log := util:log("INFO","trigger:after-update-document("||$uri||")")
+    let $log := util:log-app("INFO",$config:app-name,"trigger:after-update-document("||$uri||")")
 	let $data := local:get-data($uri),
 		$type := if (exists($data/tei:TEI/tei:sourceDoc)) then "tablet"
 				 else if (exists($data//tei:div[@xml:id = 'imtImageAnnotations'])) then "surface"
-				 else (util:log("INFO","$type could not be determined."))
+				 else (util:log-app("INFO",$config:app-name,"$type could not be determined."))
 	let $update := 
 		if ($type = "surface") then 
 			local:updateTablet($data/tei:TEI) else  
@@ -285,11 +285,11 @@ declare function trigger:after-update-document($uri as xs:anyURI) {
 };
 
 declare function trigger:before-delete-document($uri as xs:anyURI) {
-    let $log := util:log("INFO","trigger:before-delete-document("||$uri||")")
+    let $log := util:log-app("INFO",$config:app-name,"trigger:before-delete-document("||$uri||")")
 	let $data := local:get-data($uri),
 		$type := if (exists($data/tei:TEI/tei:sourceDoc)) then "tablet"
 				 else if (exists($data//tei:div[@xml:id = 'imtImageAnnotations'])) then "surface"
-				 else (util:log("INFO","$type could not be determined."))
+				 else (util:log-app("INFO",$config:app-name,"$type could not be determined."))
 	let $update := 
 	   if ($type = "surface") then ()(:surface:remove($uri):)   
 	   else ()

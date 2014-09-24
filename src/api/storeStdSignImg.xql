@@ -13,11 +13,11 @@ import module namespace config="http://www.oeaw.ac.at/acdh/cuneidb/config" at "x
 declare variable $data external;
 
 declare function local:move-to-db($id as xs:string, $img-path as xs:string, $filename as xs:string, $mediatype as xs:string) as item() {
-    let $log := util:log("INFO", "local:move-to-db()")
+    let $log := util:log-app("INFO",$config:app-name, "local:move-to-db()")
     return
     if (some $p in ($id, $img-path, $filename, $mediatype) satisfies $p = "")
     then 
-        let $log := util:log("INFO", "local:move-to-db() some parameter is empty")
+        let $log := util:log-app("INFO",$config:app-name, "local:move-to-db() some parameter is empty")
         return false()
     else system:as-user('cuneiformDBSystem', 'sEN5)u#)~Tn!3E6ZkCW{J9e',
         try {
@@ -39,16 +39,16 @@ declare function local:move-to-db($id as xs:string, $img-path as xs:string, $fil
                             let $do-rm :=  file:delete($upload-directory||'/'||$img-collection||"/")
                             return 
                                 if ($do-rm)
-                                then util:log("INFO","removed temp directory  "||$upload-directory||'/'||$img-collection||"/")
-                                else util:log("INFO","could not remove "||$upload-directory||'/'||$img-collection||"/")
-                        else util:log("INFO", "did not delete temp directory because $upload-directoy does not point to /exist/webapp/upload")
+                                then util:log-app("INFO",$config:app-name,"removed temp directory  "||$upload-directory||'/'||$img-collection||"/")
+                                else util:log-app("INFO",$config:app-name,"could not remove "||$upload-directory||'/'||$img-collection||"/")
+                        else util:log-app("INFO",$config:app-name, "did not delete temp directory because $upload-directoy does not point to /exist/webapp/upload")
                     return $store
                 else
-                    let $log := util:log("INFO","file "||$file-path||" not found.")
+                    let $log := util:log-app("INFO",$config:app-name,"file "||$file-path||" not found.")
                     return false()
                 
         } catch * {
-            let $log := util:log("INFO", "local:move-to-db() something went wrong")
+            let $log := util:log-app("INFO",$config:app-name, "local:move-to-db() something went wrong")
             return false()
         }
     )

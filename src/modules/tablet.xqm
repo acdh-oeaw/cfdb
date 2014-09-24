@@ -30,15 +30,15 @@ declare function tablet:new($tei as element(tei:TEI)) as map() {
     let $create-collection := xmldb:create-collection($config:tablets-root,$id)
     let $collection-created := 
     	if ($create-collection)
-    	then util:log("INFO","Created collection for new tablet "||$id)
-    	else (util:log("INFO","An error occured. Could not create collection "||$id||" in "||$config:tablets-root),false())
+    	then util:log-app("INFO",$config:app-name,"Created collection for new tablet "||$id)
+    	else (util:log-app("INFO",$config:app-name,"An error occured. Could not create collection "||$id||" in "||$config:tablets-root),false())
     let $store-tei := 
         try {
             xmldb:store($config:tablets-root || "/" || $id ,
             			$id||".xml", 
             			$tei-prefRmvd)
         } catch * {
-            util:log("INFO","An error occured. Could not store tablet "||$id||".")
+            util:log-app("INFO",$config:app-name,"An error occured. Could not store tablet "||$id||".")
         }
 	let $returnVal := 
 		if ($create-collection and $store-tei)
@@ -102,7 +102,7 @@ declare function  tablet:extractGlyphs($tablet as element(tei:TEI)) {
                             then ()
                             else xmldb:create-collection($img-collection,$tablet-id) 
                     return xmldb:store($img-collection||"/"||$tablet-id,$glyph-id||".jpg",$img-crop) 
-                else util:log("INFO","image at "||$img-filepath||" is not available")
+                else util:log-app("INFO",$config:app-name,"image at "||$img-filepath||" is not available")
     return $imt2tei
 }; 
 
@@ -135,7 +135,7 @@ declare function tablet:listResources($id as xs:string, $mime-type-filter as xs:
     let $col-available := xmldb:collection-available($col)
     let $imgs :=
     	if (not($col-available))
-    	then util:log("INFO","Collection "||$col||" not found.")
+    	then util:log-app("INFO",$config:app-name,"Collection "||$col||" not found.")
     	else
 	    	for $x in xmldb:get-child-resources(xs:anyURI($col))
 				let $dbpath := $col || "/" || $x

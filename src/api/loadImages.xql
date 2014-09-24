@@ -37,7 +37,7 @@ return
 		
 		default return
 			let $imgs := tablet:listResources($id,("image/jpg","image/jpeg","IMAGE/JPEG","IMAGE/JPG"))
-			let $log := util:log("INFO",string-join($imgs,'; '))
+			let $log := util:log-app("INFO",$config:app-name,string-join($imgs,'; '))
 			let $newSurfaces := 
 				for $i in $imgs return 
 					if (doc-available(replace($i,'(jpg|jpeg|JPG|JPEG)$','xml')))

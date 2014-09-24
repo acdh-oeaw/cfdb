@@ -29,6 +29,8 @@ declare variable $config:app-root :=
         substring-before($modulePath, "/modules")
 ;
 
+declare variable $config:app-name := "cfdb"; 
+
 declare variable $config:data-root := $config:app-root || "/data";
 
 declare variable $config:tablets-root := $config:data-root || "/tablets";
