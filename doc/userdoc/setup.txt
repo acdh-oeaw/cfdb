@@ -1,0 +1,18 @@
+﻿h1. Setup
+
+Die Arbeit in cfdb erfolgt auf zwei Ebenen: Die Verwaltung von Texten/Tafeln im Webbrowser; die Annotation der Bilder mit dem Programm "Image Markup Tool", wobei auf die Dateien in der Datenbank mittels eines Netzlaufwerkes zugegriffen wird.
+
+h2. Image Markup Tool
+
+Download von http://tapor.uvic.ca/~mholmes/image_markup/download.php
+
+
+h2. Einbinden des Netzlaufwerks
+
+Start > Computer, Klick auf "Netzlaufwerk verbinden"
+
+"Laufwerk": kann frei gewählt werden    
+"Ordner": https://corpus4.aac.oeaw.ac.at/cfdb/data
+
+"Verbindung mit anderen Anmeldeinformationen herstellen"
+

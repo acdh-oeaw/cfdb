@@ -1,0 +1,110 @@
+﻿h1. Datenstruktur
+
+h2. Tafeln
+
+Jede Tafel wird als eine eigene @<TEI>@ Instanz abgebildet, die aus einem @<sourceDoc>@ Element für die Digitalisate sowie einem @<text>@ mit für transliterierte Zeichenkontexte besteht. 
+
+h3. Metadaten
+
+|_. Feldname |_. Beschreibung                      |_. TEI Struktur                                                                                     |_. Anmerkungen |
+| Text Reference | Eindeutiger Bezeichner des Textes | @teiHeader/fileDesc/sourceDesc/msDesc/msIdentifier/idno@                                      |              |
+| (id)     | Datenbankweit eindeutiger Bezeichner | @TEI/@xml:id@                                                                                    | bei Anlegen aus Text Reference generiert, nicht veränderbar |
+| (title)   | Titel der TEI Instanz             | @teiHeader/fileDesc/titleStmt/title@                                                                | = Text Reference, nicht veränderbar                               |
+| Region   | Fundregion                         | @teiHeader/fileDesc/sourceDesc/msDesc/msIdentifier/region@                                         | *                 |
+| Archive  | Archiv = Sammlung von Tafeln      | @teiHeader/fileDesc/sourceDesc/msDesc/msIdentifier/collection[@type='archive']@                     |  *           |
+| Dossier  | Unterkategorisierung v. Archiven  | @teiHeader/fileDesc/sourceDesc/msDesc/msIdentifier/collection[@type='dossier']@                     |  *           |
+| CDLI no. | Nummer der Tafel in CDLI          | @teiHeader/fileDesc/sourceDesc/msDesc/msIdentifier/altIdentifier[@type='CDLI']/idno@                |                |
+| NABUCCO no. | Nummer der Tafel in NABUCCO    | @teiHeader/fileDesc/sourceDesc/msDesc/msIdentifier/altIdentifier[@type='NABUCCO']/idno@             |             |
+| Scribe    | Schreiber | @teiHeader/fileDesc/sourceDesc/msDesc/physDesc/handDesc/handNote/persName@ | *|
+| Period |     |  @/TEI/teiHeader/profileDesc/creation/origDate/date/@period@ | * |
+| Date of Issue | |  @/TEI/teiHeader/profileDesc/creation/origDate/date@ | |
+| Place of Issue | |  @/TEI/teiHeader/profileDesc/creation/origPlace/placeName@ | * |
+| Ductus | Gerader oder schräger Schriftduktus |@/TEI/teiHeader/fileDesc/sourceDesc/msDesc/physDesc/handDesc/handNote/fs/f/symbol/@value@ | "normal" oder "slanting" |
+| Text type | Textsorte                   | @/TEI/teiHeader/profileDesc/textClass/keywords[@scheme='local']/term @| * |
+| Content   | Zusammenfassung d. Inhalts | @/TEI/teiHeader/profileDesc/abstract@|  |
+| Distinctive Protagonists | Im Text erwähnte Personen | @/TEI/teiHeader/profileDesc/particDesc/persName@ | |
+| Bibliography | Transliterationen oder Abdrucke | @/TEI/teiHeader/fileDesc/sourceDesc/msDesc/additional/surrogates/listBibl@ | |
+
+
+Die mit Asteriskus gekennzeichneten Felder enthalten Werten aus kontrollierte Vokabularien.
+
+
+h2. Daten 
+
+h3. Digitalisate 
+
+Jedes annotierte Bild einer Tafel wird als eine @<surface>@ in @/TEI/sourceDoc@ abgebildet. Darin befindet sich eine @<graphic/>@ , die den Dateipfad zum Digitalisat (@@url@) sowie seine Abmessungen (@@height, @width@) enthält. 
+
+Jedes @<surface>@-Element enthält ein oder mehrere @<zone>@-Elemente, die Zeichenkontexte repräsentieren. 
+
+Jeder dieser Zeichenkontexte enhält (mindestens und höchstens) eine weitere @<zone>@, in der die Koordinaten des annotierten Zeichen auf dem Digitalisat als Rechteck stehen (@@lrx, @lry, @ulx@@ und @@uly@). Diese "Zeichen"-@<zone>@ enthält ein weiteres @<graphic>@ Element mit dem Dateipfad zum extrahierten Bild des Zeichens.
+
+Beispiel für eine solche Struktur:
+
+<pre><code class="xml">
+<surface>
+    <graphic height="3456px" url="PTS_2253_l2_marked.JPG" width="5184px"/>
+    <zone corresp="#context_PTS2253_PTS_2253_l2_marked_0">
+        <zone corresp="#glyph_PTS2253_PTS_2253_l2_marked_0" lrx="2154" lry="1651" ulx="1724" uly="1128">
+            <graphic url="_glyphs/glyph_PTS2253_PTS_2253_l2_marked_0.jpg" xml:id="graphic_glyph_PTS2253_PTS_2253_l2_marked_0"/>
+        </zone>
+    </zone>
+</surface>
+</code></pre>
+
+h3. Kontexte / Zeichen 
+
+Die Transliterationen des Kontexts eines Zeichens stehen in einem oder mehreren Elementen @<seg type="context">@ innerhalb von @TEI/text/body/ab@. Das annotierte Zeichen ist darin als @<g>@-Element (_glyph_) ausgezeichnet. Das Attribut @@type@ enthält den Namen des Standardzeichens, @@facs@ verwerist auf ein @<graphic>@-Element in einer @<zone>@ und @@ana@ auf ein @<glyph>@-Element im @teiHeader@, das ein @charProp@-Element für die Angabe der Sequenz (Anordnung der Keile) enthält.
+
+
+<pre><code class="xml">
+<text>
+    <body>
+        <ab>
+            <seg type="context" xml:id="context_PTS2253_PTS_2253_l2_marked_0">
+                DINGIR.MEŠ GAL.<g ana="#charDecl_PTS2253_PTS_2253_l2_marked_0" facs="#graphic_glyph_PTS2253_PTS_2253_l2_marked_0" type="MESH" xml:id="glyph_PTS2253_PTS_2253_l2_marked_0">MEŠ</g>
+            </seg>
+        </ab>
+    </body>
+</text>
+</code></pre>
+
+
+<pre><code class="xml">
+<glyph xml:id="charDecl_PTS2253_PTS_2253_l4_marked_0">
+    <charProp>
+        <localName>sequence</localName>
+            <value>3d</value>
+    </charProp>
+</glyph>
+</code></pre>
+
+h2. Controlled Vocabularies 
+
+h3. Regionen, Archive, Dossiers
+
+Die Angaben zu Region, Archiv und Dossier sind hierarchisch von einander abhängig. Die Liste der möglichen Werte wird in @data/etc/places.xml@ gepflegt und hat folgende Struktur:
+
+<pre><code class="xml">
+...
+<body>
+<list n="Regions" xml:id="regions">
+    <item xml:id="region_uruk">
+        <placeName>Uruk</placeName>
+        <list n="Archives">
+            <item xml:id="archive_eanna_w0aaab3aa">
+                <name>Eanna</name>
+                <list n="Dossiers">
+                    <item xml:id="dossier_ndinu_w0aaab3ab3aa">
+                        <name>Nādinu</name>
+                    </item>
+                </list>
+            </item>
+       </list>
+    </item>
+</list>
+</body>
+</code></pre>
+
+
+

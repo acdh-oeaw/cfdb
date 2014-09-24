@@ -1,0 +1,43 @@
+﻿h1. Arbeitsablauf
+
+h2. Neuen Text anlegen
+
+* Einstieg auf https://corpus4.aac.oeaw.ac.at/cfdb/editTablets.html
+* Klick auf "New Tablet"
+* Eingabe der Textreferenz
+* Nach Klick auf "create" wird am Netzlaufwerk ein Ordner erstellt, der mit der ID des Textes benannt ist
+
+h2. Metadaten des Textes bearbeiten:
+
+* Im Webbrowser: Tafel aus der Liste auswählen, Klick auf "edit"
+* Eingabe der Metadaten:
+    - _Archive Information_: Region, Archiv und Dossier auswählbar, die Textreferenz sowie die IDs von CDLI und NABUCCO
+    - _Creation_: Angaben zur Herkunft der Tafel (Schreiber, Periode, Datum, Ort)
+    - _Script_: Angaben zum Schriftbild ("Ductus")
+    - _Content_: Angaben zum Inhalt (Textklasse, Paraphrase des Inhalts, Eingabe erwähnter Personen)
+    - _Bibliography_: Quellenangaben von Abdrucken der Tafel 
+    - _Signs_: Annotation einzelner Zeichen auf dieser Tafel (s.u.)
+    - _Images_: Liste der Bilder dieser Tafel
+* Mit Klick auf "store" wird der Eintrag der bearbeiteten Tafel gespeichert. 
+
+h2. Neues Bild annotieren
+
+* Im Explorer: Netzlaufwerk öffnen, Bilder in diesen Ordner kopieren
+
+* Im Menüpunkt "Images" auf "Import uploaded images" klicken. Eine Liste der aktuellen Bilddateien wird geladen.
+* Für jede Bilddatei wird eine XML-Datei gleichen Namens generiert.
+* Im _Image Markup Tool_: File > Open > Datei auswählen
+* Annotation bearbeiten:
+    - Ausschnitt mit grünem Rechteck wählen
+    - Name des Standardzeichens in das Feld *Annotation title*
+    - die Zeilen "Reading", "context", "sequence" und ggf. "note" ausfüllen
+    - Klick auf OK
+    - Datei speichern mit File > Open > Save
+* Im Webbrowser: Im Menüpunk "Signs" auf "reload signs" klicken - das Zeichen wird in der Zeichenliste angezeigt
+* Die Angaben zum Zeichen können mit Klick auf "edit selected Sign" bearbeitet werden
+    - Wenn eine Lesart (der Wert in "Reading") mehrmals im Kontext vorkommt, bitte _hinter_ die entsprechende Lesart einen Stern setzen.
+    - Ist das zweite MEŠ im Kontext "DINGIR.MEŠ GAL.MEŠ" annotiert, in das Feld Kontext "DINGIR.MEŠ GAL.MEŠ*" setzen
+    - Wenn kein Stern gesetzt ist, wird angenommen, dass das erste Vorkommen der Lesart die annotierte ist.
+* Mit Klick auf "store" wird der Eintrag der bearbeiteten Tafel gespeichert. 
+
+    
