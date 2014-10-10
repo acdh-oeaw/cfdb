@@ -40,6 +40,13 @@ declare function tablet:new($tei as element(tei:TEI)) as map() {
         } catch * {
             util:log-app("INFO",$config:app-name,"An error occured. Could not store tablet "||$id||".")
         }
+	let $setACL := 
+	   if ($create-collection and $store-tei)
+	   then (
+	       sm:add-group-ace($create-collection, "cuneiformDB", true(), "rwx"),
+	       sm:add-group-ace($store-tei, "cuneiformDB", true(), "rwx")
+	   )
+	   else ()
 	let $returnVal := 
 		if ($create-collection and $store-tei)
 		then true()
@@ -56,6 +63,13 @@ declare function tablet:new($tei as element(tei:TEI)) as map() {
 		} 
 	
 		 
+};
+
+
+(: by now every cfdb group member can do everything :)
+declare function tablet:setACL($paths as xs:string+) {
+    for $p in $paths
+    return sm:add-group-ace($p, "cuneiformDB", true(), "rwx")
 };
 
 
