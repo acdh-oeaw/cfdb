@@ -12,6 +12,7 @@ declare namespace tei = "http://www.tei-c.org/ns/1.0";
 
 import module namespace tablet="http://www.oeaw.ac.at/acdh/cuneidb/tablet" at "xmldb:exist:///db/apps/cuneidb/modules/tablet.xqm";
 import module namespace surface="http://www.oeaw.ac.at/acdh/cuneidb/surface" at "xmldb:exist:///db/apps/cuneidb/modules/surface.xqm";
+import module namespace config = "http://www.oeaw.ac.at/acdh/cuneidb/config" at "xmldb:exist:///db/apps/cuneidb/modules/config.xqm";
 
 
 (:~ 
@@ -284,14 +285,14 @@ declare function trigger:after-update-document($uri as xs:anyURI) {
 	return ()
 };
 
-declare function trigger:before-delete-document($uri as xs:anyURI) {
+(:declare function trigger:before-delete-document($uri as xs:anyURI) {
     let $log := util:log-app("INFO",$config:app-name,"trigger:before-delete-document("||$uri||")")
 	let $data := local:get-data($uri),
 		$type := if (exists($data/tei:TEI/tei:sourceDoc)) then "tablet"
 				 else if (exists($data//tei:div[@xml:id = 'imtImageAnnotations'])) then "surface"
 				 else (util:log-app("INFO",$config:app-name,"$type could not be determined."))
 	let $update := 
-	   if ($type = "surface") then ()(:surface:remove($uri):)   
+	   if ($type = "surface") then ()(\:surface:remove($uri):\)   
 	   else ()
 	return ()
-};
+};:)
