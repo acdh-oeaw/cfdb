@@ -19,7 +19,12 @@ import module namespace tablet="http://www.oeaw.ac.at/acdh/cuneidb/tablet" at "t
  : @param $model a map containing arbitrary data - used to pass information between template calls
  :)
 declare function app:current-user($node as node(), $model as map(*)) {
-    xmldb:get-current-user()
+    <span xmlns="http://www.w3.org/1999/xhtml">{
+        (xmldb:get-current-user(),'not logged in')[.!='guest'][1],
+        if (xmldb:get-current-user() = $config:authorized-users)
+        then <span xmlns="http://www.w3.org/1999/xhtml">&#160;(<a href=".?logout=true">logout</a>)</span>
+        else ()
+    }</span>
 };
 
 
