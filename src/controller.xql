@@ -10,7 +10,7 @@ import module namespace config="http://www.oeaw.ac.at/acdh/cuneidb/config" at "m
 
 import module namespace login="http://exist-db.org/xquery/login" at "resource:org/exist/xquery/modules/persistentlogin/login.xql";
 
-let $login:=login:set-user("acdh.oeaw.ac.at/cuneiformdb", (), false())
+let $login := login:set-user("cfdb.acdh.oeaw.ac.at", (), false())
 let $authorized-user := xmldb:get-current-user() = $config:authorized-users
 
 return
