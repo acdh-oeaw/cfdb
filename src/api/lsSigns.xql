@@ -6,6 +6,7 @@ import module namespace config="http://www.oeaw.ac.at/acdh/cuneidb/config" at "x
 import module namespace tablet="http://www.oeaw.ac.at/acdh/cuneidb/tablet" at "xmldb:exist:///db/apps/cuneidb/modules/tablet.xqm";
 import module namespace api="http://www.oeaw.ac.at/acdh/cuneidb/api" at "xmldb:exist:///db/apps/cuneidb/modules/api.xqm";
 
+(: lists all tei:g elements in the whole dataset :)
 let $data := 
     for $g in collection($config:tablets-root)//tei:g
     return 
