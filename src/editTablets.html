@@ -136,7 +136,7 @@
         
         <xf:submission id="saveTablet" method="put" ref="instance('tablet')" replace="instance">
             <xf:resource value="concat('exist:',instance('selectedTablet')/path,'/',instance('selectedTablet')/id,'.xml')"/>
-            <xf:message ev:event="xforms-submit-error" level="ephemeral">saving tablet has failed</xf:message>
+            <xf:message ev:event="xforms-submit-error" level="ephemeral">saving tablet <xf:output value="concat('exist:',instance('selectedTablet')/path,'/',instance('selectedTablet')/id,'.xml')"/> has failed</xf:message>
             <xf:message ev:event="xforms-submit-done" level="ephemeral">tablet saved successfully</xf:message>
         </xf:submission>
 
