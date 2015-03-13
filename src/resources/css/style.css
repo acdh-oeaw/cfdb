@@ -1,5 +1,9 @@
 /* Application styles could go here */
 
+body {
+    background: none!important;
+}
+
 .xfRepeatIndex {
     background-color: #D8D8D8;
 }
@@ -82,3 +86,42 @@
     width: 180px;
     height: auto;
 }
+
+
+/* glyph.html */
+#glyphDetails img {
+    max-width: 180px;
+    max-height: 200px;
+}
+
+
+
+
+/* editTablets.html */
+#tabletHTMLContainer .gThumbnail{
+    float: left;
+    height: auto;
+    margin-bottom: 1em;
+    margin-right: 1em;
+    max-width: 10em;
+}
+
+#tabletHTMLContainer .gThumbnail > a:hover {
+    position: relative;
+}
+
+#tabletHTMLContainer .gThumbnail a:hover > .attributes {
+    background: none repeat scroll 0 0 black;
+    border: 1px solid black;
+    bottom: 0;
+    color: white;
+    display: block;
+    left: 0;
+    position: absolute;
+    width: auto;
+    padding: 2px 0;
+}
+
+#tabletHTMLContainer .gThumbnail .attributes {
+    display: none;
+} 

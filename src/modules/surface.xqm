@@ -24,12 +24,24 @@ declare variable $surface:seed-xsl := doc($tablet:seed-xsl-filepath);
  :
 ~:)
 declare function surface:new($path-to-img as xs:anyURI) {
-    let $log := util:log-app("INFO",$config:app-name,$path-to-img)
+    let $log := util:log-app("DEBUG",$config:app-name,"surface:new -- for image file: "||$path-to-img)
     let $filename := tokenize($path-to-img,'/')[last()], 
         $suffix := "."||tokenize($filename,'\.')[last()],
-        $collection := substring-before($path-to-img,$filename),
-        $height := image:get-height(util:binary-doc($path-to-img)),
-        $width := image:get-width(util:binary-doc($path-to-img))
+        $collection := substring-before($path-to-img,$filename)
+    
+    let $height := 
+            try {
+                image:get-height(util:binary-doc($path-to-img))
+            } catch * {
+                util:log-app("ERROR",$config:app-name,"surface:new -- error determiing image height")
+            }
+    let $width := 
+            try {
+                image:get-width(util:binary-doc($path-to-img))
+            } catch * {
+                util:log-app("ERROR",$config:app-name,"surface:new -- error determiing image width")
+            }
+    let $log := util:log-app("DEBUG",$config:app-name,"surface:new -- height/width: "||$height||"/"||$width)
     
     let $parameters := 
         <parameters>
@@ -44,7 +56,7 @@ declare function surface:new($path-to-img as xs:anyURI) {
     
     let $main-TEI := collection($collection)//tei:TEI[tei:sourceDoc],
     	$IMT-graphic := $IMT-file/tei:facsimile[@xml:id = 'imtAnnotatedImage']/tei:surface/tei:graphic, 
-    	$surface := if (not(exists($main-TEI/tei:sourceDoc/tei:surface[tei:graphic/@url = $IMT-graphic/@url])))
+    	$surface := if ($height and $width and not(exists($main-TEI/tei:sourceDoc/tei:surface[tei:graphic/@url = $IMT-graphic/@url])))
     				then update insert <surface xmlns="http://www.tei-c.org/ns/1.0">{$IMT-graphic}</surface> into $main-TEI/tei:sourceDoc
     				else ()
     
@@ -53,7 +65,9 @@ declare function surface:new($path-to-img as xs:anyURI) {
             case (not(util:binary-doc-available($path-to-img))) return util:log-app("INFO",$config:app-name,$path-to-img||" is not available")
             case (doc-available($collection||"/"||replace($filename,'\..+$','.xml'))) return util:log-app("INFO",$config:app-name,$path-to-img||" file already exists")
             default return :)
-         xmldb:store($collection, substring-before($filename,$suffix)||".xml", $IMT-file)
+         if ($height and $width)
+         then xmldb:store($collection, substring-before($filename,$suffix)||".xml", $IMT-file)
+         else util:log-app("ERROR", $config:app-name, "could not create surface file")
 };
 
 
@@ -97,3 +111,58 @@ declare function surface:remove($path as xs:anyURI) {
     
     return ()
 };
+
+
+(:~ By default, the Image Markup Tool adds IDs like 'imtArea_0' to its 
+ : zones and refers to them from the Annotation-divs via @corresp.
+ : 
+ : Here we update those IDs and IDRefs to be application-independent by replacing 
+ : them with the @xml:id of the tei:TEI element, which is the tablet-id 
+ : ('tablet_' being replaced by 'surface_') plus the filename of the IMT image.
+ : 
+ : Given the tablet 'tablet_YOS21209' and the image file 'NCBT 369 UE' a
+ : zone-id of 'imtArea_0' becomes 'surface_YOS21209_NCBT369UE_0'.
+ : 
+ : As this function is called every time an IMT document is stored, we 
+ : make sure that we only change those IDs that have been added by the IMT,
+ : e.g. those that start with 'imtArea'.
+~:)
+declare function surface:resetIDs($surface as element(tei:TEI)) as empty() {
+	if ($surface//tei:zone/@xml:id[starts-with(.,'imtArea')])
+	then
+	   let $log := util:log-app("DEBUG", $config:app-name, "resetting IDs of any new annotations in "||base-uri($surface))
+	   (: fetch the TEI document of the tablet this surface document is part of :)
+	   let $tablet := collection(util:collection-name($surface))//tei:TEI[tei:sourceDoc], 
+	       $tID := $tablet/xs:string(@xml:id)
+	   return 
+	       for $zone at $n in $surface//tei:zone[starts-with(@xml:id,'imtArea')]
+	           let $zone-id := $zone/@xml:id,
+	               $new-id := replace($tID,'^tablet_','glyph_')||"_"||$surface/@xml:id||"_"||substring-after($zone-id,'imtArea_')
+            return
+     			(update value $surface//tei:div[@type='imtAnnotation'][@corresp = concat('#',$zone-id)]/@corresp with concat('#',$new-id),
+     			update value $zone-id with $new-id)
+	else util:log-app("DEBUG", $config:app-name, "no new IMT Areas found in "||base-uri($surface))
+};
+
+declare function surface:parseAnnotation($annotation as element(tei:div)) as map() {
+	let $sign := map:entry("sign",$annotation/xs:string(tei:head)),
+		$id := map:entry("id",substring-after($annotation/@corresp,'#'))
+	let $lines := tokenize($annotation/tei:div/tei:p/text(),'\s*\n\s*')
+	let $fields := 
+	        (: if there's only one line without a field name, we assume that it's the reading :)
+	        if (count($lines) = 1 and not(contains($lines,':')))
+	        then 
+	           map:entry("reading",normalize-space($lines))
+	        (: otherwise the lines will be parsed as "field name : field value" syntax :)
+	        else 
+    			for $l in $lines 
+    				let $field := normalize-space(substring-before($l,':')),
+    					$value := normalize-space(substring-after($l,':'))
+    				return 
+    				    (: we _always_ need a context field to create a <g> element, even if it's empty :)
+    					if ($field !='' or $field='context')
+    					then map:entry($field,$value)
+    					else ()
+	return map:new(($sign,$id,$fields)) 
+};
+

@@ -11,6 +11,12 @@ declare namespace templates="http://exist-db.org/xquery/templates";
 declare namespace repo="http://exist-db.org/xquery/repo";
 declare namespace expath="http://expath.org/ns/pkg";
 
+declare variable $config:debug := false();
+
+declare variable $config:annotationtext-to-ignore := ('[Annotation text]');
+
+declare variable $config:tablet2html := $config:app-root||"/tablet2html.xsl";
+
 (: 
     Determine the application root collection from the current module load path.
 :)
@@ -33,13 +39,17 @@ declare variable $config:app-name := "cfdb";
 
 declare variable $config:data-root := $config:app-root || "/data";
 
+declare variable $config:pending-updates-doc := doc($config:data-root||"/etc/pending-updates.xml");
+
 declare variable $config:tablets-root := $config:data-root || "/tablets";
 
 declare variable $config:repo-descriptor := doc(concat($config:app-root, "/repo.xml"))/repo:meta;
 
 declare variable $config:expath-descriptor := doc(concat($config:app-root, "/expath-pkg.xml"))/expath:package;
 
-declare variable $config:authorized-users := ("daniel", "rPirngruber", "mJursa");
+declare variable $config:authorized-users := ("admin", "daniel", "rPirngruber", "mJursa");
+
+declare variable $config:superusers := ("admin", "rPirngruber", "mJursa", "daniel");
 
 (:~
  : Resolve the given path using the current application context.
