@@ -67,7 +67,34 @@ declare function app:listGlyphs($node as node(), $model as map(*)) {
 declare function app:showGlyph($node as node(), $model as map(*), $glyph-id as xs:string?, $filterExpr as xs:string?) {
 	if ($glyph-id and $glyph-id != '')
 	then
-		let $g := collection($config:data-root||"/tablets")//tei:g[@xml:id = $glyph-id]
-		return <h2>{$g}</h2>
+		let $g := collection($config:data-root||"/tablets")//tei:g[@xml:id = $glyph-id],
+		    $tablet-id := root($g)/tei:TEI/@xml:id,
+		    $src := root($g)//tei:graphic[@xml:id=substring-after($g/@facs,'#')]/@url,
+		    $glyph := root($g)//tei:glyph[@xml:id = substring-after($g/@ana,'#')]
+		return 
+		<div xmlns="http://www.w3.org/1999/xhtml">
+    		  <h2>{$g}</h2>
+    		  <table class="table" id="glyphDetails">
+    		      <tbody>
+    		          <tr>
+    		              <td>ID</td>
+    		              <td>{$g/xs:string(@xml:id)}</td>
+    		          </tr>
+    		          <tr>
+    		              <td>Context</td>
+    		              <td>{$g/parent::tei:seg[@type='context']}</td>
+    		          </tr>
+    		          {for $charProp in $glyph/tei:charProp return
+    		          <tr>
+    		              <td>{$charProp/tei:localName}</td>
+    		              <td>{$charProp/tei:value}</td>
+    		          </tr>}
+    		          <tr>
+    		              <td></td>
+    		              <td><img src="$app-root/data/tablets/{$tablet-id}/{$src}"/></td>
+    		          </tr>
+    		      </tbody>
+    		  </table>
+		</div>
 	else ()
 };
