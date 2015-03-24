@@ -125,3 +125,13 @@ body {
 #tabletHTMLContainer .gThumbnail .attributes {
     display: none;
 } 
+
+.hint .hintText {display: none;}
+.hint:hover {position: relative; text-decoration: none; color: black;}
+.hint:hover .hintText {display: block; position: absolute; top: 25px; left: 25px; background: white; padding: 3px; border: 1px solid black; width: 125px;}
+
+#searchForm fieldset {margin-bottom: 0.5em; display: inline; margin-right: 2em;}
+#searchForm input {margin-right: 0.8em;}
+.facet-selected {border: 1px solid red; border-radius: 4px; padding: 6px;}
+.rmFacet {float: right; margin-top: 2px;}
+#clearSignSelection {vertical-align: top; margin-left: 10px;}

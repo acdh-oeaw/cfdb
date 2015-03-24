@@ -122,3 +122,87 @@ function api:list-surfaces($tablet-id as xs:string) {
     return util:serialize($response,"method=json")
 };
 
+
+(: ********** ANNOTATIONS *********:)
+
+(:~ lists annotations in a given surface :)
+declare 
+    %rest:GET
+    %rest:path("/cfdb/tablets/{$tablet-id}/surfaces/{$surface-id}/annotations")
+    %rest:form-param("filter", "{$filter}")
+    %rest:produces("application/json")
+    %output:media-type("application/json")
+function api:list-annotations($tablet-id as xs:string, $surface-id as xs:string, $filter as xs:string*) {
+    let $tablet := tablet:get($tablet-id)
+    return 
+        if (exists($tablet))
+        then 
+            let $annos := surface:list-annotations($tablet, $surface-id, $filter),
+                $response := <cfdb:response>{$annos}</cfdb:response> 
+            return util:serialize($response,"method=json")
+        else "tablet with id "||$tablet-id||" not available"
+};
+
+
+declare 
+    %rest:GET
+    %rest:path("/cfdb/tablets/{$tablet-id}/surfaces/{$surface-id}/annotations/{$annotation-id}")
+    %rest:form-param("filter", "{$filter}")
+    %rest:produces("application/json")
+    %output:media-type("application/json")
+function api:read-annotation($tablet-id as xs:string, $surface-id as xs:string, $annotation-id as xs:string, $filter as xs:string*) {
+    let $tablet := tablet:get($tablet-id)
+    return 
+        if (exists($tablet))
+        then annotation:read($tablet, $surface-id, $annotation-id, $filter) 
+        else "tablet with id "||$tablet-id||" not available"
+};
+
+declare
+    %rest:POST("{$data}")
+    %rest:path("/cfdb/tablets/{$tablet-id}/surfaces/{$surface-id}")
+    %rest:produces("application/json")
+    %output:media-type("application/json")
+function api:create-annotation($data as xs:string, $tablet-id as xs:string, $surface-id as xs:string) {
+    let $tablet := tablet:get($tablet-id)
+    return 
+        if (exists($tablet))
+        then annotation:new($data, $tablet, $surface-id)
+        else "tablet with id "||$tablet-id||" not available"
+}; 
+
+(:~ update an existing annotation
+ :)
+declare
+    %rest:PUT("{$data}")
+    %rest:path("/cfdb/tablets/{$tablet-id}/surfaces/{$surface-id}/annotations/{$annotation-id}")
+    %rest:produces("application/json")
+    %output:media-type("application/json")
+function api:update-annotation($data as xs:string, $tablet-id as xs:string, $surface-id as xs:string, $annotation-id as xs:string) {
+    let $tablet := tablet:get($tablet-id)
+    return 
+        if (exists($tablet))
+        then annotation:update($data, $tablet-id, $surface-id, $annotation-id) 
+        else "tablet with id "||$tablet-id||" not available"
+};
+
+(:~ delete an annotation :)
+declare 
+    %rest:DELETE
+    %rest:path("/cfdb/tablets/{$tablet-id}/surfaces/{$surface-id}/annotations/{$annotation-id}")
+function api:delete-annotation($tablet-id as xs:string, $surface-id as xs:string, $annotation-id as xs:string) {
+    annotation:delete(tablet:get($tablet-id), $surface-id, $annotation-id)
+};
+
+
+
+(:~ list all annotions standard signs :)
+declare 
+    %rest:GET
+    %rest:path("/cfdb/taxonomies/signs")
+    %rest:produces("application/json")
+    %output:media-type("application/json")
+function api:list-std-signs() {
+    cfdb:listStdSigns()
+};
+

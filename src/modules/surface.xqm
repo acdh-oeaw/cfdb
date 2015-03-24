@@ -3,166 +3,132 @@ xquery version "3.0";
 module namespace surface = "http://www.oeaw.ac.at/acdh/cuneidb/surface";
 
 import module namespace config = "http://www.oeaw.ac.at/acdh/cuneidb/config" at "xmldb:exist:///db/apps/cuneidb/modules/config.xqm";
+import module namespace cfdb = "http://www.oeaw.ac.at/acdb/cuneidb/db" at "xmldb:exist:///db/apps/cuneidb/modules/cfdb.xqm";
 import module namespace tablet = "http://www.oeaw.ac.at/acdh/cuneidb/tablet" at "xmldb:exist:///db/apps/cuneidb/modules/tablet.xqm";
+import module namespace annotation = "http://www.oeaw.ac.at/acdb/cuneidb/annotations" at "xmldb:exist:///db/apps/cuneidb/modules/annotations.xqm";
 
 declare namespace tei = "http://www.tei-c.org/ns/1.0";
 
-declare variable $surface:template-filepath := $config:app-root||"/surfaceTpl.xml";
-declare variable $surface:template := doc($surface:template-filepath);
-
-declare variable $surface:seed-xsl-filepath := $template:seed-xsl-filepath;
-declare variable $surface:seed-xsl := doc($tablet:seed-xsl-filepath);
-
-(:~ Each tablet constists of a "main" TEI document holding metadata in its teiHeader and a 
- : tei:sourceDoc element containing a series of tei:surface elements with 
- : tei:graphics referencing Images that are annotated with the Image Markup Tool. 
- : 
- : As the Image Markup Tool can only edit TEI documents with one surface, each image of a 
- : tablet has to be represented by its own TEI document. This function generates such a  
- : "surface" TEI document and adds a corresponding tei:surface element to the "main" 
- : TEI document that represents the tablet.
- :
-~:)
-declare function surface:new($path-to-img as xs:anyURI) {
-    let $log := util:log-app("DEBUG",$config:app-name,"surface:new -- for image file: "||$path-to-img)
-    let $filename := tokenize($path-to-img,'/')[last()], 
-        $suffix := "."||tokenize($filename,'\.')[last()],
-        $collection := substring-before($path-to-img,$filename)
-    
-    let $height := 
-            try {
-                image:get-height(util:binary-doc($path-to-img))
-            } catch * {
-                util:log-app("ERROR",$config:app-name,"surface:new -- error determiing image height")
-            }
-    let $width := 
-            try {
-                image:get-width(util:binary-doc($path-to-img))
-            } catch * {
-                util:log-app("ERROR",$config:app-name,"surface:new -- error determiing image width")
-            }
-    let $log := util:log-app("DEBUG",$config:app-name,"surface:new -- height/width: "||$height||"/"||$width)
-    
-    let $parameters := 
-        <parameters>
-            <param name="filename" value="{$filename}"/>
-            <param name="title" value="{xmldb:decode(translate(substring-before($filename,$suffix),'_',' '))}"/>
-            <param name="height" value="{$height}px"/>
-            <param name="width" value="{$width}px"/>
-            <param name="type" value="surface"/>
-        </parameters>
-     
-    let $IMT-file := transform:transform($surface:template, $surface:seed-xsl, $parameters)/self::tei:TEI
-    
-    let $main-TEI := collection($collection)//tei:TEI[tei:sourceDoc],
-    	$IMT-graphic := $IMT-file/tei:facsimile[@xml:id = 'imtAnnotatedImage']/tei:surface/tei:graphic, 
-    	$surface := if ($height and $width and not(exists($main-TEI/tei:sourceDoc/tei:surface[tei:graphic/@url = $IMT-graphic/@url])))
-    				then update insert <surface xmlns="http://www.tei-c.org/ns/1.0">{$IMT-graphic}</surface> into $main-TEI/tei:sourceDoc
-    				else ()
-    
-    return 
-        (:switch(true())
-            case (not(util:binary-doc-available($path-to-img))) return util:log-app("INFO",$config:app-name,$path-to-img||" is not available")
-            case (doc-available($collection||"/"||replace($filename,'\..+$','.xml'))) return util:log-app("INFO",$config:app-name,$path-to-img||" file already exists")
-            default return :)
-         if ($height and $width)
-         then xmldb:store($collection, substring-before($filename,$suffix)||".xml", $IMT-file)
-         else util:log-app("ERROR", $config:app-name, "could not create surface file")
-};
-
-
-
-(:~ 
- : Removes the surface TEI document that represents the graphic at $path-to-img and
- : removes also its corresponding tei:surface element from the "tablet" TEI document. 
+(:~ stores a new surface image to the database and inserts a tei:surface element pointing to it
+ : @param $tablet-id the id of the tablet
+ : @param $width the width of the image to be stored
+ : @param $height the height of the image to be stored
+ : @param $data the image data
+ : @return a map with a mandatory "status" key ("success"|"error") and an optional "msg" key
  :)
-declare function surface:remove($path as xs:anyURI) {
-    let $mime-type := xmldb:get-mime-type($path)
-    let $filename := tokenize($path,'/')[last()],
-        $collection := substring-before($path,"/"||$filename)
-    let $IMT-filename :=
-        switch($mime-type)
-            case ("application/xml") return $filename
-            case (contains($mime-type,"image")) return string-join(tokenize($filename,'\.') except last(),'.')||".xml"
-            default return ()
-    
-    
-    
-    let $mainTEI := collection($collection)//tei:TEI[tei:sourceDoc],
-    	$surfaceInTablet := $mainTEI//tei:surface[tei:graphic/@url = $filename]
-    let $log := for $x in ("$filename","$IMT-filename","$surfaceInTablet","exists($mainTEI)") return util:log-app("INFO",$config:app-name,$x||" "||util:eval($x))
-
-    (: remove glyph and glyph images :)
-    let $rmGlyphs := 
-    	for $g in $surfaceInTablet//tei:grapic  
-    	   let $contexts := $mainTEI//tei:seg[@type='context'][tei:g/@facs = $g/@url],
-    	       $glyphElts := $mainTEI//tei:glyph[@xml:id = $contexts//tei:g/concat('#',@xml:id)]
-    	   return (
-    	       update delete $glyphElts,
-    	       update delete $contexts,
-    	       if ($g/@url != '')
-    	       then xmldb:remove($collection||"/"||$g/@url)
-    	       else ()
-    	   )
-    (: remove tei:surface in the "main" tablet document :)
-    let $rmSurface := update delete $surfaceInTablet
-    (: remove the "surface" TEI document :)
-    let $rmTEI := if ($IMT-filename != $filename) then xmldb:remove($collection,$IMT-filename) else ()
-    
-    return ()
+declare function surface:new($tablet as element(tei:TEI), $type as xs:string?, $filename as xs:string?,  $width as xs:integer, $height as xs:integer, $data as item()) as map() {   
+    let $tablet-id := tablet:id($tablet),   
+        $path := tablet:path($tablet),
+        $ext := 
+            switch(true())
+                case (lower-case($type) = 'image/jpeg') return 'jpg'
+                case (lower-case($type) = 'image/tiff') return 'tiff'
+                case (lower-case($type) = 'image/png') return 'png'
+                case ($filename != '') return tokenize($filename,'\.')[last()]
+                default return false(),
+        (:$url := util:uuid()||"."||$ext:)
+        $url := xmldb:encode-uri($filename)
+    return 
+    if ($url = tablet:listSurfaces($tablet)/tei:graphic/xs:string(@url))
+    then map{"status" := "error", "msg" := "Surface exists already for this image."}
+    else 
+        let $store := if ($ext) then xmldb:store($path, $url, $data) else false(),
+            $insert :=  
+                if ($store and $store != '')
+                then update insert <surface xmlns="http://www.tei-c.org/ns/1.0"><graphic url="{$url}" width="{$width}px" height="{$height}px"/></surface> into $tablet//tei:sourceDoc
+                else ()
+        return
+            switch (true())
+                case ($type = "" and $filename = "") return map{"status":= "error", "msg" := "either argument type or filename must be provided"}
+                case ($store = "") return map{"status":= "error", "msg" := "could not store image at "||$path||"/"||$url}
+                default return map{"status":= "success", "msg" := "Added new surface "||$url}
 };
 
 
-(:~ By default, the Image Markup Tool adds IDs like 'imtArea_0' to its 
- : zones and refers to them from the Annotation-divs via @corresp.
- : 
- : Here we update those IDs and IDRefs to be application-independent by replacing 
- : them with the @xml:id of the tei:TEI element, which is the tablet-id 
- : ('tablet_' being replaced by 'surface_') plus the filename of the IMT image.
- : 
- : Given the tablet 'tablet_YOS21209' and the image file 'NCBT 369 UE' a
- : zone-id of 'imtArea_0' becomes 'surface_YOS21209_NCBT369UE_0'.
- : 
- : As this function is called every time an IMT document is stored, we 
- : make sure that we only change those IDs that have been added by the IMT,
- : e.g. those that start with 'imtArea'.
-~:)
-declare function surface:resetIDs($surface as element(tei:TEI)) as empty() {
-	if ($surface//tei:zone/@xml:id[starts-with(.,'imtArea')])
-	then
-	   let $log := util:log-app("DEBUG", $config:app-name, "resetting IDs of any new annotations in "||base-uri($surface))
-	   (: fetch the TEI document of the tablet this surface document is part of :)
-	   let $tablet := collection(util:collection-name($surface))//tei:TEI[tei:sourceDoc], 
-	       $tID := $tablet/xs:string(@xml:id)
-	   return 
-	       for $zone at $n in $surface//tei:zone[starts-with(@xml:id,'imtArea')]
-	           let $zone-id := $zone/@xml:id,
-	               $new-id := replace($tID,'^tablet_','glyph_')||"_"||$surface/@xml:id||"_"||substring-after($zone-id,'imtArea_')
-            return
-     			(update value $surface//tei:div[@type='imtAnnotation'][@corresp = concat('#',$zone-id)]/@corresp with concat('#',$new-id),
-     			update value $zone-id with $new-id)
-	else util:log-app("DEBUG", $config:app-name, "no new IMT Areas found in "||base-uri($surface))
+(:~deletes one tei:surface element and all the annotations it contains
+ : @param $tablet the tablet to operate on as a tei:TEI element
+ : @param $surface-id id of the surface (i.e. the @url on a tei:graphic that is subordinate to the tei:surface in question)   
+ : @return a map with a mandatory "status" key ("success"|"error") and an optional "msg" key
+ :)
+declare function surface:delete($tablet as element(tei:TEI), $surface-id as xs:string) as map() {
+    let $path := tablet:path($tablet),
+        $surface := surface:get($tablet, $surface-id),
+        $filename := $surface-id,
+        $annotation-ids := $surface/tei:zone!substring-after(@corresp,'#context_')
+    return 
+        if (not(util:binary-doc-available($path||"/"||$filename)))
+        then map{"status" := "error", "msg" := "file not available at "||$path||"/"||$filename}
+        else 
+            let $rm-img := 
+                try {xmldb:remove($path, $filename)}
+                catch * {map{"status" := "error", "msg" := "Could not delete file at "||$path||"/"||$filename}}
+            let $rm-annotations := $annotation-ids!annotation:delete($tablet, $filename, .)
+            let $rm-surface := update delete $surface
+            return map{"status" := "success", "msg" := "removed surface "||$filename}
 };
 
-declare function surface:parseAnnotation($annotation as element(tei:div)) as map() {
-	let $sign := map:entry("sign",$annotation/xs:string(tei:head)),
-		$id := map:entry("id",substring-after($annotation/@corresp,'#'))
-	let $lines := tokenize($annotation/tei:div/tei:p/text(),'\s*\n\s*')
-	let $fields := 
-	        (: if there's only one line without a field name, we assume that it's the reading :)
-	        if (count($lines) = 1 and not(contains($lines,':')))
-	        then 
-	           map:entry("reading",normalize-space($lines))
-	        (: otherwise the lines will be parsed as "field name : field value" syntax :)
-	        else 
-    			for $l in $lines 
-    				let $field := normalize-space(substring-before($l,':')),
-    					$value := normalize-space(substring-after($l,':'))
-    				return 
-    				    (: we _always_ need a context field to create a <g> element, even if it's empty :)
-    					if ($field !='' or $field='context')
-    					then map:entry($field,$value)
-    					else ()
-	return map:new(($sign,$id,$fields)) 
+
+(:~retrieves the given surface in the given tablet
+ : @param $tablet the tablet to operate on as a tei:TEI element 
+ : @param $surface-id id of the surface (i.e. the @url on a tei:graphic that is subordinate to the tei:surface in question)   
+ : @return a tei:surface element
+ :)
+declare function surface:get($tablet as element(tei:TEI), $surface-id as xs:string) as element(tei:surface)? {
+    $tablet//tei:surface[tei:graphic/@url = $surface-id]
 };
 
+
+(:~checks whether the surface with the given surface-id is available in the given tablet
+ : @param $tablet the tablet to operate on as a tei:TEI element 
+ : @param $surface-id id of the surface (i.e. the @url on a tei:graphic that is subordinate to the tei:surface in question)   
+ : @return a map with a mandatory "status" key ("success"|"error") and an optional "msg" key
+ :)
+declare function surface:exists($tablet as element(tei:TEI), $surface-id as xs:string) as xs:boolean {
+    exists(surface:get($tablet, $surface-id))
+};
+
+
+
+(: lists all annotations from the given surface, optionally filtering :)
+declare function surface:list-annotations($tablet as element(tei:TEI), $surface-id as xs:string) {
+    surface:list-annotations($tablet, $surface-id, ())
+};
+
+(: lists all annotations from the given surface, optionally filtering :)
+declare function surface:list-annotations($tablet as element(tei:TEI), $surface-id as xs:string, $filter as xs:string*) {
+    let $tablet-id := tablet:id($tablet),
+        $surface := $tablet//tei:surface[tei:graphic/@url = $surface-id]
+    let $glyphs := 
+        for $zone in $surface/tei:zone
+            let $glyph-zone := $zone/tei:zone,
+                $img := $glyph-zone/tei:graphic/xs:string(@url)            
+            let $context-id := substring-after($zone/@corresp,'#')
+            let $context := $tablet//tei:seg[@type='context'][@xml:id = $context-id],
+                $glyph := $context/tei:g,
+                $char := $tablet//tei:glyph[@xml:id = substring-after($glyph/@ana,'#')],
+                $note := $tablet//tei:note[@target = "#"||$glyph/@xml:id]
+            return 
+                <annotation>
+                    <uuid>{substring-after($context-id,'context_')}</uuid>
+                    <tablet>{$tablet-id}</tablet>
+                    <img>/exist/apps/cuneidb/$app-root/data/tablets/{$tablet-id||"/"||$img}</img>
+                    <surface>{$surface-id}</surface>
+                    <x>{$glyph-zone/number(@ulx)}</x>
+                    <y>{$glyph-zone/number(@uly)}</y>
+                    <width>{number($glyph-zone/@lrx) - number($glyph-zone/@ulx)}</width>
+                    <height>{number($glyph-zone/@lry) - number($glyph-zone/@uly)}</height>
+                    <sign>{$glyph/xs:string(@type)}</sign>
+                    <reading>{$glyph/text()}</reading>
+                    <context>{annotation:renderContext($context)}</context>
+                    <sequence>{$char/tei:charProp[tei:localName='sequence']/tei:value/text()}</sequence>
+                    <note>{$note/text()}</note>
+                </annotation>
+    let $filtered := 
+        if ($filter = '') 
+        then $glyphs
+        else $glyphs[some $x in descendant::* satisfies contains($x,$filter)]
+    return $filtered
+    (:let $response := <cfdb:response>{$filtered}</cfdb:response> 
+    return util:serialize($response,"method=json"):)
+(:    return $response:)
+};
