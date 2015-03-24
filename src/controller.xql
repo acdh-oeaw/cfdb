@@ -12,7 +12,12 @@ import module namespace login="http://exist-db.org/xquery/login" at "resource:or
 
 let $login := login:set-user("cfdb.acdh.oeaw.ac.at", (), false())
 let $authorized-user := xmldb:get-current-user() = $config:authorized-users
-
+let $log := 
+    if (xmldb:get-current-user()!='guest') 
+    then 
+        let $parameters := if (count(request:get-parameter-names()) gt 0) then "?"||string-join(for $x in request:get-parameter-names() return concat($x,"=",string-join(request:get-parameter($x,'')),','),'&amp;') else ()
+        return util:log-app("DEBUG", $config:app-name, $exist:path||$parameters||" requested by " ||xmldb:get-current-user()||"@"||request:get-remote-addr())
+    else ()
 return
 
 if ($exist:path eq "/") then
