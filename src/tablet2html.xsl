@@ -159,8 +159,34 @@
             <a href="#">
                 <img src="$app-root/data/tablets/{root()/tei:TEI/@xml:id}/{root()//tei:graphic[@xml:id = substring-after(current()/@facs,'#')]/@url}"/>
                 <span class="attributes">
-                    <!--                    <xsl:text>Sign: </xsl:text>-->
-                    <xsl:value-of select="@type"/>
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td>ID</td>
+                                <td>
+                                    <xsl:value-of select="@xml:id"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Sign</td>
+                                <td>
+                                    <xsl:value-of select="@type"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Reading</td>
+                                <td>
+                                    <xsl:value-of select="text()"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Context</td>
+                                <td>
+                                    <xsl:value-of select="parent::tei:seg"/>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </span>
             </a>
         </span>
