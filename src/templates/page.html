@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:api="http://www.oeaw.ac.at/acdh/cuneidb/api" tei:dummy="xx" bfc:dummy="XXX" api:dummy="xx">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cuneidb/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" tei:dummy="xx" bfc:dummy="XXX" api:dummy="xx" bf:evalAVTs="href" xf:dummy="xyz">
     <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
         <title data-template="config:app-title">App Title</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
         <meta data-template="config:app-meta"/>
@@ -9,14 +10,14 @@
         <link rel="stylesheet" type="text/css" href="$shared/resources/css/bootstrap-responsive.min.css"/>
         <link rel="stylesheet" type="text/css" href="$app-root/resources/css/style.css"/>
         <script type="text/javascript" src="$shared/resources/scripts/jquery/jquery-1.7.1.min.js"/>
-        <script type="text/javascript" src="$shared/resources/scripts/loadsource.js"/>
+        <!--<script type="text/javascript" src="$shared/resources/scripts/loadsource.js"/>-->
         <script type="text/javascript" src="$shared/resources/scripts/bootstrap.min.js"/>
         <script type="text/javascript">
             function callback(data) {console.log(data);}
         </script>
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/4.5.0/codemirror.min.js"/>
+        <!--<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/4.5.0/codemirror.min.js"/>-->
     </head>
-    <body id="body" bf:evalAVTs="src">
+    <body id="body">
         <div id="overlay" class="invisible"/>
         <div class="navbar">
             <div class="navbar-inner">
