@@ -226,7 +226,7 @@
         <!-- ********** SUBMISSIONS  ************************ -->
         <!-- ************************************************ -->
         <!-- Returns a list of tablets containing their titles and locations in the database -->
-        <xf:submission id="ls" method="execute" omit-xml-declaration="true" ref="instance('tablets')" replace="instance">
+        <xf:submission id="ls" method="execute" ref="instance('tablets')" replace="instance">
             <xf:resource value="'exist:/db/apps/cuneidb/api/lsTablets.xql'"/>
             <xf:message ev:event="xforms-submit-error" level="ephemeral">tablets listing has failed</xf:message>
             <!--<xf:message ev:event="xforms-submit-done" level="ephemeral">tablets listed successfully</xf:message>-->
@@ -282,9 +282,9 @@
         </xf:submission>
         
         <!-- places a HTML view of the tablet into the interface -->
-        <xf:submission id="viewTablet" replace="embedHTML" targetid="tabletHTMLContainer" ref="instance('selectedTablet')" resource="exist:/db/apps/cuneidb/api/viewTablet.xql" method="execute">
+        <xf:submission id="viewTablet" replace="embedHTML" targetid="tabletHTMLContainer" ref="instance('selectedTablet')" resource="exist:/db/apps/cuneidb/api/viewTablet.xql" method="execute"/>
             
-        </xf:submission>
+        
         
         
         <!-- stores the currently edited tablet in the instance 'tablet' to its corresponding resource in the database -->
@@ -445,11 +445,28 @@
 
 
 
-
-
         <xf:action ev:event="xforms-ready">
             <!-- fetch tablets list on load -->
             <xf:send submission="ls"/>
+            <script type="text/javascript">
+                function getParameterByName(name) {
+                    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+                    var regex = new RegExp("[\\?&amp;]" + name + "=([^&amp;#]*)"),
+                    results = regex.exec(location.search);
+                    return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+                };
+                
+                if ($('#lsTablets').find("tr:contains('" + getParameterByName("tablet-id") + "')").parent().prevAll("tbody").length !== 0 ) {
+                    fluxProcessor.setRepeatIndex(
+                        'lsTablets', 
+                        $('#lsTablets').find("tr:contains('" + getParameterByName("tablet-id") + "')").parent().prevAll("tbody").length
+                    );
+                    
+                    fluxProcessor.dispatchEvent("editTrigger");
+                } else {
+                    window.alert("Unknown Tablet " + getParameterByName("tablet-id"));
+                }
+            </script>
         </xf:action>
     </xf:model>
     
@@ -469,61 +486,12 @@
                 <thead>
                     <tr>
                         <th>Text Reference</th>
-                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody id="lsTablets" xf:repeat-nodeset="instance('tablets')/tablet[contains(title,instance('listFilter'))]">
                     <tr>
                         <td>
                             <xf:output ref="title"/>
-                        </td>
-                        <td>
-                            <xf:group appearance="minimal">
-                                <xf:trigger id="viewTabletTrigger">
-                                    <xf:label>show</xf:label>
-                                    <xf:setvalue ref="instance('selectedTablet')/path" value="context()/path"/>
-                                    <xf:setvalue ref="instance('selectedTablet')/id" value="context()/id"/>
-                                    <xf:send submission="viewTablet"/>
-                                    <xf:toggle case="viewTabletCase"/>
-                                </xf:trigger>
-                                
-                                <xf:trigger id="editTrigger" ref="self::tablet[@editable='1']">
-                                    <xf:label>edit</xf:label>
-                                    <xf:action>
-                                        <xf:setvalue ref="instance('selectedTablet')/path" value="context()/path"/>
-                                        <xf:setvalue ref="instance('selectedTablet')/id" value="context()/id"/>
-                                        <xf:setvalue ref="instance('selectedTablet')/title" value="context()/title"/>
-                                        <xf:send submission="loadTablet"/>
-                                        <xf:toggle case="editTabletCase"/>
-                                    </xf:action>
-                                </xf:trigger>
-    
-                                <xf:trigger ref="self::tablet[@editable='1']">
-                                        <xf:label>remove</xf:label>
-                                        <xf:setvalue ref="instance('selectedTablet')/path" value="context()/path"/>
-                                        <xf:setvalue ref="instance('selectedTablet')/id" value="context()/id"/>
-                                        <xf:setvalue ref="instance('selectedTablet')/title" value="context()/title"/>
-                                        <bfc:show dialog="removeTabletConfirmDialog" ev:event="DOMActivate"/>
-                                    </xf:trigger>
-    
-                                    <bfc:dialog id="removeTabletConfirmDialog">
-                                        <xf:group appearance="minimal">
-                                            <xf:label>You are about to delete the tablet <xf:output value="instance('selectedTablet')/title"/> at <xf:output value="instance('selectedTablet')/path"/>.<br/>Are you sure?</xf:label>
-                                            <xf:trigger>
-                                                <xf:label>Yes</xf:label>
-                                                <bfc:hide dialog="removeTabletConfirmDialog" ev:event="DOMActivate"/>
-                                                <xf:action>
-                                                    <xf:send submission="removeTablet"/>
-                                                </xf:action>
-                                            </xf:trigger>
-                                            <xf:trigger>
-                                                <xf:label>No</xf:label>
-                                                <bfc:hide dialog="removeTabletConfirmDialog" ev:event="DOMActivate"/>
-                                            </xf:trigger>
-                                        </xf:group>
-                                    </bfc:dialog>
-                                
-                            </xf:group>
                         </td>
                     </tr>
                 </tbody>
@@ -540,6 +508,53 @@
                             </script>
                         </xf:action>
                     </xf:trigger>
+                    
+                    <xf:group appearance="minimal">
+                        <xf:trigger id="viewTabletTrigger">
+                            <xf:label>show</xf:label>
+                            <xf:setvalue ref="instance('selectedTablet')/path" value="instance('tablets')/tablet[contains(title,instance('listFilter'))][index('lsTablets')]/path"/>
+                            <xf:setvalue ref="instance('selectedTablet')/id" value="instance('tablets')/tablet[contains(title,instance('listFilter'))][index('lsTablets')]/id"/>
+                            <xf:send submission="viewTablet"/>
+                            <xf:toggle case="viewTabletCase"/>
+                        </xf:trigger>
+                        
+                        <xf:trigger id="editTrigger" ref="instance('tablets')/tablet[contains(title,instance('listFilter'))][index('lsTablets')][@editable='1']">
+                            <xf:label>edit</xf:label>
+                            <xf:action>
+                                <xf:setvalue ref="instance('selectedTablet')/path" value="instance('tablets')/tablet[contains(title,instance('listFilter'))][index('lsTablets')]/path"/>
+                                <xf:setvalue ref="instance('selectedTablet')/id" value="instance('tablets')/tablet[contains(title,instance('listFilter'))][index('lsTablets')]/id"/>
+                                <xf:setvalue ref="instance('selectedTablet')/title" value="instance('tablets')/tablet[contains(title,instance('listFilter'))][index('lsTablets')]/title"/>
+                                <xf:send submission="loadTablet"/>
+                                <xf:toggle case="editTabletCase"/>
+                            </xf:action>
+                        </xf:trigger>
+                        
+                        <xf:trigger ref="self::tablet[@editable='1']">
+                            <xf:label>remove</xf:label>
+                            <xf:setvalue ref="instance('selectedTablet')/path" value="instance('tablets')/tablet[contains(title,instance('listFilter'))][index('lsTablets')]/path"/>
+                            <xf:setvalue ref="instance('selectedTablet')/id" value="instance('tablets')/tablet[contains(title,instance('listFilter'))][index('lsTablets')]/id"/>
+                            <xf:setvalue ref="instance('selectedTablet')/title" value="instance('tablets')/tablet[contains(title,instance('listFilter'))][index('lsTablets')]/title"/>
+                            <bfc:show dialog="removeTabletConfirmDialog" ev:event="DOMActivate"/>
+                        </xf:trigger>
+                        
+                        <bfc:dialog id="removeTabletConfirmDialog">
+                            <xf:group appearance="minimal">
+                                <xf:label>You are about to delete the tablet <xf:output value="instance('selectedTablet')/title"/> at <xf:output value="instance('selectedTablet')/path"/>.<br/>Are you sure?</xf:label>
+                                <xf:trigger>
+                                    <xf:label>Yes</xf:label>
+                                    <bfc:hide dialog="removeTabletConfirmDialog" ev:event="DOMActivate"/>
+                                    <xf:action>
+                                        <xf:send submission="removeTablet"/>
+                                    </xf:action>
+                                </xf:trigger>
+                                <xf:trigger>
+                                    <xf:label>No</xf:label>
+                                    <bfc:hide dialog="removeTabletConfirmDialog" ev:event="DOMActivate"/>
+                                </xf:trigger>
+                            </xf:group>
+                        </bfc:dialog>
+                        
+                    </xf:group>
                 </xf:case>
 
                 <xf:case id="newTabletMenuResult">
@@ -1138,10 +1153,10 @@
                                 <xf:output value="'annotated image has changed, please click reload signs to rebuild index'"/>
                             </xf:group>
                             <xf:group appearance="minimal">
-                                <xf:trigger>
+                                <!--<xf:trigger>
                                     <xf:label>reload signs</xf:label>
                                     <bfc:show dialog="reloadSignsConfirmDialog" ev:event="DOMActivate"/>
-                                </xf:trigger>
+                                </xf:trigger>-->
                                 
                                 <bfc:dialog id="reloadSignsConfirmDialog">
                                     <xf:group appearance="minimal">
@@ -1269,19 +1284,23 @@
                             </xf:switch>
                         </div>
                         <div class="tab-pane" id="tab-imgs">
-                            <h3>Images</h3>
-                            <xf:group>
-                                <!-- since automatic triggers are not working, we have to add a 'get uploaded images' button -->
+                            <h3>Images</h3>                            
+                            <xf:repeat ref="instance('tablet')/tei:sourceDoc/tei:surface" id="repeat-surfaces">
+                                <xf:output value="if (contains(tei:graphic/@url,'%20')) then replace(tei:graphic/@url,'%20',' ') else tei:graphic/@url"/>
                                 <xf:trigger>
-                                    <xf:send submission="importImages"/>
-                                    <xf:send submission="loadTablet"/>
-                                    <xf:label>Import uploaded images</xf:label>
+                                    <xf:label>annotate signs</xf:label>
+                                    <xf:load show="replace">
+                                        <xf:resource value="concat('annotate.xql?t=', instance('tablet')/@xml:id, '&amp;s=', tei:graphic/@url)"/>
+                                    </xf:load>
                                 </xf:trigger>
-
-                                <xf:repeat ref="instance('tablet')/tei:sourceDoc/tei:surface">
-                                    <xf:output value="tei:graphic/replace(@url,'%20','')"/>
-                                </xf:repeat>
-                            </xf:group>
+                                <xf:trigger>
+                                    <xf:label>delete image</xf:label>
+                                    <xf:load show="replace">
+                                        <!--<xf:resource value="concat('annotate.xql?t=', instance('tablet')/@xml:id, '&s=', tei:graphic/@url)"/>-->
+                                        <!--talk to restxq endpoint-->
+                                    </xf:load>
+                                </xf:trigger>
+                            </xf:repeat>
                         </div>
 
                     </div>
