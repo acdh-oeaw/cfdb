@@ -16,7 +16,6 @@ return
     if ($tablet-id='')
     then <span/>
     else 
-        let $log := util:log-app("DEBUG",$config:app-name, "$tablet-id = "||$tablet-id)
         let $tablet := tablet:get($tablet-id)
         let $html := transform:transform($tablet,doc($config:tablet2html),())
-        return $html
+        return $html 
