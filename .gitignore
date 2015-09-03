@@ -1,4 +1,4 @@
 ## data is synched into its own repository
-src/data/
+##src/data/
 backups/
 .DS_Store
