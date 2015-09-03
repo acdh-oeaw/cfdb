@@ -12,7 +12,7 @@
     <!-- =================================================================== -->
     <!-- Include eXist-db's ant libraries and ant-contrib library -->
     <!-- =================================================================== -->
-    <typedef resource="org/exist/ant/antlib.xml" uri="http://exist-db.org/ant">
+    <!--<typedef resource="org/exist/ant/antlib.xml" uri="http://exist-db.org/ant">
         <classpath>
             <fileset dir="${exist.dir}/lib/core">
                 <include name="*.jar"/>
@@ -21,7 +21,7 @@
             <pathelement location="${exist.dir}/exist-optional.jar"/>
         </classpath>
     </typedef>
-    <typedef resource="net/sf/antcontrib/antlib.xml" classpath="${exist.dir}/tools/ant/lib/ant-contrib-1.0b3.jar"/>
+    <typedef resource="net/sf/antcontrib/antlib.xml" classpath="${exist.dir}/tools/ant/lib/ant-contrib-1.0b3.jar"/>-->
     
     
     
@@ -134,7 +134,7 @@
         </replace>
     </target>
     
-    <target name="install" depends="clean,xar">
+    <!--<target name="install" depends="clean,xar">
         <property name="xar">${project.name}-${project.version}.xar</property>
         <xdb:store user="${dba.username}" password="${dba.password}" uri="${server.xmlrpc.uri}${test.collection}"
             createcollection="true" createsubcollections="true">
@@ -143,5 +143,5 @@
         <xdb:xquery user="${dba.username}" password="${dba.password}" uri="${server.xmlrpc.uri}"
             outputproperty="deploy-result">repo:install-and-deploy-from-db('${test.collection.path}/${xar}')</xdb:xquery>
         <echo message="${deploy-result}"/>
-    </target>
+    </target>-->
 </project>
