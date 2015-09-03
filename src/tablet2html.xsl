@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema" exclude-result-prefixes="#all" version="2.0">
-    <xsl:variable name="taxonomies" select="doc('/db/apps/cuneidb/data/etc/taxonomies.xml')"/>
-
+    <xsl:param name="taxonomies.path"/>
+    <xsl:variable name="taxonomies" select="doc($taxonomies.path)"/>
     <xsl:template match="/tei:TEI">
         <div id="html_{@xml:id}">
             <h3>
@@ -155,9 +155,14 @@
 
 
     <xsl:template match="tei:g">
+        <xsl:variable name="annotation-id" select="substring-after(@xml:id, 'glyph_')"/>
+        <xsl:variable name="tablet-id" select="root()/tei:TEI/@xml:id"/>
+        <xsl:variable name="g-graphic" select="root()//tei:graphic[@xml:id = substring-after(current()/@facs,'#')]"/>
+        <xsl:variable name="snippet-relpath" select="$g-graphic/@url"/>
+        <xsl:variable name="surface-id" select="$g-graphic/ancestor::tei:surface/tei:graphic/@url"/>
         <span class="gThumbnail">
-            <a href="#">
-                <img src="$app-root/data/tablets/{root()/tei:TEI/@xml:id}/{root()//tei:graphic[@xml:id = substring-after(current()/@facs,'#')]/@url}"/>
+            <a href="annotate.xql?t={$tablet-id}&amp;s={encode-for-uri($surface-id)}&amp;a={$annotation-id}">
+                <img src="$app-root/data/tablets/{$tablet-id}/{$snippet-relpath}"/>
                 <span class="attributes">
                     <table>
                         <tbody>

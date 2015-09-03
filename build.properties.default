@@ -1,0 +1,26 @@
+#2015/04/08
+
+app.name=
+app.uri=http://www.oeaw.ac.at/acdh/cfdb2
+
+# app.version= -> moved to .version
+
+# the base collection (relative to /db/) where to store all data
+data.dir=cfdb-data
+
+# system user account
+system.account.user=cfdbSystem
+system.account.pwd=pwd
+
+# allows to exclude individual directories (especially modules) from the build package
+exclude.dirs=
+
+## testing
+# dba account that is used to deploy the xar on a test machine via the ant "test" task
+system.account.test.dba=admin
+system.account.test.pwd=adminpwd
+# uris
+server.xmlrpc.uri=xmldb:exist://localhost:8080/exist/xmlrpc/db/apps/
+server.http.uri=http://localhost:8080/exist/apps/
+test.collection="${app.name}-test"
+test.collection.path="/db/apps/${test.collection}"

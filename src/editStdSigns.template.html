@@ -1,0 +1,321 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<div xmlns="http://www.w3.org/1999/xhtml" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:api="http://www.oeaw.ac.at/acdh/cuneidb/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" bf:evalAVTs="src" data-template="templates:surround" data-template-at="content" data-template-with="templates/page.html">
+    <xf:model id="model1" style="display:none;">
+
+        <!-- instance holding original sign data in the db -->
+        <xf:instance id="stdSigns" resource="exist:/db/@data.dir@/etc/stdSigns/stdSigns.xml"/>
+        
+        <!-- holds the sorted list of standard signs (this is the one displayed in the UI) -->
+        <xf:instance xmlns="" id="listSort">
+            <data by=""/>
+        </xf:instance>
+        
+        <!-- holds all tei:g elements in the database-->
+        <xf:instance xmlns="" id="allSigns">
+            <signs/>
+        </xf:instance>
+
+        <!-- a generic way to remove resources -->
+        <xf:instance id="resourceToBeDeleted">
+            <data/>
+        </xf:instance>
+        
+        
+        <!-- template for new signs -->
+        <xf:instance xmlns="http://www.tei-c.org/ns/1.0" id="charTemplate">
+            <char n="[Borger no]" xml:id="id">
+                <charName>[sign name]</charName>
+                <figure>
+                    <graphic url="img"/>
+                </figure>
+            </char>
+        </xf:instance>
+        
+        <!-- holds reference to the uploaded standard Sign Image file -->
+        <xf:instance xmlns="" id="stdSignImg">
+            <img filename="" id="" mediatype="">
+                <path/>
+                <message/>
+            </img>
+        </xf:instance>
+        
+        <!-- instance that holds the filter expression that is applied to the list of standard signs -->
+        <xf:instance xmlns="" id="listFilter">
+            <filterExpression/>
+        </xf:instance>
+        
+        
+        <!-- holds the sign currently being edited -->
+        <xf:instance xmlns="" id="currentSign">
+            <currentSign>
+                <!-- the dummy node is necessary to have a target for the insert @ref of the 'edit' action; 
+                    @context does not work if we want to use context() in the @origin attribute --> 
+                <dummy/>
+            </currentSign>
+        </xf:instance>
+        
+        
+        
+        <!-- ***************************************************************************** -->
+        <!-- ***** SUBMISSIONS *********************************************************** -->
+        <!-- ***************************************************************************** -->
+        
+        
+        <!-- stores the stdSigns TEI file -->
+        <xf:submission id="saveStdSigns" method="put" ref="instance('stdSigns')" replace="instance">
+            <xf:resource value="'exist:/db/@data.dir@/etc/stdSigns/stdSigns.xml'"/>
+            <xf:message level="ephemeral" ev:event="xforms-submit-done">stored signs</xf:message>
+            <xf:message level="ephemeral" ev:event="xforms-submit-error">an error occured storing signs</xf:message>
+            
+            <!-- and resets the sign list -->
+            <xf:action ev:event="xforms-submit-done">
+                <xf:delete ref="instance('listSort')/*"/>
+                <xf:insert context="instance('listSort')" origin="instance('stdSigns')//tei:char"/>
+            </xf:action>
+        </xf:submission>
+        
+        
+        <!-- loads all tei:g elements into the 'allSigns' instance -->
+        <xf:submission id="retrieveAllSigns" method="execute" ref="instance('allSigns')" replace="instance" resource="exist:/db/apps/@app.name@/api/lsSigns.xql">
+            <xf:message ev:event="xforms-submit-error" level="ephemeral">an error occured loading sign occurences</xf:message>
+        </xf:submission>
+        
+
+        <!-- deletes the resource set in 'resourceToBeDeleted' -->
+        <xf:submission id="remove" method="delete">
+            <xf:resource resource="concat('exist:/db/@data.dir@/',instance('resourceToBeDeleted')))"/>
+        </xf:submission>
+        
+        <!-- calls 'storeStdSignImg.xql' which moves the uploaded image from the 'upload' system path to the database -->
+        <!-- this is only necessary when datatype of 'stdSignImg'/path is set to xs:anyURI, i.e. it only holds the path to
+             the uploaded file in the system and not the real data. -->
+        <xf:submission id="storeStdSignImg" method="execute" ref="instance('stdSignImg')" replace="instance" resource="exist:/db/apps/@app.name@/api/storeStdSignImg.xql">
+            <xf:message ev:event="xforms-submit-error" level="ephemeral">could not store image</xf:message>
+            <xf:setvalue ev:event="xforms-submit-done" ref="instance('currentSign')/tei:char/tei:figure/tei:graphic/@url" value="instance('stdSignImg')/path"/>
+        </xf:submission>
+        
+        <!-- Sends the current list of standard signs to the sort.xql script that does the actual sorting -->
+        <xf:submission id="sortInstance" method="execute" ref="instance('listSort')" replace="instance" resource="exist:/db/apps/@app.name@/api/sort.xql">
+            <xf:message ev:event="xforms-submit-error" level="ephemeral">sorting failed</xf:message>
+        </xf:submission>
+
+    
+        <!-- ********************************************************************************************************************** -->
+        <!-- ******* Data Bindings ************************************************************************************************ -->
+        <!-- ********************************************************************************************************************** -->
+
+        <!-- Standard Sign Image - depending on the datatype, the upload method differs -->
+        <xf:bind ref="instance('stdSignImg')/path" type="xs:anyURI"/>
+
+        <!-- we want to automatically set the xml:id for new std signs-->
+        <xf:bind calculate="concat('sign_',parent::tei:char/@n)" ref="instance('currentSign')/tei:char/@xml:id[. = instance('charTemplate')/@xml:id]"/>
+
+        <!-- must insert name and number -->
+        <xf:bind constraint=". != instance('charTemplate')/@n and . != ''" ref="instance('currentSign')/tei:char/@n"/>
+        <xf:bind constraint=". != instance('charTemplate')/tei:charName and . != ''" ref="instance('currentSign')/tei:char/tei:charName"/>
+
+        <!-- sorted list with filter applied -->
+        <xf:bind id="filteredList" ref="instance('listSort')/tei:char[some $x in (@n,tei:charName) satisfies contains($x,instance('listFilter'))]"/>
+
+
+
+
+        <xf:action ev:event="xforms-ready">
+            <!-- copy standard signs from db into list -->
+            <xf:insert context="instance('listSort')" origin="instance('stdSigns')//tei:char"/>
+            <!-- copy all occurences into list - WATCHME this might get long-->
+            <xf:send submission="retrieveAllSigns"/>
+            <xf:message level="ephemeral">form loaded</xf:message>
+        </xf:action>
+    </xf:model>
+
+    <div class="page-header">
+        <h1>Standard Signs</h1>
+    </div>
+
+    <div class="row-fluid">
+        <div class="span5">
+
+            <xf:group>
+                <xf:input incremental="true" ref="instance('listFilter')">
+                    <xf:label>Filter list</xf:label>
+                </xf:input>
+
+                <xf:select1 id="sortSelect" incremental="true" ref="instance('listSort')/@by">
+                    <xf:label>Sort by</xf:label>
+                    <xf:item>
+                        <xf:label>Sign Number</xf:label>
+                        <xf:value>@n</xf:value>
+                    </xf:item>
+                    <xf:item>
+                        <xf:label>Sign Name</xf:label>
+                        <xf:value>tei:charName</xf:value>
+                    </xf:item>
+                    <xf:action ev:event="xforms-value-changed">
+                        <xf:send submission="sortInstance"/>
+                    </xf:action>
+                </xf:select1>
+            </xf:group>
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Sign Number</th>
+                        <th>Sign Name</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+<!--                <tbody id="lsSigns" xf:repeat-bind="filteredList">-->
+                <tbody id="lsSigns" xf:repeat-nodeset="instance('listSort')/tei:char[some $x in (@n,tei:charName) satisfies contains($x,instance('listFilter'))]">
+                    <tr>
+                        <td>
+                            <xf:output ref="@n"/>
+                        </td>
+                        <td>
+                            <xf:output ref="tei:charName"/>
+                        </td>
+                        <td>
+                            <xf:group appearance="minimal">
+                                <xf:trigger>
+                                    <xf:label>edit</xf:label>
+                                    <xf:delete nodeset="instance('currentSign')/*[not(self::dummy)]"/>
+                                    <!-- the dummy node is necessary to have a target for the insert @ref of the 'edit' action; 
+                                        @context does not work if we want to use context() in the @origin attribute --> 
+                                    <xf:insert nodeset="instance('currentSign')/dummy" origin="instance('stdSigns')//tei:char[@xml:id = context()/@xml:id]" position="after"/>
+                                </xf:trigger>
+
+                                
+                                <xf:trigger>
+                                	<xf:label>remove</xf:label>
+                                	<bfc:show dialog="removeSignConfirmDialog" ev:event="DOMActivate"/>
+                                </xf:trigger>
+                                
+                                <bfc:dialog id="removeSignConfirmDialog">
+                                	<xf:group appearance="minimal">
+                                		<xf:label>Are you sure that you want to delete this sign?</xf:label>
+                                		<xf:trigger>
+                                			<xf:label>Yes</xf:label>
+                                		    <bfc:hide dialog="removeSignConfirmDialog" ev:event="DOMActivate"/>
+                                		    <xf:action ev:event="DOMActivate">
+                                				<xf:delete ref="instance('stdSigns')//tei:char[@xml:id = context()/@xml:id]"/>
+                                				<xf:delete ref="context()"/>
+                                				<xf:send submission="saveStdSigns"/>
+                                			</xf:action>
+                                		</xf:trigger>
+                                		<xf:trigger>
+                                			<xf:label>No</xf:label>
+                                		    <bfc:hide dialog="removeSignConfirmDialog" ev:event="DOMActivate"/>
+                                		</xf:trigger>
+                                	</xf:group>
+                                </bfc:dialog>
+                            </xf:group>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <xf:trigger>
+                <xf:label>New Sign</xf:label>
+                <xf:delete context="instance('currentSign')/tei:char"/>
+                <xf:insert context="instance('currentSign')" origin="instance('charTemplate')"/>
+                <xf:setfocus control="charNameInput"/>
+            </xf:trigger>
+        </div>
+
+        <div class="span7">
+            <xf:group ref="instance('currentSign')/tei:char">
+                <h3>
+                    <i>
+                        <xf:output ref="tei:charName"/>
+                    </i>
+                    <xf:output value="concat('(',@n,')')"/>
+                </h3>
+
+                <xf:group appearance="bf:verticalTable">
+                    <xf:input id="charNameInput" incremental="true" ref="tei:charName">
+                        <xf:label>Sign Name</xf:label>
+                        <xf:alert>name must be set</xf:alert>
+                    </xf:input>
+                    <xf:input incremental="true" ref="@n">
+                        <xf:label>Borger Number</xf:label>
+                        <xf:alert>number must be set</xf:alert>
+                    </xf:input>
+                    
+                    <xf:group ref="tei:figure/tei:graphic/@url[. != instance('charTemplate')/tei:figure/tei:graphic/@url]">
+                        <xf:output mediatype="image/jpg" value="concat('$app-root/data/etc/stdSigns/',.)">
+                            <xf:label>Image</xf:label>
+                        </xf:output>
+                        <xf:trigger>
+                            <xf:label>remove image</xf:label>
+                        </xf:trigger>
+                    </xf:group>
+
+                    <xf:group ref="tei:figure/tei:graphic/@url[. = instance('charTemplate')/tei:figure/tei:graphic/@url or . = '']" relevant="instance('') != instance('charTemplate')/@n">
+
+                        <xf:upload ref="instance('stdSignImg')/path">
+                            <xf:label>Upload new image</xf:label>
+                            <xf:filename ref="../@filename"/>
+                            <xf:mediatype ref="../@mediatype"/>
+                            <xf:action ev:event="xforms-value-changed">
+                                <xf:setvalue ref="../@id" value="instance('currentSign')/tei:char/@xml:id"/>
+                                <xf:send submission="storeStdSignImg"/>
+                            </xf:action>
+                        </xf:upload>
+                    </xf:group>
+
+                  
+                </xf:group>
+
+                <xf:group appearance="minimal" id="tabletEditButtons">
+                    <xf:trigger>
+                        <xf:label>store</xf:label>
+                        <xf:action>
+                            <!-- remove the char in the TEI file -->
+                            <xf:delete ref="instance('stdSigns')//tei:char[@xml:id = instance('currentSign')/tei:char/@xml:id]"/>
+                            <!-- ... and insert it anew -->
+                            <xf:insert context="instance('stdSigns')//tei:charDecl" origin="instance('currentSign')/tei:char"/>
+                            <xf:send submission="saveStdSigns"/>
+                        </xf:action>
+                    </xf:trigger>
+                    <xf:trigger>
+                        <xf:label>revert</xf:label>
+                        <xf:delete if="not(empty(instance('currentSign')))" ref="instance('currentSign')/*"/>
+                        <xf:delete if="not(empty(instance('stdSignImg')))" ref="instance('stdSignImg')/*"/>
+                        <xf:delete context="instance('listSort')/*"/>
+                        <xf:insert context="instance('listSort')" origin="instance('stdSigns')//tei:char"/>
+                    </xf:trigger>
+                </xf:group>
+                
+                <xf:group>
+                    <h4 id="occurences">Occurences</h4>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Reading</th>
+                                <th>Text Reference</th>
+                                <th>Period</th>
+                                <th>Place</th>
+                            </tr>
+                        </thead>
+                        <tbody xf:repeat-nodeset="instance('allSigns')//api:item[api:property[@name = 'type'] = instance('currentSign')/tei:char/tei:charName/text()]">
+                            <tr>
+                                <td>
+                                    <xf:output ref="api:property[@name = 'reading']"/>
+                                </td>
+                                <td>
+                                    <xf:output ref="api:property[@name = 'textReference']"/>
+                                </td>
+                                <td>
+                                    <xf:output ref="api:property[@name = 'period']"/>
+                                </td>
+                                <td>
+                                    <xf:output ref="api:property[@name = 'place']"/>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </xf:group>
+            </xf:group>
+        </div>
+    </div>
+</div>

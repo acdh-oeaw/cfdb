@@ -1,18 +1,21 @@
 /* CSS Styles for Image markup application */
 body {background-color: black; margin: 0; padding: 0; font-family: sans-serif;}
 
-/* fallback form when no tablet has been selected in a request parameter */  
-#selectTabletDialog {background: white; border: 1px solid gray; width: 250px; margin-left: auto; margin-right: auto; padding: 1.5em; margin-top: 15em;}
-#selectTabletDialog p {margin: 5px;} 
+/* fallback form when no tablet has been selected in a request parameter or when there is no surface on the selected tablet */  
+#selectTabletDialog, #noSurfaceDialog {background: white; border: 1px solid gray; min-width: 250px; width: 45%; margin-left: auto; margin-right: auto; padding: 1.5em; margin-top: 15em;}
+#selectTabletDialog p, , #noSurfaceDialog p {margin: 5px;} 
+
 
 /* top menu */
 #menu {padding: 5px; border: 1px solid gray;}
 #menu .currentUser {float: right; margin-right: 2px; color: white;}
 #menu > form {margin: 0; display: inline;}
-.menuitem {color: white; border: 1px solid gray; border-radius: 3px; padding: 2px 8px; font-size: 9pt;}
+.menuitem {color: white; border: 1px solid gray; border-radius: 3px; padding: 2px 8px; font-size: 9pt; text-decoration: none;}
 .menuitem:hover {background: white; color: black;}
 #zoomControlsContainer {margin-left: 25px;}
-#uploader {display: none;}
+#zoomControlsContainer > .menuitem {margin-left: 5px;}
+/*#uploader {display: none;}*/
+/*#uploader_start {display: none;}*/
 
 /* sign list */ 
 #listContainer {float: left; width: 15%; height: 100%; background: black; overflow: scroll; padding: 1em 0 0 1em;}
@@ -46,3 +49,7 @@ body {background-color: black; margin: 0; padding: 0; font-family: sans-serif;}
 #details {display: none; position: absolute; left: 17%; width: 250px; top: 5em; border: 1px solid gray; padding: 5px; background: black; color: white; z-index: 99; font-size: 15pt}
 #details > h3 {margin: 5px 1px;}
 #detailsContent > .props {display: block; color: white; width: 100%;}
+
+#img {opacity: 0;}
+#spinner-wrapper {height: 100%; width: 100%; position: absolute; background: black; z-index: 9999; opacity: 0.8;}
+#spinner {color: white; font-size: 5em;   position: absolute; top: 50%; left: 50%;} 

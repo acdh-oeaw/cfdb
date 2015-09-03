@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<div xmlns="http://www.w3.org/1999/xhtml" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" bf:evalAVTs="src" data-template="templates:surround" data-template-at="content" data-template-with="templates/page.html">
+    <xf:model id="model1" style="display:none;">
+
+        <xf:instance id="places" resource="exist:/db/@data.dir@/etc/places.xml"/>
+
+    	<xf:submission id="savePlaces" method="put" ref="instance('places')" replace="instance" includenamespaceprefixes="">
+            <xf:resource value="'exist:/db/@data.dir@/etc/places.xml'"/>
+            <xf:message ev:event="xforms-submit-done" level="ephemeral">stored place list</xf:message>
+
+            <!-- reset sign list -->
+            <xf:action ev:event="xforms-submit-done">
+                <xf:delete ref="instance('listSort')/*"/>
+                <xf:insert context="instance('listSort')" origin="instance('places')//tei:list[@n='Regions']/tei:item"/>
+            </xf:action>
+
+            <xf:message ev:event="xforms-submit-error" level="ephemeral">an error occured storing list</xf:message>
+        </xf:submission>
+
+
+
+        <!-- template for new regions -->
+        <xf:instance xmlns="http://www.tei-c.org/ns/1.0" id="regionTemplate">
+        	<item xml:id="id">
+                <placeName>[Region]</placeName>
+                <list n="Archives"/>
+            </item>
+        </xf:instance>
+
+        <!-- template for new archive -->
+        <xf:instance xmlns="http://www.tei-c.org/ns/1.0" id="archiveTemplate">
+        	<item xml:id="id">
+                <name>[Archive]</name>
+                <list n="Dossiers"/>
+            </item>
+        </xf:instance>
+
+        <!-- template for new archive -->
+        <xf:instance xmlns="http://www.tei-c.org/ns/1.0" id="dossierTemplate">
+        	<item xml:id="id">
+                <name>[Dossier]</name>
+            </item>
+        </xf:instance>
+
+
+
+
+
+
+        <!-- Sorting and Filtering -->
+        <xf:submission id="sortInstance" method="execute" ref="instance('listSort')" replace="instance" resource="exist:/db/apps/@app.name@/api/sort.xql">
+            <xf:message ev:event="xforms-submit-error" level="ephemeral">sorting failed</xf:message>
+        </xf:submission>
+
+        <xf:instance xmlns="" id="listFilter">
+            <filterExpression/>
+        </xf:instance>
+
+        <xf:instance xmlns="" id="listSort">
+            <data by=""/>
+        </xf:instance>
+
+
+        <!-- holds the region currently being edited -->
+        <xf:instance xmlns="" id="currentRegion">
+            <currenRegion/>
+        </xf:instance>
+
+        
+
+
+
+        <!-- sorted list with filter applied -->
+        <xf:bind id="filteredList" ref="instance('listSort')/tei:item[some $x in *[self::tei:name or self::tei:placeName] satisfies contains($x,instance('listFilter'))]"/>
+
+
+
+
+        <xf:action ev:event="xforms-ready">
+            <!-- copy regions from db into list -->
+            <xf:insert context="instance('listSort')" origin="instance('places')//tei:item[parent::tei:list/@n='Regions']"/>
+            <xf:message level="ephemeral">form loaded</xf:message>
+        </xf:action>
+    </xf:model>
+
+    <div class="page-header">
+        <h1>Regions / Archives / Dossiers</h1>
+    </div>
+
+    <div class="row-fluid">
+        <div class="span5">
+
+            <xf:group>
+                <xf:input incremental="true" ref="instance('listFilter')">
+                    <xf:label>Filter list</xf:label>
+                </xf:input>
+            </xf:group>
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Region Name</th>
+                        <th>Archives</th>
+                        <th>Dossiers</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="lsPlaces" xf:repeat-nodeset="instance('listSort')/tei:item[some $x in (tei:placeName,descendant::tei:name) satisfies contains($x,instance('listFilter'))]">
+                    <tr>
+                        <td>
+                            <xf:output ref="tei:placeName"/>
+                        </td>
+                        <td>
+                            <xf:output value="string-join(tei:list[@n = 'Archives']/tei:item/tei:name,', ')"/>
+                        </td>
+                        <td>
+                            <xf:output value="string-join(tei:list[@n = 'Archives']/tei:item/tei:list[@n = 'Dossiers']/tei:item/tei:name, ', ')"/>
+                        </td>
+                        <td>
+                            <xf:group appearance="minimal">
+                                <xf:trigger>
+                                    <xf:label>edit</xf:label>
+                                    <xf:delete ref="instance('currentRegion')/*"/>
+                                    <xf:insert context="instance('currentRegion')" origin="instance('listSort')/tei:item[some $x in (tei:placeName,//tei:name) satisfies contains($x,instance('listFilter'))][index('lsPlaces')]"/>
+                                </xf:trigger>
+                            	
+                            	<xf:trigger>
+                            		<xf:label>remove</xf:label>
+                            		<bfc:show dialog="removeRegionConfirmDialog" ev:event="DOMActivate"/>
+                            	</xf:trigger>
+                            	
+                            	<bfc:dialog id="removeRegionConfirmDialog">
+                            		<xf:group appearance="minimal">
+                            			<xf:label>Are you sure that you want to delete the entry for the region <xf:output value="context()/tei:placeName"/>?</xf:label>
+                            			<xf:trigger>
+                            				<xf:label>Yes</xf:label>
+                            				<bfc:hide dialog="removeRegionConfirmDialog" ev:event="DOMActivate"/>
+                            				<xf:action>
+                            					<xf:delete ref="instance('places')//tei:item[@xml:id = context()/@xml:id]"/>
+                            					<xf:delete ref="context()"/>
+                            					<xf:send submission="savePlaces"/>
+                            				</xf:action>
+                            			</xf:trigger>
+                            			<xf:trigger>
+                            				<xf:label>No</xf:label>
+                            				<bfc:hide dialog="removeRegionConfirmDialog" ev:event="DOMActivate"/>
+                            			</xf:trigger>
+                            		</xf:group>
+                            	</bfc:dialog>
+                            </xf:group>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <xf:trigger>
+                <xf:label>New Region</xf:label>
+                <xf:delete ref="instance('currentRegion')/*"/>
+                <xf:insert context="instance('currentRegion')" origin="instance('regionTemplate')"/>
+                <xf:setfocus control="regionNameInput"/>
+            </xf:trigger>
+        </div>
+
+        <div class="span7">
+            <xf:group ref="instance('currentRegion')/tei:item">
+                <h3>
+                    <i>
+                        <xf:output ref="tei:placeName"/>
+                    </i>
+                </h3>
+                
+                <xf:input id="regionNameInput" incremental="true" ref="tei:placeName">
+                    <xf:label>Region Name</xf:label>
+                </xf:input>
+                
+                <xf:group ref="tei:list[@n='Archives']"> 
+                    <h4>Archives in Region <xf:output ref="../tei:placeName"/>
+                    </h4>
+                    <xf:repeat nodeset="tei:item" id="ls-archives">
+                    	<xf:input ref="tei:name" id="archiveNameInput"/>
+                    </xf:repeat>
+                    
+                    <xf:group appearance="minimal">
+                        <xf:trigger>
+                            <xf:label>Add Archive</xf:label>
+                            <xf:insert context="." origin="instance('archiveTemplate')"/>
+                        	<xf:setfocus control="archiveNameInput"/>
+                        </xf:trigger>
+                        <xf:trigger>
+                            <xf:label>Remove Archive</xf:label>
+                            <xf:delete ref="tei:item[index('ls-archives')]"/>
+                        </xf:trigger>
+                    </xf:group>
+                    
+                    <hr/>
+                    
+                    <xf:group ref="tei:item[index('ls-archives')]/tei:list[@n='Dossiers']">
+                    	<h4>Dossiers  in Archive <xf:output ref="../tei:name"/>
+                        </h4>
+                        <xf:repeat nodeset="tei:item" id="ls-dossiers">
+                        	<xf:input ref="tei:name" id="dossierNameInput"/>
+                        </xf:repeat>
+                        
+                        <xf:group appearance="minimal">
+                            <xf:trigger>
+                                <xf:label>Add Dossier</xf:label>
+                                <xf:insert context="." origin="instance('dossierTemplate')"/>
+                            	<xf:setfocus control="dossierNameInput"/>
+                            </xf:trigger>
+                            <xf:trigger>
+                                <xf:label>Remove Dossier</xf:label>
+                                <xf:delete ref="tei:item[index('ls-dossiers')]"/>
+                            </xf:trigger>
+                        </xf:group>
+                    </xf:group>
+                
+                </xf:group>
+                    
+    
+                <xf:group appearance="minimal" id="regionEditButtons">
+                    <xf:trigger>
+                        <xf:label>store</xf:label>
+                        <xf:action>
+                            <!-- ID Region -->
+                        	<xf:setvalue if="instance('currentRegion')/tei:item/@xml:id = instance('regionTemplate')/@xml:id" ref="instance('currentRegion')/tei:item/@xml:id" value="concat('region_',replace(lower-case(instance('currentRegion')/tei:item/tei:placeName),'[^A-Za-z0-9_-]+',''),'_',generate-id(.))"/>
+                        	
+                        	<!-- ID Archive -->
+                        	<xf:setvalue nodeset="instance('currentRegion')/tei:item/tei:list[@n = 'Archives']/tei:item/@xml:id" value="concat('archive_',lower-case(replace(../tei:name,'[^A-Za-z0-9_-]+','')),'_',generate-id(.))"/>
+                        	
+                        	<!-- ID Dossiers -->
+                        	<xf:setvalue nodeset="instance('currentRegion')//tei:list[@n = 'Dossiers']/tei:item/@xml:id" value="concat('dossier_',lower-case(replace(../tei:name,'[^A-Za-z0-9_-]+','')),'_',generate-id(.))"/>
+                        	
+                            <!-- remove the region from the TEI file -->
+                            <xf:delete ref="instance('places')//tei:list[@n = 'Regions']/tei:item[@xml:id = instance('currentRegion')/tei:item/@xml:id]"/>
+                            
+                            <!-- ... and insert it anew -->
+                            <xf:insert context="instance('places')//tei:list[@n = 'Regions']" nodeset="instance('places')//tei:list[@n = 'Regions']/tei:item" origin="instance('currentRegion')/tei:item"/>
+                            
+                            <xf:send submission="savePlaces"/>
+                        </xf:action>
+                    </xf:trigger>
+                    <xf:trigger>
+                        <xf:label>revert</xf:label>
+                    	<xf:delete ref="instance('currentRegion')/tei:item"/>
+                        <!--<xf:delete if="not(empty(instance('currentP')))" ref="instance('currentSign')/*"/>
+                        <xf:delete if="not(empty(instance('stdSignImg')))" ref="instance('stdSignImg')/*"/>
+                        <xf:delete context="instance('listSort')/*"/>
+                        <xf:insert context="instance('listSort')" origin="instance('stdSigns')//tei:char"/>-->
+                    </xf:trigger>
+                </xf:group>
+            </xf:group>
+        </div>
+    </div>
+</div>

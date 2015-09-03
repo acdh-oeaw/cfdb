@@ -1,10 +1,147 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project default="xar" name="cuneidb">
-    <property name="project.version" value="0.1"/>
-    <property name="project.app" value="cuneidb"/>
+<project default="xar" name="cfdb-main" xmlns:xdb="http://exist-db.org/ant">
+    <!--    <property name="project-name" value="cr-xq"/>-->
+    
+    <import file="../build.xml"/>
+    
+    <!--    <property  file="../build.properties"  />-->
+    
     <property name="build.dir" value="build"/>
-    <target name="xar">
+    
+    
+    <!-- =================================================================== -->
+    <!-- Include eXist-db's ant libraries and ant-contrib library -->
+    <!-- =================================================================== -->
+    <typedef resource="org/exist/ant/antlib.xml" uri="http://exist-db.org/ant">
+        <classpath>
+            <fileset dir="${exist.dir}/lib/core">
+                <include name="*.jar"/>
+            </fileset>
+            <pathelement location="${exist.dir}/exist.jar"/>
+            <pathelement location="${exist.dir}/exist-optional.jar"/>
+        </classpath>
+    </typedef>
+    <typedef resource="net/sf/antcontrib/antlib.xml" classpath="${exist.dir}/tools/ant/lib/ant-contrib-1.0b3.jar"/>
+    
+    
+    
+    
+    <target name="xar" depends="configure-metafiles">   
+        <echo>building: ${app.name}#${app.version}</echo>
+        <echo>into: ${build.dir}</echo>
         <mkdir dir="${build.dir}"/>
-        <zip basedir="." destfile="${build.dir}/${project.app}-${project.version}.xar" excludes="${build.dir}/*"/>
+        <zip 
+            basedir="." 
+            destfile="${build.dir}/${app.name}-${app.version}.xar" 
+            excludes="${exclude.dirs},${build.dir},${build.dir}/**,**/*.template.*,**/build.*,api.template/,modules.template/,**.version"/>
+    </target>
+    
+    <target name="clean">
+        <delete dir="modules"/>
+        <delete dir="api"/>
+        <delete file="repo.xml"/>
+        <delete file="expath-pkg.xml"/>
+        <delete file="repo.xml"/>
+        <delete file="annotate.xql"/>
+        <delete file="controller.xql"/>
+        <delete file="post-install.xql"/>
+        <delete file="qa.xql"/>
+        <delete file="editArchives.html"/>
+        <delete file="editStdSigns.html"/>
+        <delete file="editTablets.html"/>
+    </target>
+    
+    <!-- insert the values from build.properties into the xar meta files: repo.xml and expath-pkg.xml -->  
+    <target name="configure-metafiles" depends="clean">
+        <copy file="repo.template.xml" tofile="repo.xml" overwrite="true"/>
+        <copy file="expath-pkg.template.xml" tofile="expath-pkg.xml" overwrite="true" />
+        <copy file="annotate.template.xql" tofile="annotate.xql" overwrite="true" />
+        <copy file="controller.template.xql" tofile="controller.xql" overwrite="true" />
+        <copy file="post-install.template.xql" tofile="post-install.xql" overwrite="true" />
+        <copy file="qa.template.xql" tofile="qa.xql" overwrite="true" />
+        <copy file="editArchives.template.html" tofile="editArchives.html" overwrite="true" />
+        <copy file="editStdSigns.template.html" tofile="editStdSigns.html" overwrite="true" />
+        <copy file="editTablets.template.html" tofile="editTablets.html" overwrite="true" />
+        
+        <replace dir="." includes="*"
+            excludes="build.xml *.template.*"
+            propertyFile="../build.properties">
+            <replacefilter 
+                token="@app.name@" 
+                property="app.name"/>
+            <replacefilter 
+                token="@app.uri@" 
+                property="app.uri"/>
+            <replacefilter 
+                token="@data.dir@" 
+                property="data.dir"/>
+            <replacefilter 
+                token="@system.account.user@" 
+                property="system.account.user"/>            
+            <replacefilter 
+                token="@system.account.pwd@" 
+                property="system.account.pwd"/>
+        </replace>
+        
+        <replace dir="." includes="repo.xml expath-pkg.xml"
+            propertyFile="../.version">            
+            <replacefilter 
+                token="@app.version@" 
+                property="app.version"/>            
+        </replace>
+        
+        
+        <copy todir="api" overwrite="true" >
+            <fileset dir="api.template"/>
+        </copy>
+        
+        <replace 
+            dir="api" 
+            includes="*"
+            propertyFile="../build.properties">
+            <replacefilter 
+                token="@app.name@" 
+                property="app.name"/>
+            <replacefilter 
+                token="@app.uri@" 
+                property="app.uri"/>    
+        </replace>
+        
+        <copy todir="modules" overwrite="true" >
+            <fileset dir="modules.template"/>
+        </copy>
+        
+        
+        <replace 
+            dir="modules" 
+            includes="**"
+            propertyFile="../build.properties">
+            <replacefilter 
+                token="@app.name@" 
+                property="app.name"/>
+            <replacefilter 
+                token="@app.uri@" 
+                property="app.uri"/>
+            <replacefilter 
+                token="@data.dir@" 
+                property="data.dir"/>
+            <replacefilter 
+                token="@system.account.user@" 
+                property="system.account.user"/>            
+            <replacefilter 
+                token="@system.account.pwd@" 
+                property="system.account.pwd"/>
+        </replace>
+    </target>
+    
+    <target name="install" depends="clean,xar">
+        <property name="xar">${project.name}-${project.version}.xar</property>
+        <xdb:store user="${dba.username}" password="${dba.password}" uri="${server.xmlrpc.uri}${test.collection}"
+            createcollection="true" createsubcollections="true">
+            <fileset dir="${build.dir}"/>
+        </xdb:store>
+        <xdb:xquery user="${dba.username}" password="${dba.password}" uri="${server.xmlrpc.uri}"
+            outputproperty="deploy-result">repo:install-and-deploy-from-db('${test.collection.path}/${xar}')</xdb:xquery>
+        <echo message="${deploy-result}"/>
     </target>
 </project>
