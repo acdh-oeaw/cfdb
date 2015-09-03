@@ -1,0 +1,857 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TEI xmlns="http://www.tei-c.org/ns/1.0">
+  <teiHeader>
+      <fileDesc>
+         <titleStmt>
+            <title>Title</title>
+         </titleStmt>
+         <publicationStmt>
+            <p>Publication Information</p>
+         </publicationStmt>         
+         <sourceDesc>
+            <p>Information about the source</p>
+         </sourceDesc>
+      </fileDesc>
+     <encodingDesc>
+        <charDecl>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="366" xml:id="sign_366">
+                <charName>KUR</charName>
+                <figure>
+                    <graphic url="img"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="205" xml:id="sign_205">
+                <charName>IL</charName>
+                <figure>
+                    <graphic url="img"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="307" xml:id="sign_307">
+                <charName>MAR</charName>
+                <figure>
+                    <graphic url="imgs/sign_307.bmp"/>
+                </figure>
+            </char>
+                
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="187" xml:id="sign_187">
+                <charName>ŠÁM</charName>
+                <figure>
+                    <graphic url="imgs/sign_187.bmp"/>
+                </figure>
+            </char>
+                
+                
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="384" xml:id="sign_384">
+                <charName>ŠÀ</charName>
+                <figure>
+                    <graphic url="imgs/sign_384.bmp"/>
+                </figure>
+            </char>
+                
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="055" xml:id="sign_55">
+                <charName>LA</charName>
+                <figure>
+                    <graphic url="imgs/sign_55.bmp"/>
+                </figure>
+            </char>
+                
+                
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="372" xml:id="sign_372">
+                <charName>US</charName>
+                <figure>
+                    <graphic url="imgs/sign_372.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="465" xml:id="sign_465">
+                <charName>DIN</charName>
+                <figure>
+                    <graphic url="imgs/sign_465.bmp"/>
+                </figure>
+            </char>
+                
+                
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="597" xml:id="sign_597">
+                <charName>ŠÁ</charName>
+                <figure>
+                    <graphic url="imgs/sign_597.bmp"/>
+                </figure>
+            </char>
+                
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="595" xml:id="sign_596">
+                <charName>THU</charName>
+                <figure>
+                    <graphic url="imgs/sign_596.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="592" xml:id="sign_592">
+                <charName>SIG</charName>
+                <figure>
+                    <graphic url="imgs/sign_592.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="589" xml:id="sign_589">
+                <charName>HA</charName>
+                <figure>
+                    <graphic url="imgs/sign_589.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="586" xml:id="sign_586">
+                <charName>ZA</charName>
+                <figure>
+                    <graphic url="imgs/sign_586.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="579" xml:id="sign_579">
+                <charName>A</charName>
+                <figure>
+                    <graphic url="imgs/sign_579.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="575" xml:id="sign_575">
+                <charName>UR</charName>
+                <figure>
+                    <graphic url="imgs/sign_575.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="574" xml:id="sign_574">
+                <charName>TUG</charName>
+                <figure>
+                    <graphic url="imgs/sign_574.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="565" xml:id="sign_565">
+                <charName>LUM</charName>
+                <figure>
+                    <graphic url="imgs/sign_565.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="559" xml:id="sign_559">
+                <charName>GU</charName>
+                <figure>
+                    <graphic url="imgs/sign_559.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="556" xml:id="sign_556">
+                <charName>NIN</charName>
+                <figure>
+                    <graphic url="imgs/sign_556.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="554" xml:id="sign_554">
+                <charName>SAL</charName>
+                <figure>
+                    <graphic url="imgs/sign_554.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="545" xml:id="sign_545">
+                <charName>ŠÚ</charName>
+                <figure>
+                    <graphic url="imgs/sign_545.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="538" xml:id="sign_538">
+                <charName>KIN</charName>
+                <figure>
+                    <graphic url="imgs/sign_538.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="537" xml:id="sign_537">
+                <charName>LU</charName>
+                <figure>
+                    <graphic url="imgs/sign_537.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="536" xml:id="sign_KU">
+                <charName>KU</charName>
+                <figure>
+                    <graphic url="imgs/sign_KU.bmp"/>
+                </figure>
+            </char>
+                
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="533" xml:id="sign_533">
+                <charName>MEŠ</charName>
+                <figure>
+                    <graphic url="imgs/sign_533.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="468" xml:id="sign_468">
+                <charName>KÙ</charName>
+                <figure>
+                    <graphic url="imgs/sign_468.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="461" xml:id="sign_461">
+                <charName>KI</charName>
+                <figure>
+                    <graphic url="imgs/sign_461.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="459" xml:id="sign_459">
+                <charName>DUL</charName>
+                <figure>
+                    <graphic url="imgs/sign_459.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="457" xml:id="sign_457">
+                <charName>DI</charName>
+                <figure>
+                    <graphic url="imgs/sign_457.bmp"/>
+                </figure>
+            </char>
+                
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="455" xml:id="sign_455">
+                <charName>Ù</charName>
+                <figure>
+                    <graphic url="imgs/sign_455.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="449" xml:id="sign_449">
+                <charName>ŠI</charName>
+                <figure>
+                    <graphic url="imgs/sign_449.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="441" xml:id="sign_441">
+                <charName>UL</charName>
+                <figure>
+                    <graphic url="imgs/sign_441.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="440" xml:id="sign_440">
+                <charName>GIM</charName>
+                <figure>
+                    <graphic url="imgs/sign_440.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="437" xml:id="sign_437">
+                <charName>ZUR</charName>
+                <figure>
+                    <graphic url="imgs/sign_437.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="427" xml:id="sign_427">
+                <charName>MI</charName>
+                <figure>
+                    <graphic url="imgs/sign_427.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="412" xml:id="sign_412">
+                <charName>MUH</charName>
+                <figure>
+                    <graphic url="imgs/sign_412.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="411" xml:id="sign_411">
+                <charName>U</charName>
+                <figure>
+                    <graphic url="imgs/sign_411.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="401" xml:id="sign_401">
+                <charName>HAR</charName>
+                <figure>
+                    <graphic url="imgs/sign_401.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="133" xml:id="sign_133">
+                <charName>KÁ</charName>
+                <figure>
+                    <graphic url="imgs/sign_133.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="005" xml:id="sign_005">
+                <charName>BA</charName>
+                <figure>
+                    <graphic url="imgs/sign_005.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="006" xml:id="sign_006">
+                <charName>ZU</charName>
+                <figure>
+                    <graphic url="imgs/sign_006.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="007" xml:id="sign_007">
+                <charName>SU</charName>
+                <figure>
+                    <graphic url="imgs/sign_007.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="012" xml:id="sign_012">
+                <charName>TAR</charName>
+                <figure>
+                    <graphic url="imgs/sign_012.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="013" xml:id="sign_013">
+                <charName>AN</charName>
+                <figure>
+                    <graphic url="imgs/sign_013.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="015" xml:id="sign_015">
+                <charName>KA</charName>
+                <figure>
+                    <graphic url="imgs/sign_015.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="052" xml:id="sign_052">
+                <charName>ITU</charName>
+                <figure>
+                    <graphic url="imgs/sign_052.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="058" xml:id="sign_058">
+                <charName>TU</charName>
+                <figure>
+                    <graphic url="imgs/sign_058.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="059" xml:id="sign_059">
+                <charName>LI</charName>
+                <figure>
+                    <graphic url="imgs/sign_059.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="061" xml:id="sign_061">
+                <charName>MU</charName>
+                <figure>
+                    <graphic url="imgs/sign_061.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="068" xml:id="sign_068">
+                <charName>RU</charName>
+                <figure>
+                    <graphic url="imgs/sign_068.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="070" xml:id="sign_070">
+                <charName>NA</charName>
+                <figure>
+                    <graphic url="imgs/sign_070.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="073" xml:id="sign_073">
+                <charName>TI</charName>
+                <figure>
+                    <graphic url="imgs/sign_073.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="078" xml:id="sign_078">
+                <charName>HU</charName>
+                <figure>
+                    <graphic url="imgs/sign_078.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="079" xml:id="sign_079">
+                <charName>NAM</charName>
+                <figure>
+                    <graphic url="imgs/sign_079.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="080" xml:id="sign_080">
+                <charName>IG</charName>
+                <figure>
+                    <graphic url="imgs/sign_080.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="086" xml:id="sign_084">
+                <charName>RI</charName>
+                <figure>
+                    <graphic url="imgs/sign_084.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="099" xml:id="sign_99">
+                <charName>EN</charName>
+                <figure>
+                    <graphic url="imgs/sign_99.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="097" xml:id="sign_97">
+                <charName>AG</charName>
+                <figure>
+                    <graphic url="imgs/sign_97.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="094" xml:id="sign_094">
+                <charName>DIM</charName>
+                <figure>
+                    <graphic url="imgs/sign_094.bmp"/>
+                </figure>
+            </char>
+                
+                
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="104" xml:id="sign_104">
+                <charName>SA</charName>
+                <figure>
+                    <graphic url="imgs/sign_104.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="207" xml:id="sign_207">
+                <charName>TUM</charName>
+                <figure>
+                    <graphic url="imgs/sign_207.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="206" xml:id="sign_206">
+                <charName>DU</charName>
+                <figure>
+                    <graphic url="imgs/sign_206.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="195" xml:id="sign_195">
+                <charName>UNUG</charName>
+                <figure>
+                    <graphic url="imgs/sign_195.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="191" xml:id="sign_191">
+                <charName>QU</charName>
+                <figure>
+                    <graphic url="imgs/sign_191.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="172" xml:id="sign_172">
+                <charName>NE</charName>
+                <figure>
+                    <graphic url="imgs/sign_172.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="170" xml:id="sign_170">
+                <charName>AM</charName>
+                <figure>
+                    <graphic url="imgs/sign_170.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="167" xml:id="sign_167">
+                <charName>GABA</charName>
+                <figure>
+                    <graphic url="imgs/sign_167.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="148" xml:id="sign_148">
+                <charName>IN</charName>
+                <figure>
+                    <graphic url="imgs/sign_148.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="145" xml:id="sign_145">
+                <charName>AD</charName>
+                <figure>
+                    <graphic url="imgs/sign_145.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="143" xml:id="sign_143">
+                <charName>GAN</charName>
+                <figure>
+                    <graphic url="imgs/sign_143.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="142" xml:id="sign_142">
+                <charName>I</charName>
+                <figure>
+                    <graphic url="imgs/sign_142.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="139" xml:id="sign_139">
+                <charName>TA</charName>
+                <figure>
+                    <graphic url="imgs/sign_139.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="134" xml:id="sign_134">
+                <charName>UM</charName>
+                <figure>
+                    <graphic url="imgs/sign_134.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="131" xml:id="sign_131">
+                <charName>AS</charName>
+                <figure>
+                    <graphic url="imgs/sign_131.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="130" xml:id="sign_130">
+                <charName>UG</charName>
+                <figure>
+                    <graphic url="imgs/sign_130.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="128" xml:id="sign_128">
+                <charName>AB</charName>
+                <figure>
+                    <graphic url="imgs/sign_128.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="115" xml:id="sign_115">
+                <charName>SAG</charName>
+                <figure>
+                    <graphic url="imgs/sign_115.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="112" xml:id="sign_112">
+                <charName>SI</charName>
+                <figure>
+                    <graphic url="imgs/sign_112.bmp"/>
+                </figure>
+            </char>
+                
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="111" xml:id="sign_111">
+                <charName>GUR</charName>
+                <figure>
+                    <graphic url="imgs/sign_111.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="331 e" xml:id="sign_331e">
+                <charName>SAR</charName>
+                <figure>
+                    <graphic url="imgs/sign_331e.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="376*" xml:id="sign_376">
+                <charName>KAR</charName>
+                <figure>
+                    <graphic url="imgs/sign_376.bmp"/>
+                </figure>
+            </char>
+                
+                
+                
+                
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="400" xml:id="sign_400">
+                <charName>BIR</charName>
+                <figure>
+                    <graphic url="imgs/sign_400.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="399" xml:id="sign_399">
+                <charName>IM</charName>
+                <figure>
+                    <graphic url="imgs/sign_399.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="398" xml:id="sign_398">
+                <charName>AH</charName>
+                <figure>
+                    <graphic url="imgs/sign_398.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="397" xml:id="sign_397">
+                <charName>A'</charName>
+                <figure>
+                    <graphic url="imgs/sign_397.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="396" xml:id="sign_396">
+                <charName>HE</charName>
+                <figure>
+                    <graphic url="imgs/sign_396.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="393" xml:id="sign_393">
+                <charName>ZAB</charName>
+                <figure>
+                    <graphic url="imgs/sign_393.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="383" xml:id="sign_383">
+                <charName>PI</charName>
+                <figure>
+                    <graphic url="imgs/sign_383.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="381" xml:id="sign_381">
+                <charName>UD</charName>
+                <figure>
+                    <graphic url="imgs/sign_381.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="371" xml:id="sign_371">
+                <charName>BU</charName>
+                <figure>
+                    <graphic url="imgs/sign_371.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="367" xml:id="sign_367">
+                <charName>ŠEŠ</charName>
+                <figure>
+                    <graphic url="imgs/sign_367.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="324" xml:id="sign_324">
+                <charName>BIT</charName>
+                <figure>
+                    <graphic url="imgs/sign_324.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="355" xml:id="sign_355">
+                <charName>LUL</charName>
+                <figure>
+                    <graphic url="imgs/sign_355.bmp"/>
+                </figure>
+            </char>
+                
+                
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="354" xml:id="sign_354">
+                <charName>ŠU</charName>
+                <figure>
+                    <graphic url="imgs/sign_354.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="346" xml:id="sign_346">
+                <charName>GIR</charName>
+                <figure>
+                    <graphic url="imgs/sign_346.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="342" xml:id="sign_342">
+                <charName>MA</charName>
+                <figure>
+                    <graphic url="imgs/sign_342.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="339" xml:id="sign_339">
+                <charName>ÁŠ</charName>
+                <figure>
+                    <graphic url="imgs/sign_339.bmp"/>
+                </figure>
+            </char>
+                
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="335" xml:id="sign_335">
+                <charName>DA</charName>
+                <figure>
+                    <graphic url="imgs/sign_335.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="334" xml:id="sign_334">
+                <charName>ID</charName>
+                <figure>
+                    <graphic url="imgs/sign_334.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="331" xml:id="sign_331">
+                <charName>ŠEŠ</charName>
+                <figure>
+                    <graphic url="imgs/sign_331.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="330" xml:id="sign_330">
+                <charName>LÚ</charName>
+                <figure>
+                    <graphic url="imgs/sign_330.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="328" xml:id="sign_328">
+                <charName>RA</charName>
+                <figure>
+                    <graphic url="imgs/sign_328.bmp"/>
+                </figure>
+            </char>
+                
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="322" xml:id="sign_322">
+                <charName>KAL</charName>
+                <figure>
+                    <graphic url="imgs/sign_322.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="319" xml:id="sign_319">
+                <charName>GA</charName>
+                <figure>
+                    <graphic url="imgs/sign_319.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="318" xml:id="sign_318">
+                <charName>Ú</charName>
+                <figure>
+                    <graphic url="imgs/sign_318.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="314" xml:id="sign_314">
+                <charName>RID</charName>
+                <figure>
+                    <graphic url="imgs/sign_314.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="313" xml:id="sign_313">
+                <charName>KID</charName>
+                <figure>
+                    <graphic url="imgs/sign_313.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="312" xml:id="sign_312">
+                <charName>UN</charName>
+                <figure>
+                    <graphic url="imgs/sign_312.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="309" xml:id="sign_309">
+                <charName>DUG</charName>
+                <figure>
+                    <graphic url="imgs/sign_309.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="308" xml:id="sign_308">
+                <charName>E</charName>
+                <figure>
+                    <graphic url="imgs/sign_308.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="306" xml:id="sign_306">
+                <charName>UB</charName>
+                <figure>
+                    <graphic url="imgs/sign_306.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="298" xml:id="sign_298">
+                <charName>AL</charName>
+                <figure>
+                    <graphic url="imgs/sign_298.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="296" xml:id="sign_296">
+                <charName>IS</charName>
+                <figure>
+                    <graphic url="imgs/sign_296.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="295" xml:id="sign_295">
+                <charName>PA</charName>
+                <figure>
+                    <graphic url="imgs/sign_295.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="232" xml:id="sign_232">
+                <charName>IR</charName>
+                <figure>
+                    <graphic url="imgs/sign_232.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="231" xml:id="sign_231">
+                <charName>NI</charName>
+                <figure>
+                    <graphic url="imgs/sign_231.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="230" xml:id="sign_230">
+                <charName>GAG</charName>
+                <figure>
+                    <graphic url="imgs/sign_230.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="214" xml:id="sign_214">
+                <charName>BI</charName>
+                <figure>
+                    <graphic url="imgs/sign_214.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="208" xml:id="sign_208">
+                <charName>ANŠE</charName>
+                <figure>
+                    <graphic url="imgs/sign_208.bmp"/>
+                </figure>
+            </char>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="211" xml:id="sign_211">
+                <charName>UŠ</charName>
+                <figure>
+                    <graphic url="imgs/sign_211.bmp"/>
+                </figure>
+            </char>
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+           
+           
+        </charDecl>
+     </encodingDesc>
+  </teiHeader>
+  <text>
+      <body>
+        <ab>this document contains a list of standard signs.</ab>
+      </body>
+  </text>
+</TEI>

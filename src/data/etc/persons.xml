@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TEI xmlns="http://www.tei-c.org/ns/1.0">
+   <teiHeader>
+      <fileDesc>
+         <titleStmt>
+            <title>Scribes</title>
+         </titleStmt>
+         <publicationStmt>
+            <p>Publication Information</p>
+         </publicationStmt>
+         <sourceDesc>
+            <p>Information about the source</p>
+         </sourceDesc>
+      </fileDesc>
+   </teiHeader>
+   <text>
+      <body>
+         <listPerson xml:id="scribes">
+            <head>Scribes</head>
+                <person role="scribe">
+                    <persName>Anu-ahhē-iddin/Anu-bēlšunu//Ekur-zakir</persName>
+                </person>
+                <person role="scribe">
+                    <persName>Anu-iqīšanni/Nidintu-Anu//Sîn-leqe-unīnni</persName>
+                </person>
+                <person role="scribe">
+                    <persName>Nādinu/Bēl-ahhē-iqīša//Egibi</persName>
+                </person>
+                
+                
+            <person xml:id="scribe1">
+               <persName>Liblu#/Mu§ezibMarduk</persName>
+               <note/>
+            </person>
+            <person xml:id="scribe2">
+               <persName>Marduka/Eppe§Ili</persName>
+               <note/>
+            </person>
+            <person xml:id="scribe3">
+               <persName>Bullu#u/Nadin</persName>
+            </person>
+            
+            <person xml:id="scribe5">
+               <persName>[..]/Iddinaja (?)</persName>
+            </person>
+            <person xml:id="scribe6">
+               <persName>Marduka/Mu§ezibBel</persName>
+            </person>
+            
+         	<person xml:id="scribe8">
+         		<persName>Itti-Nabû-balāṭu</persName>
+         	</person>
+         </listPerson>
+      </body>
+   </text>
+</TEI>
