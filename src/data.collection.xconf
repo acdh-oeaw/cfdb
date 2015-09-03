@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<collection xmlns="http://exist-db.org/collection-config/1.0">
+    <index xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:mods="http://www.loc.gov/mods/v3">
+        <fulltext default="none" attributes="false"/>
+        <create type="xs:string" qname="tei:g"/>
+        <create type="xs:string" qname="tei:seg"/>
+        <create type="xs:string" qname="tei:localName"/>
+        <create type="xs:string" qname="tei:value"/>
+        <create type="xs:string" qname="tei:placeName"/>
+        <create type="xs:string" qname="tei:idno"/>
+        <create type="xs:string" qname="tei:collection"/>
+        <create type="xs:string" qname="tei:region"/>
+        <create type="xs:string" qname="tei:date"/>
+        <create type="xs:string" qname="tei:note"/>
+        <create type="xs:string" qname="@key"/>
+        <create type="xs:string" qname="@role"/>
+        <create type="xs:string" qname="@type"/>
+        <create type="xs:string" qname="@target"/>
+        <create type="xs:string" qname="@ana"/>
+        <create type="xs:string" qname="@facs"/>
+        <create type="xs:string" qname="@url"/>
+        <create type="xs:string" qname="@corresp"/>
+    </index>
+</collection>
