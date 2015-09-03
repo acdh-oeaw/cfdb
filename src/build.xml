@@ -58,7 +58,6 @@
         <copy file="annotate.template.xql" tofile="annotate.xql" overwrite="true" />
         <copy file="controller.template.xql" tofile="controller.xql" overwrite="true" />
         <copy file="post-install.template.xql" tofile="post-install.xql" overwrite="true" />
-        <copy file="qa.template.xql" tofile="qa.xql" overwrite="true" />
         <copy file="editArchives.template.html" tofile="editArchives.html" overwrite="true" />
         <copy file="editStdSigns.template.html" tofile="editStdSigns.html" overwrite="true" />
         <copy file="editTablets.template.html" tofile="editTablets.html" overwrite="true" />
