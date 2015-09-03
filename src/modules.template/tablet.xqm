@@ -5,6 +5,7 @@ module namespace tablet = "@app.uri@/tablet";
 import module namespace config="@app.uri@/config" at "xmldb:exist:///db/apps/@app.name@/modules/config.xqm";
 import module namespace surface="@app.uri@/surface" at "xmldb:exist:///db/apps/@app.name@/modules/surface.xqm";
 import module namespace annotation = "@app.uri@/annotations" at "xmldb:exist:///db/apps/@app.name@/modules/annotations.xqm";
+import module namespace cfdb = "@app.uri@/db" at "xmldb:exist:///db/apps/@app.name@/modules/cfdb.xqm";
 
 declare namespace tei = "http://www.tei-c.org/ns/1.0";
 
