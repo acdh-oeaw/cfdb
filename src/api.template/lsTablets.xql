@@ -5,7 +5,7 @@ declare namespace tei = "http://www.tei-c.org/ns/1.0";
 import module namespace api = "@app.uri@/api" at "xmldb:exist://db/apps/@app.name@/modules/api.xqm";
 import module namespace config="@app.uri@/config" at "xmldb:exist://db/apps/@app.name@/modules/config.xqm";
 
-import module namespace tablet="@app.uri@/tablet" at "xmldb:exist://db/apps/@app.name@/modules/tablet.xqm";
+import module namespace cfdb = "@app.uri@/db" at "xmldb:exist:///db/apps/@app.name@/modules/cfdb.xqm";
 
 let $user := xmldb:get-current-user()
 let $log := util:log-app("DEBUG", $config:app-name, "lsTablets.xql called by " ||$user)
