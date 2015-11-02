@@ -44,3 +44,38 @@ declare function cfdb:listStdSigns() as element(tei:char)* {
 declare function cfdb:tablets() as element(tei:TEI)* {
     collection($config:tablets-root)//tei:TEI[tei:sourceDoc]
 };
+
+(: returns an JSON representation of all tablets in the database :)
+declare function cfdb:tabletsAsJSON() as xs:string {
+    cfdb:array(
+        for $t in cfdb:tablets() 
+        return cfdb:object((
+            cfdb:property("id", $t//tei:msIdentifier/tei:idno),
+            cfdb:property("region", $t//tei:collection[@type = "region"]),
+            cfdb:property("archive", $t//tei:collection[@type = "archive"]),
+            cfdb:property("dossier", $t//tei:collection[@type = "dossier"]),
+            cfdb:property("scribe", $t//tei:persName[@role = "scribe"]),
+            cfdb:property("city", $t//tei:origPlace/tei:placeName),
+            cfdb:property("period", $t//tei:origDate/tei:date[@calendar = '#gregorian']/xs:string(@period)),
+            cfdb:property("anteQuem", $t//tei:origDate/tei:date[@calendar = '#gregorian']/xs:string(@notAfter)),
+            cfdb:property("postQuem", $t//tei:origDate/tei:date[@calendar = '#gregorian']/xs:string(@notBefore)),
+            cfdb:property("date", $t//tei:origDate/tei:date[@calendar = '#gregorian']),
+            cfdb:property("dateBabylonian", $t//tei:origDate/tei:date[@calendar = '#babylonian']),
+            cfdb:property("ductus", $t//tei:f[@name = "ducuts"]/tei:symbol/xs:string(@value))
+        ))
+    )
+};
+
+
+declare %private function cfdb:array($objects as xs:string*) {
+    concat("[", string-join($objects, ","), "]") 
+}; 
+
+
+declare %private function cfdb:object($properties as xs:string*) {
+    concat("{", string-join($properties, ","), "}") 
+}; 
+
+declare %private function cfdb:property($key as xs:string, $value as xs:string?) {
+    concat("'",$key,"'",":'",replace($value,"(['])","\\$1"),"'")
+}; 
