@@ -10,6 +10,7 @@ import module namespace config="@app.uri@/config" at "config.xqm";
 import module namespace tablet="@app.uri@/tablet" at "tablet.xqm";
 import module namespace a="@app.uri@/annotations" at "annotations.xqm";
 import module namespace search = "@app.uri@/search" at "search.xqm";
+import module namespace cfdb = "@app.uri@/db" at "cfdb.xqm";
 
 (:~
  : This is a sample templating function. It will be called by the templating module if
