@@ -13,8 +13,17 @@ declare variable $domain := $config:domain;
 
 
 let $login := login:set-user($domain, (), false()),
-    $user := request:get-attribute($domain||".user"),
-    $userAllowed := $user = $config:authorized-users
+    $user := request:get-attribute($domain||".user")
+
+let $set-credentions :=
+    if (request:get-parameter("password", ()) != '' and request:get-parameter("password", ()))
+    then (
+        session:set-attribute("user", $user),
+        session:set-attribute("password", request:get-parameter("password", ()))
+    )
+    else ()
+    
+let $userAllowed := $user = $config:authorized-users
 
 let $log := 
     if (xmldb:get-current-user()!='guest') 
