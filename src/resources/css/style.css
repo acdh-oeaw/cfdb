@@ -28,11 +28,16 @@ body { background: none!important; }
 #tabletHTMLContainer .gThumbnail a:hover > .attributes { background: none repeat scroll 0 0 black; border: 1px solid black; bottom: 0; color: white; display: block; left: 0; position: absolute; width: auto; padding: 2px 0; }
 #tabletHTMLContainer .gThumbnail .attributes { display: none; }
 
+/* index.html */
+#signlist-nav { position: fixed; right: 25px; }
+#signlist-nav span.label:hover { background-color: rgba(160, 160, 160, 0.48)}
+#signlist-nav a:hover { text-decoration: none; }
 
 .thumbnail > .attributes {display: none;}
 .thumbnail:hover {position: relative;}
 .thumbnail:hover > .attributes {background: none repeat scroll 0 0 black; color: white; display: block; left: 25%; padding: 5px; position: absolute; top: 25%; width: 100px;}
 .attribute {display: block;}
+.attribute-label {min-width: 5em; display: inline-block;} 
 
 .hint .hintText {display: none;}
 .hint:hover {position: relative; text-decoration: none; color: black;}
