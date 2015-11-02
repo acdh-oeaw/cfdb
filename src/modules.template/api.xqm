@@ -279,3 +279,27 @@ function api:list-std-signs() {
     return util:serialize($response,"method=json")
 };
 
+(:declare 
+    %rest:POST
+    %rest:path("/cfdb/login")
+    %rest:produces("application/json")
+    %rest:header-param("user", "{$user}")
+    %rest:header-param("password", "{$password}")
+    %output:media-type("application/json")
+function api:login($user as xs:string*, $password as xs:string*) {
+    let $login := xmldb:login($config:data-root,$user[1], $password[1])
+    let $session-token := <token expires="{current-dateTime() + xs:dayTimeDuration("PT1H")}">{util:uuid()}</token>
+    let $store := 
+        if ($login)
+        then xmldb:store($config:app-root||"/data/tokens", $user||".xml", $session-token)
+        else ()
+    let $response := 
+        <cfdb:response>
+            <user>{$user}</user>
+            <password>{$password}</password>
+            <login-result>{$login}</login-result>
+            <token>{$session-token}</token>
+        </cfdb:response>
+    return util:serialize($response,"method=json")
+    
+};:)

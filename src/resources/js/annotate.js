@@ -343,6 +343,36 @@ cfdb.prepUpload = function (uploader, file) {
 };
 
 $(document).ready(function () {
+    /*login via restxq edpoint / token authentication functionality
+    to be tested and implemented*/
+    /*$('#dialog-login').dialog({
+        autoOpen: false
+    });
+    
+    if ( cfdb.user === "" ) {
+       $('#dialog-login').dialog("open"); 
+    }
+    
+    $('#dialog-login form').submit(function(e){
+        e.preventDefault();
+        var formdata = $(e.target).serializeArray();
+        var user = formdata[0].value;
+        var pwd = formdata[1].value;
+        cfdb.user = user;
+        cfdb.password = pwd;
+        $('#dialog-login').dialog("close");
+        var settings = {
+                url : cfdb.url + "login",
+                method : "POST",
+                headers: {
+                    user : cfdb.user,
+                    password : cfdb.password 
+                }
+        }
+        jQuery.ajax(settings);
+        cfdb.loadSigns();
+    });*/
+    
     var $img = $('#img'),
         tmpImg = new Image();
     tmpImg.src = $img.attr("src");

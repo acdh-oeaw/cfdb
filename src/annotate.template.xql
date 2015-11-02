@@ -151,6 +151,17 @@ return
                    <p>Are you sure to delete the selected annotation?</p>
                </div>,
                
+               (: dialog for restxq endpoint token authorization - needs to be tested :) 
+               (:<div id="dialog-login" title="Login">
+                    <form action="" method="post">
+                        <label>User name:</label>
+                        <input id="name" name="name" type="text"/>
+                        <label>Password:</label>
+                        <input id="pwd" name="password" type="password"/>
+                        <input id="submit" type="submit" value="Submit"/>
+                    </form>
+               </div>,:)
+               
                <div id="dialog-confirmSurfaceRemove">
                    <p>Are you sure to delete the current image and all annotated signs on it?</p>
                </div>,
