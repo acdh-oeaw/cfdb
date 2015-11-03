@@ -100,6 +100,63 @@ function api:list-tablets() {
         else api:status("unauthorized", "You are not allowed to access this service")
 };
 
+(: get all attributes of a tablet :)
+declare 
+    %rest:GET
+    %rest:path("/cfdb/tablet/{$tablet-id}")
+    %rest:produces("application/json")
+    %output:media-type("application/json")
+function api:get-tablet-attributes($tablet-id) {
+    let $attributes := tablet:get-attributes($tablet-id)
+    let $response := <cfdb:response>{
+        for $key in map:keys($attributes)[. != ''] 
+        return element {$key} {map:get($attributes, $key)}
+    }</cfdb:response>
+    let $user := xmldb:get-current-user()
+    return 
+        if ($user = $config:authorized-users)
+        then util:serialize($response,"method=json")
+        else api:status("unauthorized", "You are not allowed to access this service")
+};
+
+declare 
+    %rest:GET
+    %rest:path("/cfdb/tablet/{$tablet-id}/{$attribute}")
+    %rest:produces("application/json")
+    %output:media-type("application/json")
+function api:get-tablet-attribute($tablet-id, $attribute) {
+    let $attributes := tablet:get-attributes($tablet-id, $attribute)
+    let $response := <cfdb:response>{
+        for $key in map:keys($attributes)[. != ''] 
+        return element {$key} {map:get($attributes, $key)}
+    }</cfdb:response>
+    let $user := xmldb:get-current-user()
+    return 
+        if ($user = $config:authorized-users)
+        then util:serialize($response,"method=json")
+        else api:status("unauthorized", "You are not allowed to access this service")
+};
+
+declare 
+    %rest:PUT("{$data}")
+    %rest:path("/cfdb/tablet/{$tablet-id}/{$attribute}")
+    %rest:consumes("text/plain")
+    %rest:produces("application/json")
+    %output:media-type("application/json")
+function api:get-tablet-attribute($tablet-id, $attribute, $data) {
+    let $attributes := tablet:set-attribute($tablet-id, $attribute, util:base64-decode($data))
+    let $response := <cfdb:response>{
+        for $key in map:keys($attributes)[. != ''] 
+        return element {$key} {map:get($attributes, $key)}
+    }</cfdb:response>
+    let $user := xmldb:get-current-user()
+    return 
+        if ($user = $config:authorized-users)
+        then util:serialize($response,"method=json")
+        else api:status("unauthorized", "You are not allowed to access this service")
+};
+
+
 
 (: **** SURFACE **** :)
 (:~ delete a surface :)

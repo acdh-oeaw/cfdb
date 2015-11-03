@@ -181,3 +181,74 @@ declare function tablet:listSurfaces($tablet as element(tei:TEI)) as element(tei
     $tablet/tei:sourceDoc/tei:surface
 };
 
+(:~ returns 1-n maps containing values of given attributes for a given tablet
+ : @param $id the ID of the tablet
+ : @param $attributes 1-n names of attributes  
+ : @return a map with one key for each attribute value
+ :)
+declare function tablet:get-attributes($id as xs:string) as map() {
+     tablet:get-attributes($id, ("id", "text", "period", "data-babylonian", "date-gregorian", "postQuem", "anteQuem", "region", "archive", "dossier", "scribe", "ductus"))
+};
+
+(:~ returns 1-n maps containing values of given attributes for a given tablet
+ : @param $id the ID of the tablet
+ : @param $attributes 1-n names of attributes  
+ : @return a map with one key for each attribute value
+ :)
+declare function tablet:get-attributes($id as xs:string, $attributes as xs:string+) as map() {
+    let $tablet := tablet:get($id)
+    let $data := for $a in $attributes return map:entry($a, tablet:index2data($tablet, $a))
+    return map:new($data)
+};
+
+(:~ updates the value of a given attribute on a given tablet
+ : @param $id the ID of the tablet
+ : @param $attribute name of 1 attribute
+ : @param $value the new value
+ : @return the updated tablet 
+ :)
+declare function tablet:set-attribute($id as xs:string, $attribute as xs:string, $value as xs:anyAtomicType) as map() {
+    let $tablet := tablet:get($id)
+    let $data := tablet:index2node($tablet, $attribute)
+    let $update := update value $data with $value
+    return tablet:get-attributes($id)
+};
+
+(:~ returns the value of the given attribute on any node of a tablet
+ : @param $node a node on a tablet
+ : @param $attribute the name of one attribute 
+ : @return the node containing the attribute value  
+ :)
+declare %private function tablet:index2node($node as node(), $attribute as xs:string) as node()? {
+    let $tablet := $node/ancestor-or-self::tei:TEI
+    return
+    if (not(exists($tablet)))
+    then ()
+    else 
+        switch($attribute)
+            case "id" return $tablet/@xml:id 
+            case "text" case "title" return $tablet//tei:sourceDesc/tei:msDesc/tei:msIdentifier/tei:idno[1]
+            case "period" return $tablet//tei:origDate/tei:date/@period
+            case "date-babylonian" return $tablet//tei:origDate/tei:date[@calendar = '#babylonian']
+            case "date-gregorian" return $tablet//tei:origDate/tei:date[@calendar = '#gregorian']
+            case "postQuem" return $tablet//tei:origDate/tei:date[@calendar = '#gregorian']/@notBefore
+            case "anteQuem" return $tablet//tei:origDate/tei:date[@calendar = '#gregorian']/@notAfter
+            case "region" return $tablet//tei:region
+            case "archive" return $tablet//tei:collection[@type='archive']
+            case "dossier" return $tablet//tei:collection[@type='dossier']
+            case "scribe" return $tablet//tei:persName[@role = 'scribe']
+            case "ductus" return $tablet//tei:f[@name = 'ductus']/tei:symbol/@value
+            default return ()
+};
+
+declare %private function tablet:index2data($node as node(), $attribute as xs:string) as xs:anyAtomicType? {
+    let $node := tablet:index2node($node, $attribute)
+    return 
+        if ($node) 
+        then 
+            switch (true())
+                (: should eventually become xs:integer :)
+                case ($attribute = ("date-gregorian", "postQuem", "anteQuem")) return xs:string($node) 
+                default return xs:string($node)
+        else ()
+};
