@@ -500,3 +500,9 @@ return
     "var cfdb = cfdb || {};
 cfdb.tablets = "||$data||";"        
 };
+
+(:declare %templates:wrap function app:creds($node as node(), $model as map()) {
+"var cfdb = cfdb || {};
+cfdb.user = '"||session:get-attribute("user")||"';
+cfdb.password = '"||session:get-attribute("password")||"';"
+};:)
