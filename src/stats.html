@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <div xmlns="http://www.w3.org/1999/xhtml" data-template="templates:surround" data-template-with="templates/page.html" data-template-at="content">
     <script type="text/javascript" data-template="app:tabletsAsJson"/>
-    <script type="text/javascript" src="resources/js/jsgrid-1.2.0/jsgrid.min.js"/>
+    <!--<script type="text/javascript" src="resources/js/jsgrid-1.2.0/jsgrid.min.js"/>
     <link type="text/css" rel="stylesheet" href="resources/js/jsgrid-1.2.0/jsgrid.min.css"/>
     <link type="text/css" rel="stylesheet" href="resources/js/jsgrid-1.2.0/jsgrid-theme.min.css"/>
     <script type="text/javascript">
@@ -32,7 +32,9 @@
                 { name: "ductus", title: "Ductus", type: "text" }
             ]
         })});
-    </script>
+    </script>-->
+    <script src="http://handsontable.com/dist/handsontable.full.js"/>
+    <link rel="stylesheet" media="screen" href="http://handsontable.com/dist/handsontable.full.css"/>
     <div class="row-fluid">
         <div class="span12">
             <div class="tabbable">
@@ -66,10 +68,36 @@
                             <tr data-template="app:oneRowPerTablet"/>
                         </tbody>
                     </table>-->
-                    <div id="jsGrid"/>
+                    <!--<div id="jsGrid"/>-->
+                    <div id="grid"/>
                 </div>
                 <div class="tab-pane" id="tab2"> </div>
             </div>
         </div>
     </div>
+    <script type="text/javascript">
+        var grid = document.getElementById('grid');
+        var hot = new Handsontable(grid, {
+            data: cfdb.tablets,
+            columnSorting: true,
+            minSpareRows: 1,
+            rowHeaders: true,
+            colHeaders: ['Text', 'Region', 'Archive', 'Dossier', 'Scribe', 'City', 'Period', 'Ante Quem', 'Post Quem', 'Date', 'Date (Babylonian)', 'Ductus'],
+            contextMenu: true,
+            columns: [
+                {data: 'id'},
+                {data: 'region'},
+                {data: 'archive'},
+                {data: 'dossier'},
+                {data: 'scribe'},
+                {data: 'city'},
+                {data: 'period'},
+                {data: 'anteQuem'},
+                {data: 'postQuem'},
+                {data: 'date'},
+                {data: 'dateBabylonian'},
+                {data: 'ductus'}
+            ]
+        });
+    </script>
 </div>
