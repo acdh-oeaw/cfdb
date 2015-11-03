@@ -51,7 +51,7 @@ declare function cfdb:tabletsAsJSON() as xs:string {
         for $t in cfdb:tablets() 
         return cfdb:object((
             cfdb:property("id", $t//tei:msIdentifier/tei:idno),
-            cfdb:property("region", $t//tei:collection[@type = "region"]),
+            cfdb:property("region", $t//tei:msIdentifier/tei:region),
             cfdb:property("archive", $t//tei:collection[@type = "archive"]),
             cfdb:property("dossier", $t//tei:collection[@type = "dossier"]),
             cfdb:property("scribe", $t//tei:persName[@role = "scribe"]),
@@ -61,7 +61,7 @@ declare function cfdb:tabletsAsJSON() as xs:string {
             cfdb:property("postQuem", $t//tei:origDate/tei:date[@calendar = '#gregorian']/xs:string(@notBefore)),
             cfdb:property("date", $t//tei:origDate/tei:date[@calendar = '#gregorian']),
             cfdb:property("dateBabylonian", $t//tei:origDate/tei:date[@calendar = '#babylonian']),
-            cfdb:property("ductus", $t//tei:f[@name = "ducuts"]/tei:symbol/xs:string(@value))
+            cfdb:property("ductus", $t//tei:f[@name = "ductus"]/tei:symbol/xs:string(@value))
         ))
     )
 };
