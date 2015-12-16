@@ -2,6 +2,7 @@ var cfdb = cfdb || {};
 cfdb.signlist = {};
 
 var submitTimeout;
+var defaultTimeout = 700;
 cfdb.dateRange = {};
 cfdb.dateRange.max = 0;
 cfdb.dateRange.min = -800;
@@ -12,7 +13,7 @@ $(document).ready(function(){
         if (submitTimeout) {
             clearTimeout(submitTimeout);
         }
-        submitTimeout = setTimeout(cfdb.signlist.submitnavform, 1000);
+        submitTimeout = setTimeout(cfdb.signlist.submitnavform, defaultTimeout);
     });
     
     // remove filter and autoload 
@@ -26,6 +27,10 @@ $(document).ready(function(){
         } else {
             $( "#slider-range" ).slider("values", [sliderVals[0], cfdb.dateRange.max]);
         }
+        if (submitTimeout) {
+            clearTimeout(submitTimeout);
+        }
+        submitTimeout = setTimeout(cfdb.signlist.submitnavform, defaultTimeout);
     });
     
     //pagination links set the values of the "s" input and submit the form
@@ -61,11 +66,17 @@ $(document).ready(function(){
         labelMax.html(cfdb.dateRange.max.toString().replace("-","") + " BC");
         labelMin.html(cfdb.dateRange.min.toString().replace("-","") + " BC");
         
-        if (before != cfdb.dateRange.max) {
+        /* if selected lower and upper limits are the same as the range minimum and maximum 
+           hide the labels, otherwise show them and update the label text. */
+        if (before == cfdb.dateRange.max) {
+            labelBefore.parent().addClass("hidden"); 
+        } else  {
             labelBefore.parent().removeClass("hidden");
             labelBefore.html("before " + before.toString().replace("-","") + " BC" );
         }
-        if (after  != cfdb.dateRange.min) {
+        if (after == cfdb.dateRange.min) {
+            labelAfter.parent().addClass("hidden"); 
+        } else  {
             labelAfter.parent().removeClass("hidden");
             labelAfter.html( "after " + after.toString().replace("-","") + " BC" );
         }
@@ -89,6 +100,10 @@ $(document).ready(function(){
         $( "#after-display .content" ).html( "after " + after.toString().replace("-","") + " BC");
         $("#before-input").val(before);
         $("#after-input").val(after);
+        if (submitTimeout) {
+            clearTimeout(submitTimeout);
+        }
+        submitTimeout = setTimeout(cfdb.signlist.submitnavform, defaultTimeout);
       }
     });
 });

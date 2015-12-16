@@ -400,7 +400,7 @@ return
                     $o/@n||" "||$o/tei:charName||" ("||$no||")"
                 )}</option>
             }</select>
-            <input type="submit" value="send"/>
+            <!--<input type="submit" value="send"/>-->
         </div>
     </form>
 </div>
