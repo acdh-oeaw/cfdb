@@ -450,12 +450,18 @@ function app:signlist($node as node(), $model as map(), $s as xs:string*, $order
                             case "city" return $city
                             case "scribe" return $scribe
                             case "archive" return $archive
-                            default return true()
+                            default return true() 
+                let $dateBefore := ($date[@calendar = "#gregorian"], $date[@calendar = "#gregorian"]/@notAfter)[. != ""][1]/xs:integer(if(contains(.,'~')) then replace(.,'~','') else .),
+                    $dateAfter := ($date[@calendar = "#gregorian"], $date[@calendar = "#gregorian"]/@notBefore)[. != ""][1]/xs:integer(if(contains(.,'~')) then replace(.,'~','') else .)
+                let $dateFilter := count(($dateBefore,$dateAfter)) gt 0 and not(some $d in ($dateBefore gt $before, $dateAfter lt $after) satisfies exists($d) and $d = false())
+                where 
+                    if ($before or $after) 
+                    then $dateFilter = true() 
+                    else true()
                 group by $groupexpr
-                order by $groupexpr
                 return      
                     <div>
-                        <h4>{if (normalize-space($groupby) = "") then "All Occurences" else (xs:string($groupexpr),"[no value]")[.!=''][1]}</h4> 
+                        <h4>{if (normalize-space($groupby) = "") then "All Occurences" else (xs:string($groupexpr),"[no value]")[.!=''][1]}&#160;<small>{count($group)}  occurences</small></h4> 
                         <ul class="thumbnails">{
                             for $g in $group
                             let $tablet-id := $g/ancestor::tei:TEI/@xml:id,
@@ -475,14 +481,10 @@ function app:signlist($node as node(), $model as map(), $s as xs:string*, $order
                             let $dateFilter := count(($dateBefore,$dateAfter)) gt 0 and not(some $d in ($dateBefore gt $before, $dateAfter lt $after) satisfies exists($d) and $d = false())
                             let $orderexpr := switch ($order)
                                 case "date" return $date[@calendar = '#gregorian']/replace(.,'^~','') 
-                                case "period" return $period
+                                case "period" return $date[@calendar = '#gregorian']/replace(.,'^~','')
                                 case "city" return $city
                                 default return true()
-                            where 
-                                if ($before or $after) 
-                                then $dateFilter = true() 
-                                else true()
-                            order by $orderexpr 
+                            order by $orderexpr  
                             return 
                             <li class="span2 gThumbnail">
                                 <a href="#" class="thumbnail">
