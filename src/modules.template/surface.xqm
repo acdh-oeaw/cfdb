@@ -110,36 +110,10 @@ declare function surface:list-annotations($tablet as element(tei:TEI), $surface-
 declare function surface:list-annotations($tablet as element(tei:TEI), $surface-id as xs:string, $filter as xs:string*) {
     let $tablet-id := tablet:id($tablet),
         $surface := surface:get($tablet, $surface-id)
-    let $glyphs := 
-        for $zone in reverse($surface/tei:zone)
-            let $glyph-zone := $zone/tei:zone,
-                $img := $glyph-zone/tei:graphic/xs:string(@url)            
-            let $context-id := substring-after($zone/@corresp,'#')
-            let $context := $tablet//tei:seg[@type='context'][@xml:id = $context-id],
-                $glyph := $context/tei:g,
-                $char := $tablet//tei:glyph[@xml:id = substring-after($glyph/@ana,'#')],
-                $note := $tablet//tei:note[@target = "#"||$glyph/@xml:id]
-            return 
-                <annotation>
-                    <uuid>{substring-after($context-id,'context_')}</uuid>
-                    <tablet>{$tablet-id}</tablet>
-                    <img>/exist/apps/@app.name@/$app-root/data/tablets/{$tablet-id||"/"||$img}</img>
-                    <surface>{$surface-id}</surface>
-                    <x>{$glyph-zone/number(@ulx)}</x>
-                    <y>{$glyph-zone/number(@uly)}</y>
-                    <width>{number($glyph-zone/@lrx) - number($glyph-zone/@ulx)}</width>
-                    <height>{number($glyph-zone/@lry) - number($glyph-zone/@uly)}</height>
-                    <sign>{$glyph/xs:string(@type)}</sign>
-                    <reading>{$glyph/text()}</reading>
-                    <context>{annotation:renderContext($context)}</context>
-                    <sequence>{$char/tei:charProp[tei:localName='sequence']/tei:value/text()}</sequence>
-                    <note>{$note/text()}</note>
-                </annotation>
-    let $filtered := 
-        if ($filter = '') 
-        then $glyphs
-        else $glyphs[some $x in descendant::* satisfies contains($x,$filter)]
-    return $filtered
+    return 
+        for $glyph-zone in reverse($surface/tei:zone)/tei:zone
+        let $annotation-id := substring-after($glyph-zone/@corresp,'#glyph_')
+        return annotation:read($tablet, $surface-id, $annotation-id, $filter) 
     (:let $response := <cfdb:response>{$filtered}</cfdb:response> 
     return util:serialize($response,"method=json"):)
 (:    return $response:)
