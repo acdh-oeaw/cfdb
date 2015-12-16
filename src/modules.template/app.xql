@@ -363,28 +363,34 @@ return
     <h4>Grouping / Navigation</h4>
     <div>
         <ul class="inline">
-            <li><span class="label label-{if ($groupby='period') then 'info' else 'default'}"><a style="color:white;" href="?{if ($groupby = "period") then () else "groupby=period"}{string-join((for $ss in $s return '&amp;s='||$ss),'')}">Period</a></span></li>
-            <li><span class="label label-{if ($groupby='city') then 'info' else 'default'}"><a style="color:white;" href="?{if ($groupby = "city") then () else "groupby=city"}{string-join((for $ss in $s return '&amp;s='||$ss),'')}">City</a></span></li>
-            <li><span class="label label-{if ($groupby='scribe') then 'info' else 'default'}"><a style="color:white;" href="?{if ($groupby = "scribe") then () else "groupby=scribe"}{string-join((for $ss in $s return '&amp;s='||$ss),'')}">Scribe</a></span></li>
-            <li><span class="label label-{if ($groupby='archive') then 'info' else 'default'}"><a style="color:white;" href="?{if ($groupby = "archive") then () else "groupby=archive"}{string-join((for $ss in $s return '&amp;s='||$ss),'')}">Archive</a></span></li>
+            <li><span class="label label-{if ($groupby='period') then 'info' else 'default'}"><a style="color:white;" href="?{if ($groupby = "period") then () else "groupby=period"}{string-join((for $ss in $s return '&amp;s='||$ss),'')}{if (exists($before)) then '&amp;before='||$before else ''}{if (exists($after)) then '&amp;after='||$after else ''}">Period</a></span></li>
+            <li><span class="label label-{if ($groupby='city') then 'info' else 'default'}"><a style="color:white;" href="?{if ($groupby = "city") then () else "groupby=city"}{string-join((for $ss in $s return '&amp;s='||$ss),'')}{if (exists($before)) then '&amp;before='||$before else ''}{if (exists($after)) then '&amp;after='||$after else ''}">City</a></span></li>
+            <li><span class="label label-{if ($groupby='scribe') then 'info' else 'default'}"><a style="color:white;" href="?{if ($groupby = "scribe") then () else "groupby=scribe"}{string-join((for $ss in $s return '&amp;s='||$ss),'')}{if (exists($before)) then '&amp;before='||$before else ''}{if (exists($after)) then '&amp;after='||$after else ''}">Scribe</a></span></li>
+            <li><span class="label label-{if ($groupby='archive') then 'info' else 'default'}"><a style="color:white;" href="?{if ($groupby = "archive") then () else "groupby=archive"}{string-join((for $ss in $s return '&amp;s='||$ss),'')}{if (exists($before)) then '&amp;before='||$before else ''}{if (exists($after)) then '&amp;after='||$after else ''}">Archive</a></span></li>
         </ul>
     </div>
     <div class="pagination">
       <ul>
-        {if (exists($prev)) then <li><a href="{concat('?groupby=',$groupby,'&amp;s=',$prev/tei:charName)}">« {$prev/tei:charName}</a></li> else ()}
-        {if (exists($next)) then <li><a href="{concat('?groupby=',$groupby,'&amp;s=',$next/tei:charName)}">{$next/tei:charName} »</a></li> else ()}
+        {if (exists($prev)) then <li><a data-s="{$prev/tei:charName}" href="{concat('?groupby=',$groupby,'&amp;s=',$prev/tei:charName)}{if (exists($before)) then '&amp;before='||$before else ''}{if (exists($after)) then '&amp;after='||$after else ''}">« {$prev/tei:charName}</a></li> else ()}
+        <li class="disabled"><a href="#">{string-join($current-signs, " ")}</a></li>
+        {if (exists($next)) then <li><a data-s="{$next/tei:charName}" href="{concat('?groupby=',$groupby,'&amp;s=',$next/tei:charName)}{if (exists($before)) then '&amp;before='||$before else ''}{if (exists($after)) then '&amp;after='||$after else ''}">{$next/tei:charName} »</a></li> else ()}
       </ul>
     </div>
     <form method="get" id="signlist-nav-form"><!-- id is used in signlist.js, do not change -->
         <input type="hidden" name="groupby" value="{$groupby}"/>
-        <p>
+        <div>
             <div class="control-group">
-                <!--<label for="after">after</label>
-                <input type="text" name="after" id="after" data-template="templates:form-control" size="5">{if ($after) then attribute value {$after} else ()}</input>
-                <label for="before">before</label>
-                <input type="text" name="before" id="before" data-template="templates:form-control" size="5">{if ($before) then attribute value {$before} else ()}</input>-->
-                <div id="slider-range"></div>
+                <div id="slider-range">
+                    <span id="slider-range-min"></span>
+                    <span id="slider-range-max"></span>
+                </div>
+                <p>
+                    <span class="label label-info{if($after) then '' else ' hidden'}" id="after-display"><span class="content"></span><a class="removeDateFilter" data-filter="after" title="remove filter" href="#"><i class="fa fa-times">&#160;</i></a></span>
+                    <span class="label label-info{if($before) then '' else ' hidden'}" id="before-display"><span class="content"></span><a class="removeDateFilter" data-filter="before" title="remove filter" href="#"><i class="fa fa-times">&#160;</i></a></span>
+                </p>
             </div>
+            <input id="before-input" type="hidden" name="before" value="{$before}"/>
+            <input id="after-input" type="hidden" name="after" value="{$after}"/>
             <select name="s" multiple="" size="30">{
                 for $o in $cfdb:stdSigns
                 let $glyphs := collection($config:tablets-root)//tei:g[@type = $o/tei:charName],
@@ -394,8 +400,8 @@ return
                     $o/@n||" "||$o/tei:charName||" ("||$no||")"
                 )}</option>
             }</select>
-            <input type="submit" value="submit"/>
-        </p>
+            <input type="submit" value="send"/>
+        </div>
     </form>
 </div>
 };
@@ -405,7 +411,9 @@ declare
 function app:signlist($node as node(), $model as map(), $s as xs:string*, $order as xs:string*, $groupby as xs:string*, $after as xs:integer*, $before as xs:integer*) {
     let $groupby := subsequence($groupby,1,1),
         $after := subsequence($after[exists(.)], 1, 1),
-        $before := subsequence($before[exists(.)], 1, 1)
+        $after := if ($after lt 0) then $after * -1 else $after,
+        $before := subsequence($before[exists(.)], 1, 1),
+        $before := if ($before lt 0) then $before * -1 else $before
     let $stdsigns := $cfdb:stdSigns
     let $current-url := concat(
                             "?",
@@ -417,7 +425,7 @@ function app:signlist($node as node(), $model as map(), $s as xs:string*, $order
         let $no := count($glyphs)
         order by $stdsign/@n
         return 
-            <div xmlns="http://www.w3.org/1999/xhtml">
+            <div xmlns="http://www.w3.org/1999/xhtml" class="row-fluid">
                 <div class="span3">
                     <h3>{$stdsign/tei:charName}<br/>
                     {$stdsign/xs:string(@n)}</h3>
@@ -446,49 +454,53 @@ function app:signlist($node as node(), $model as map(), $s as xs:string*, $order
                 group by $groupexpr
                 order by $groupexpr
                 return      
-                    (<h4>{if (normalize-space($groupby) = "") then "All Occurences" else (xs:string($groupexpr),"[no value]")[.!=''][1]}</h4>, 
-                    <ul class="thumbnails">{
-                        for $g in $group
-                        let $tablet-id := $g/ancestor::tei:TEI/@xml:id,
-                            $glyph-id := $g/@xml:id,
-                            $facspath := root($g)//tei:graphic[@xml:id = substring-after($g/@facs,'#')]/@url,
-                            $facsurl :=  concat('$app-root/data/tablets/',$tablet-id,'/',$facspath)
-                        let $msIdentifier := root($g)//tei:msIdentifier,
-                            $archive := $msIdentifier/tei:collection[@type="archive"],
-                            $museumNo := $msIdentifier/tei:altIdentifier[@type="museumNumber"]
-                        let $creation := $g/root()//tei:creation,
-                            $date := $creation/tei:origDate/tei:date,
-                            $period := $date[@period]/@period, 
-                            $city := $creation/tei:origPlace/tei:placeName,
-                            $context := $g/parent::tei:seg
-                        let $dateBefore := ($date[@calendar = "#gregorian"], $date[@calendar = "#gregorian"]/@notAfter)[. != ""][1]/xs:integer(if(contains(.,'~')) then replace(.,'~','') else .),
-                            $dateAfter := ($date[@calendar = "#gregorian"], $date[@calendar = "#gregorian"]/@notBefore)[. != ""][1]/xs:integer(if(contains(.,'~')) then replace(.,'~','') else .)
-                        let $dateFilter := count(($dateBefore,$dateAfter)) gt 0 and not(some $d in ($dateBefore gt $before, $dateAfter lt $after) satisfies exists($d) and $d = false())
-                        let $orderexpr := switch ($order)
-                            case "date" return $date[@calendar = '#gregorian']/replace(.,'^~','') 
-                            case "period" return $period
-                            case "city" return $city
-                            default return true()
-                        where $dateFilter = true()
-                        order by $orderexpr 
-                        return 
-                        <li class="span2 gThumbnail">
-                            <a href="#" class="thumbnail">
-                                <img src="{$facsurl}"/>
-                                <span class="attributes" style="width:auto; min-width: 250px;">
-                                    <span class="attribute"><span class="attribute-label">Text:</span><span class="attribute-value">{$museumNo}</span></span>
-                                    <span class="attribute"><span class="attribute-label">Archive:</span><span class="attribute-value">{$archive}</span></span>
-                                    <span class="attribute"><span class="attribute-label">Reading:</span><span class="attribute-value">{$g}</span></span>
-                                    <span class="attribute"><span class="attribute-label">Context:</span><span class="attribute-value">{$context}</span></span>
-                                    <span class="attribute"><span class="attribute-label">City:</span><span class="attribute-value">{$city}</span></span>
-                                    <span class="attribute"><span class="attribute-label">Period:</span><span class="attribute-value">{$date[@period]/@period}</span></span>
-                                    <span class="attribute"><span class="attribute-label">Date:</span><span class="attribute-value">{if ($date[@calendar="#gregorian"] != '') then $date[@calendar="#gregorian"] else concat($date[@calendar="#gregorian"]/xs:string(@notBefore), ' / ', $date[@calendar="#gregorian"]/@notAfter)}</span></span>
-                                    <span class="attribute"><span class="attribute-label">Date (Babylonian):</span><span class="attribute-value">{$date[@calendar = '#babylonian']}</span></span>
-                                </span>
-                            </a>
-                        </li>
-                    }</ul>
-                    )
+                    <div>
+                        <h4>{if (normalize-space($groupby) = "") then "All Occurences" else (xs:string($groupexpr),"[no value]")[.!=''][1]}</h4> 
+                        <ul class="thumbnails">{
+                            for $g in $group
+                            let $tablet-id := $g/ancestor::tei:TEI/@xml:id,
+                                $glyph-id := $g/@xml:id,
+                                $facspath := root($g)//tei:graphic[@xml:id = substring-after($g/@facs,'#')]/@url,
+                                $facsurl :=  concat('$app-root/data/tablets/',$tablet-id,'/',$facspath)
+                            let $msIdentifier := root($g)//tei:msIdentifier,
+                                $archive := $msIdentifier/tei:collection[@type="archive"],
+                                $museumNo := $msIdentifier/tei:altIdentifier[@type="museumNumber"]
+                            let $creation := $g/root()//tei:creation,
+                                $date := $creation/tei:origDate/tei:date,
+                                $period := $date[@period]/@period, 
+                                $city := $creation/tei:origPlace/tei:placeName,
+                                $context := $g/parent::tei:seg
+                            let $dateBefore := ($date[@calendar = "#gregorian"], $date[@calendar = "#gregorian"]/@notAfter)[. != ""][1]/xs:integer(if(contains(.,'~')) then replace(.,'~','') else .),
+                                $dateAfter := ($date[@calendar = "#gregorian"], $date[@calendar = "#gregorian"]/@notBefore)[. != ""][1]/xs:integer(if(contains(.,'~')) then replace(.,'~','') else .)
+                            let $dateFilter := count(($dateBefore,$dateAfter)) gt 0 and not(some $d in ($dateBefore gt $before, $dateAfter lt $after) satisfies exists($d) and $d = false())
+                            let $orderexpr := switch ($order)
+                                case "date" return $date[@calendar = '#gregorian']/replace(.,'^~','') 
+                                case "period" return $period
+                                case "city" return $city
+                                default return true()
+                            where 
+                                if ($before or $after) 
+                                then $dateFilter = true() 
+                                else true()
+                            order by $orderexpr 
+                            return 
+                            <li class="span2 gThumbnail">
+                                <a href="#" class="thumbnail">
+                                    <img src="{$facsurl}"/>
+                                    <span class="attributes" style="width:auto; min-width: 250px;">
+                                        <span class="attribute"><span class="attribute-label">Text:</span><span class="attribute-value">{$museumNo}</span></span>
+                                        <span class="attribute"><span class="attribute-label">Archive:</span><span class="attribute-value">{$archive}</span></span>
+                                        <span class="attribute"><span class="attribute-label">Reading:</span><span class="attribute-value">{$g}</span></span>
+                                        <span class="attribute"><span class="attribute-label">Context:</span><span class="attribute-value">{$context}</span></span>
+                                        <span class="attribute"><span class="attribute-label">City:</span><span class="attribute-value">{$city}</span></span>
+                                        <span class="attribute"><span class="attribute-label">Period:</span><span class="attribute-value">{$date[@period]/@period}</span></span>
+                                        <span class="attribute"><span class="attribute-label">Date:</span><span class="attribute-value">{if ($date[@calendar="#gregorian"] != '') then $date[@calendar="#gregorian"] else concat($date[@calendar="#gregorian"]/xs:string(@notBefore), ' / ', $date[@calendar="#gregorian"]/@notAfter)}</span></span>
+                                        <span class="attribute"><span class="attribute-label">Date (Babylonian):</span><span class="attribute-value">{$date[@calendar = '#babylonian']}</span></span>
+                                    </span>
+                                </a>
+                            </li>
+                        }</ul>
+                    </div>
                 }
                 </div>
             </div>

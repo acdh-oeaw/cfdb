@@ -33,6 +33,14 @@ body { background: none!important; }
 #signlist-nav span.label:hover { background-color: rgba(160, 160, 160, 0.48)}
 #signlist-nav a:hover { text-decoration: none; }
 
+#after-display, #before-display {margin-right: 1em;}
+#after-display i, #before-display i {color:  white;}
+
+#slider-range {margin-bottom: 3em;}
+#slider-range-min, #slider-range-max {padding-top: 1.5em; position: absolute; }
+#slider-range-min {left: -0.6em;}
+#slider-range-max {right: 0;}
+
 .thumbnail > .attributes {display: none;}
 .thumbnail:hover {position: relative;}
 .thumbnail:hover > .attributes {background: none repeat scroll 0 0 black; color: white; display: block; left: 25%; padding: 5px; position: absolute; top: 25%; width: 100px;}
@@ -48,3 +56,6 @@ body { background: none!important; }
 .facet-selected {border: 1px solid red; border-radius: 4px; padding: 6px;}
 .rmFacet {float: right; margin-top: 2px;}
 #clearSignSelection {vertical-align: top; margin-left: 10px;}
+
+/* stats.html */
+.jsgrid-table {font-size: 12px;}
