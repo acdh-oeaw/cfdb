@@ -268,10 +268,12 @@ declare
 function api:read-annotation($tablet-id as xs:string, $surface-id as xs:string, $annotation-id as xs:string, $filter as xs:string*) {
     let $tablet := tablet:get($tablet-id)
     let $log := util:log-app("DEBUG", "cfdb", "api:read-annotation() current-user: "||xmldb:get-current-user())
-    return 
+    let $annotation :=  annotation:read($tablet, $surface-id, $annotation-id, $filter)
+    let $response := 
         if (exists($tablet))
-        then annotation:read($tablet, $surface-id, $annotation-id, $filter) 
+        then <cfdb:response>{$data}</cfdb:response> 
         else "tablet with id "||$tablet-id||" not available"
+    return util:serialize($response,"method=json")
 };
 
 declare

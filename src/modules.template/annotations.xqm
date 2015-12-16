@@ -223,13 +223,16 @@ declare function annotation:read($tablet as element(tei:TEI), $surface-id as xs:
             <y>{$glyph-zone/number(@uly)}</y>
             <width>{number($glyph-zone/@lrx) - number($glyph-zone/@ulx)}</width>
             <height>{number($glyph-zone/@lry) - number($glyph-zone/@uly)}</height>
-            <reading>{$glyph/text()}</reading>
-            <context>{annotation:renderContext($context)}</context>
             <sign>{$glyph/xs:string(@type)}</sign>
+            <reading>{lower-case($glyph/text())}</reading>
+            <context>{annotation:renderContext($context)}</context>
+            <sequence>{$char/tei:charProp[tei:localName='sequence']/tei:value/text()}</sequence>
             <note>{$note/text()}</note>
         </annotation>
-    let $response := <cfdb:response>{$data}</cfdb:response> 
-    return util:serialize($response,"method=json")
+    return  
+        if ($filter = '') 
+        then $data
+        else $data[some $x in descendant::* satisfies contains(lower-case($x),$filter)]
 };
 
 
@@ -441,7 +444,7 @@ declare function annotation:parseContext($context as xs:string, $reading as xs:s
     if ($context = '' or $reading = '')
     then ()
     else 
-        let $ana := fn:analyze-string($context, $reading)
+        let $ana := fn:analyze-string($context, $reading, "i")
         let $highlighted := annotation:highlightMatch($ana)
         let $before := replace(string-join($highlighted/fn:match[@is-reading='true']/preceding-sibling::*,''),'\s+',' '),
             $glyph := $highlighted/fn:match[@is-reading='true']/text(),
@@ -464,7 +467,7 @@ declare function annotation:parsedContextToString($parsed as map()) as xs:string
 
 declare function annotation:renderContext($context as element(tei:seg)) (:as xs:string:) {
     let $glyph := $context/tei:g,
-        $ana := fn:analyze-string(xs:string($context), xs:string($glyph))
+        $ana := fn:analyze-string(xs:string($context), xs:string($glyph), "i")
     let $content := 
         switch(count($ana/fn:match))
             case 0 return $context/normalize-space(.)
