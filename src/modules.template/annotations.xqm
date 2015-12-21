@@ -224,7 +224,7 @@ declare function annotation:read($tablet as element(tei:TEI), $surface-id as xs:
             <width>{number($glyph-zone/@lrx) - number($glyph-zone/@ulx)}</width>
             <height>{number($glyph-zone/@lry) - number($glyph-zone/@uly)}</height>
             <sign>{$glyph/xs:string(@type)}</sign>
-            <reading>{lower-case($glyph/text())}</reading>
+            <reading>{if (matches($glyph/text(),"^\p{Lu}+$")) then $glyph/text() else lower-case($glyph/text())}</reading>
             <context>{annotation:renderContext($context)}</context>
             <sequence>{$char/tei:charProp[tei:localName='sequence']/tei:value/text()}</sequence>
             <note>{$note/text()}</note>
