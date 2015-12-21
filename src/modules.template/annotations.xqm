@@ -4,6 +4,7 @@ module namespace annotation = "@app.uri@/annotations";
 
 import module namespace config = "@app.uri@/config" at "xmldb:exist:///db/apps/@app.name@/modules/config.xqm";
 import module namespace tablet = "@app.uri@/tablet" at "xmldb:exist:///db/apps/@app.name@/modules/tablet.xqm";
+import module namespace functx = "http://www.functx.com"; 
 
 declare namespace tei = "http://www.tei-c.org/ns/1.0";
 declare namespace cfdb = "@app.uri@";
@@ -444,7 +445,7 @@ declare function annotation:parseContext($context as xs:string, $reading as xs:s
     if ($context = '' or $reading = '')
     then ()
     else 
-        let $ana := fn:analyze-string($context, $reading, "i")
+        let $ana := fn:analyze-string($context, functx:escape-for-regex($reading), "i")
         let $highlighted := annotation:highlightMatch($ana)
         let $before := replace(string-join($highlighted/fn:match[@is-reading='true']/preceding-sibling::*,''),'\s+',' '),
             $glyph := $highlighted/fn:match[@is-reading='true']/text(),
