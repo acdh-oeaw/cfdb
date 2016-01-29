@@ -233,7 +233,7 @@ declare function annotation:read($tablet as element(tei:TEI), $surface-id as xs:
     return  
         if ($filter = '') 
         then $data
-        else $data[some $x in descendant::* satisfies contains(lower-case($x),$filter)]
+        else $data[some $x in descendant::* satisfies contains(lower-case($x),lower-case($filter))]
 };
 
 
