@@ -15,6 +15,11 @@ declare variable $tablet:template := doc($tablet:template-filepath);
 declare variable $tablet:seed-xsl-filepath := $config:app-root||"/seed.xsl";
 declare variable $tablet:seed-xsl := doc($tablet:seed-xsl-filepath);
 
+(:~ This module combines function that operate on one single tablet. 
+ : Operations on more than one tablet are kept under cfdb.xqm, 
+ : operations on annotations under annotations.xqm
+:)
+
 (:~
  : stores a new tablet document (based on form data) by creating a collection 
  : inside of $config:tablets-root and storing the data in there.
@@ -79,8 +84,7 @@ declare function tablet:setACL($paths as xs:string+) {
  : @return the tablet's tei:TEI element 
  :)
 declare function tablet:get($id as xs:string) as element(tei:TEI)? {
-    let $log := util:log-app("DEBUG", $config:app-name, "tablet:get("||$id||")")
-    return collection($config:tablets-root)//tei:TEI[tei:sourceDoc][@xml:id = $id]
+    collection($config:tablets-root)//tei:TEI[tei:sourceDoc][@xml:id = $id]
 };
 
 
@@ -182,12 +186,13 @@ declare function tablet:listSurfaces($tablet as element(tei:TEI)) as element(tei
 };
 
 (:~ returns 1-n maps containing values of given attributes for a given tablet
+ : NB The list of fields should at least contain the ones used by the jSGrid (resources/js/jsGrid.js)
  : @param $id the ID of the tablet
  : @param $attributes 1-n names of attributes  
  : @return a map with one key for each attribute value
  :)
 declare function tablet:get-attributes($id as xs:string) as map() {
-     tablet:get-attributes($id, ("id", "text", "period", "data-babylonian", "date-gregorian", "postQuem", "anteQuem", "region", "archive", "dossier", "scribe", "ductus"))
+     tablet:get-attributes($id, ("id", "text", "period", "date-babylonian", "date", "postQuem", "anteQuem", "region", "archive", "dossier", "scribe", "ductus", "editable"))
 };
 
 (:~ returns 1-n maps containing values of given attributes for a given tablet
@@ -227,10 +232,10 @@ declare %private function tablet:index2node($node as node(), $attribute as xs:st
     else 
         switch($attribute)
             case "id" return $tablet/@xml:id 
-            case "text" case "title" return $tablet//tei:sourceDesc/tei:msDesc/tei:msIdentifier/tei:idno[1]
+            case "text" return $tablet//tei:sourceDesc/tei:msDesc/tei:msIdentifier/tei:idno[1]
             case "period" return $tablet//tei:origDate/tei:date/@period
             case "date-babylonian" return $tablet//tei:origDate/tei:date[@calendar = '#babylonian']
-            case "date-gregorian" return $tablet//tei:origDate/tei:date[@calendar = '#gregorian']
+            case "date" return $tablet//tei:origDate/tei:date[@calendar = '#gregorian']
             case "postQuem" return $tablet//tei:origDate/tei:date[@calendar = '#gregorian']/@notBefore
             case "anteQuem" return $tablet//tei:origDate/tei:date[@calendar = '#gregorian']/@notAfter
             case "region" return $tablet//tei:region
@@ -238,7 +243,7 @@ declare %private function tablet:index2node($node as node(), $attribute as xs:st
             case "dossier" return $tablet//tei:collection[@type='dossier']
             case "scribe" return $tablet//tei:persName[@role = 'scribe']
             case "ductus" return $tablet//tei:f[@name = 'ductus']/tei:symbol/@value
-            default return ()
+            default return $node
 };
 
 declare %private function tablet:index2data($node as node(), $attribute as xs:string) as xs:anyAtomicType? {
@@ -248,7 +253,15 @@ declare %private function tablet:index2data($node as node(), $attribute as xs:st
         then 
             switch (true())
                 (: should eventually become xs:integer :)
-                case ($attribute = ("date-gregorian", "postQuem", "anteQuem")) return xs:string($node) 
+                case ($attribute = ("date-gregorian", "postQuem", "anteQuem")) return xs:string($node)
+                case ($attribute = "editable") return 
+                    let $owner := sm:get-permissions(base-uri($node))/*/@owner,
+                        $cfdbEditors := sm:get-group-members("cfdbEditors")
+                    return 
+                        if (xmldb:get-current-user() = ($owner, $cfdbEditors)) 
+                        then 1
+                        else 0
+                    
                 default return xs:string($node)
         else ()
 };

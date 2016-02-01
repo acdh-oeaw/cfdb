@@ -70,40 +70,116 @@ declare function api:log($msg) as empty() {
 
 
 (: **** TABLETS **** :)
-(: list tablets (only GET is supported on this endpoint) :)
+(:~ list tablets as JSON 
+ : @param $text: filter tablets by text reference (exact match) 
+ : @param $region: filter tablets by region (case insensitive substring match)
+ : @param $archive: filter tablets by archive (case insensitive substring match)
+ : @param $dossier: filter tablets by dossier (case insensitive substring match) 
+ : @param $scribe: filter tablets by scribe (case insensitive substring match)
+ : @param $city: filter tablets by city (case insensitive substring match)
+ : @param $periodd: filter tablets by period (substring match)
+ : @param $anteQuem: filter tablets by anteQuem date (exact match)
+ : @param $postQuem: filter tablets by anteQuem date (exact match)
+ : @param $date: filter tablets by date (exact match)
+ : @param $dateBabylonian: filter tablets by babylonian date (exact match)
+ : @param $ductus: filter tablets by ductus attribute(exact match)
+ : NB: only GET is supported on this endpoint 
+ :)
 declare 
     %rest:GET
     %rest:path("/cfdb/tablets")
     %rest:produces("application/json")
     %output:media-type("application/json")
-function api:list-tablets() {
-    (:let $tablets := cfdb:tablets(),
-        $user := xmldb:get-current-user(),
-        $log := util:log-app("DEBUG", $config:app-name, "api:list-tablets() called by "||$user)
-    let $response := <cfdb:response>{
-            for $t in $tablets
-                let $id := $t/xs:string(@xml:id),
-                    $title := $t/tei:teiHeader/tei:fileDesc/tei:titleStmt/data(tei:title),
-                    $filename := util:document-name($t),
-           	        $path := util:collection-name($t),
-           	        $permissions := sm:get-permissions($path),
-           	        $editable := if ($permissions/*/@owner = $user or $user = $config:superusers) then true() else false()
-            return  <tablet editable="{if ($editable) then 1 else 0}">
-                  		<id>{$id}</id>
-                  		<path>{$path}</path>
-                  		<title>{$title}</title>
-                  	</tablet>
-        }</cfdb:response>
-    return 
-        if ($user = $config:authorized-users)
-        then util:serialize($response,"method=json")
-        else api:status("unauthorized", "You are not allowed to access this service"):)
-    let $user := xmldb:get-current-user()
+    %rest:query-param("text", "{$text}")
+    %rest:query-param("region", "{$region}")
+    %rest:query-param("archive", "{$archive}")
+    %rest:query-param("dossier", "{$dossier}")
+    %rest:query-param("scribe", "{$scribe}")
+    %rest:query-param("city", "{$city}")
+    %rest:query-param("period", "{$period}")
+    %rest:query-param("anteQuem", "{$anteQuem}")
+    %rest:query-param("postQuem", "{$postQuem}")
+    %rest:query-param("date", "{$date}")
+    %rest:query-param("dateBabylonian", "{$dateBabylonian}")
+    %rest:query-param("ductus", "{$ductus}")
+function api:list-tablets-as-json($text as xs:string*, $region as xs:string*, $archive as xs:string*, $dossier as xs:string*, $scribe as xs:string*, $city as xs:string*, $period as xs:string*, $anteQuem as xs:string*, $postQuem as xs:string*, $date as xs:string*, $dateBabylonian as xs:string*, $ductus as xs:string*) {
+    let $tablets-filtered := api:do-filter-tablets($text, $region, $archive, $dossier, $scribe, $city, $period, $anteQuem, $postQuem, $date, $dateBabylonian, $ductus)
+    let $tablets-as-objects := 
+        for $t in $tablets-filtered
+        let $attributes := tablet:get-attributes($t/@xml:id)
+        return cfdb:object(for $k in map:keys($attributes) return cfdb:property($k, map:get($attributes, $k))) 
     return
-        if ($user = $config:authorized-users)
-        then cfdb:tabletsAsJSON()
+        if (xmldb:get-current-user() = $config:authorized-users)
+        then cfdb:array($tablets-as-objects)
         else api:status("unauthorized", "You are not allowed to access this service")
 };
+
+(:~ list tablets as XML 
+ : @param $text: filter tablets by text reference (exact match) 
+ : @param $region: filter tablets by region (case insensitive substring match)
+ : @param $archive: filter tablets by archive (case insensitive substring match)
+ : @param $dossier: filter tablets by dossier (case insensitive substring match) 
+ : @param $scribe: filter tablets by scribe (case insensitive substring match)
+ : @param $city: filter tablets by city (case insensitive substring match)
+ : @param $periodd: filter tablets by period (substring match)
+ : @param $anteQuem: filter tablets by anteQuem date (exact match)
+ : @param $postQuem: filter tablets by anteQuem date (exact match)
+ : @param $date: filter tablets by date (exact match)
+ : @param $dateBabylonian: filter tablets by babylonian date (exact match)
+ : @param $ductus: filter tablets by ductus attribute(exact match)
+ : NB: only GET is supported on this endpoint 
+ :)
+declare 
+    %rest:GET
+    %rest:path("/cfdb/tablets")
+    %rest:produces("application/xml")
+    %output:media-type("application/xml")
+    %rest:query-param("text", "{$text}")
+    %rest:query-param("region", "{$region}")
+    %rest:query-param("archive", "{$archive}")
+    %rest:query-param("dossier", "{$dossier}")
+    %rest:query-param("scribe", "{$scribe}")
+    %rest:query-param("city", "{$city}")
+    %rest:query-param("period", "{$period}")
+    %rest:query-param("anteQuem", "{$anteQuem}")
+    %rest:query-param("postQuem", "{$postQuem}")
+    %rest:query-param("date", "{$date}")
+    %rest:query-param("dateBabylonian", "{$dateBabylonian}")
+    %rest:query-param("ductus", "{$ductus}")
+function api:list-tablets-as-xml($text as xs:string*, $region as xs:string*, $archive as xs:string*, $dossier as xs:string*, $scribe as xs:string*, $city as xs:string*, $period as xs:string*, $anteQuem as xs:string*, $postQuem as xs:string*, $date as xs:string*, $dateBabylonian as xs:string*, $ductus as xs:string*) {
+    let $tablets-filtered := api:do-filter-tablets($text, $region, $archive, $dossier, $scribe, $city, $period, $anteQuem, $postQuem, $date, $dateBabylonian, $ductus)
+    let $tablets-as-xml := 
+        for $t in $tablets-filtered/@xml:id!tablet:get-attributes(.)
+        return <tablet>{for $k in map:keys($t) return element {$k} {map:get($t, $k)}}</tablet>
+    return
+        if (xmldb:get-current-user() = $config:authorized-users)
+        then <cfdb:response items="{count($tablets-filtered)}">{$tablets-as-xml}</cfdb:response>
+        else api:status("unauthorized", "You are not allowed to access this service")
+};
+
+
+(:~
+ : This helper function converts REST query parameters to XML elements and calls cfdb:tablets().
+ :)
+declare %private function api:do-filter-tablets($text as xs:string*, $region as xs:string*, $archive as xs:string*, $dossier as xs:string*, $scribe as xs:string*, $city as xs:string*, $period as xs:string*, $anteQuem as xs:string*, $postQuem as xs:string*, $date as xs:string*, $dateBabylonian as xs:string*, $ductus as xs:string*) {
+    let $filter := (
+        if ($text != '') then <filter key="text">{$text[1]}</filter> else (),
+        if ($region != '') then <filter key="region">{$region[1]}</filter> else (),
+        if ($archive != '') then <filter key="archive">{$archive[1]}</filter> else (),
+        if ($dossier != '') then <filter key="dossier">{$dossier[1]}</filter> else (),
+        if ($scribe != '') then <filter key="scribe">{$scribe[1]}</filter> else (),
+        if ($city != '') then <filter key="city">{$city[1]}</filter> else (),
+        if ($period != '') then <filter key="period">{$period[1]}</filter> else (),
+        if ($anteQuem != '') then <filter key="anteQuem">{$anteQuem[1]}</filter> else (),
+        if ($postQuem != '') then <filter key="postQuem">{$postQuem[1]}</filter> else (),
+        if ($date != '') then <filter key="date">{$date[1]}</filter> else (),
+        if ($dateBabylonian != '') then <filter key="dateBabylonian">{$dateBabylonian[1]}</filter> else (),
+        if ($ductus != '') then <filter key="ductus">{$ductus[1]}</filter> else ()
+    )
+    return cfdb:tablets($filter)
+};
+
+
 
 (: get all attributes of a tablet :)
 declare 

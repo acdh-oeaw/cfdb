@@ -40,68 +40,90 @@ declare function cfdb:listStdSigns() as element(tei:char)* {
 };
 
 
-(: lists all tablets in the database :)
+(:~
+ : This function lists all tablets in the database as TEI elements.
+ : @return zero or more tei:TEI elements
+ :)
 declare function cfdb:tablets() as element(tei:TEI)* {
-    collection($config:tablets-root)//tei:TEI[tei:sourceDoc]
+    cfdb:tablets(())
 };
 
-(: returns an JSON representation of all tablets in the database :)
-declare function cfdb:tabletsAsJSON() as xs:string {
-    let $user := xmldb:get-current-user()
-    let $tablets := cfdb:tablets()
-    let $data := 
-    cfdb:array(
-        for $t in $tablets
-        let $filename := util:document-name($t),
-            $path := util:collection-name($t),
-            $permissions := sm:get-permissions($path),
-            $editable := if ($permissions/*/@owner = $user or $user = $config:superusers) then true() else false() 
-        let $id := $t//tei:msIdentifier/tei:idno,
-            $title := $t/tei:teiHeader/tei:fileDesc/tei:titleStmt/data(tei:title),
-            $region := $t//tei:msIdentifier/tei:region,
-            $archive := $t//tei:collection[@type = "archive"],
-            $dossier := $t//tei:collection[@type = "dossier"],
-            $scribe := $t//tei:persName[@role = "scribe"],
-            $city := $t//tei:origPlace/tei:placeName,
-            $period := $t//tei:origDate/tei:date[@calendar = '#gregorian']/xs:string(@period),
-            $anteQuem := $t//tei:origDate/tei:date[@calendar = '#gregorian']/xs:string(@notAfter),
-            $postQuem := $t//tei:origDate/tei:date[@calendar = '#gregorian']/xs:string(@notBefore),
-            $date := $t//tei:origDate/tei:date[@calendar = '#gregorian'],
-            $dateBabylonian := $t//tei:origDate/tei:date[@calendar = '#babylonian'],
-            $ductus := $t//tei:f[@name = "ductus"]/tei:symbol/xs:string(@value)
-        return cfdb:object((
-            cfdb:property("id", $id),
-            cfdb:property("region", $region),
-            cfdb:property("archive", $archive),
-            cfdb:property("dossier", $dossier),
-            cfdb:property("scribe", $scribe),
-            cfdb:property("city", $city),
-            cfdb:property("period", $period),
-            cfdb:property("anteQuem", $anteQuem),
-            cfdb:property("postQuem", $postQuem),
-            cfdb:property("date", $date),
-            cfdb:property("dateBabylonian", $dateBabylonian),
-            cfdb:property("ductus", $ductus),
-            cfdb:property("editable", $editable)
-        ))
-    )
-    return cfdb:object((
-        cfdb:property("data", $data),
-        cfdb:property("itemsCount", count($tablets))
-    ))
+(:~
+ : This function lists all tablets in the database as TEI elements, applying zero or more filters on specific attributes. 
+ : Filters are combined using the AND operator after calling the cfdb:filter-tablets() function for each constraint.   
+ : @param $filters zero or more <code>filter</code> elements with an attribute <code>key</code> containing the name of a defined attribute.
+ : @return zero or more tei:TEI elements
+ :)
+declare function cfdb:tablets($filters as element(filter)*) as element(tei:TEI)* {
+    let $activeFilters := $filters[not(. = ('','0'))]
+    let $items := 
+        if (count($activeFilters) ge 1)
+        then cfdb:filter-tablets($activeFilters, ())
+        else collection($config:tablets-root)//tei:TEI
+    return $items 
+};
+
+(:~ This function executes the filtering recursively by calling <code>cfdb:tablet-by-facet()</code> (thus returning a set of tablets that 
+ : satisfy the given constraint) and creates an intersection with a set of tei:TEI elements from previous filter operations.
+ : 
+ :)
+declare %private function cfdb:filter-tablets($filters as element(filter)+, $results as element(tei:TEI)*){
+    let $facet := cfdb:tablet-by-facet($filters[1]/@key, $filters[1])/ancestor-or-self::tei:TEI
+    return
+        if (count($filters) = 1)
+        then 
+            if ($results)
+            then $facet intersect $results
+            else $facet
+        else 
+            if ($results)
+            then cfdb:filter-tablets(subsequence($filters, 2), $facet intersect $results)
+            else cfdb:filter-tablets(subsequence($filters, 2), $facet)
 };
 
 
-declare %private function cfdb:array($objects as xs:string*) {
+
+(:~
+ : This function searches directly within the tables collection on various defined facets of a tablet and returns the element(s) found.
+ : How the filterValue will matched against the data (exact match, contains, case insensitive) depends on the facet.  
+ : 
+ : @param key: the key of a named faced
+ : @param filterValue: the value of the faced to be searched for 
+ :)
+declare %private function cfdb:tablet-by-facet($key as xs:string, $filterValue as item()) as node()* {
+    let $value := if ($filterValue = "[null]") then "" else $filterValue
+    let $facet :=  
+        switch ($key)
+            case "text"             return collection($config:tablets-root)//tei:msIdentifier/tei:idno[. = $value]
+            case "title"            return collection($config:tablets-root)//tei:teiHeader/tei:fileDesc/tei:titleStmt/tei:title[contains(., $value)]
+            case "region"           return collection($config:tablets-root)//tei:msIdentifier/tei:region[contains(., $value, "?strength=secondary")]
+            case "archive"          return collection($config:tablets-root)//tei:collection[@type = "archive"][contains(., $value, "?strength=secondary")]
+            case "dossier"          return collection($config:tablets-root)//tei:collection[@type = "dossier"][contains(., $value, "?strength=secondary")]
+            case "scribe"           return collection($config:tablets-root)//tei:persName[@role = "scribe"][contains(., $value, "?strength=secondary")]
+            case "city"             return collection($config:tablets-root)//tei:origPlace/tei:placeName[contains(., $value, "?strength=secondary")]
+            case "period"           return collection($config:tablets-root)//tei:origDate/tei:date[@calendar = '#gregorian'][contains(@period, $value)]
+            case "anteQuem"         return collection($config:tablets-root)//tei:origDate/tei:date[@calendar = '#gregorian'][@notAfter = $value]
+            case "postQuem"         return collection($config:tablets-root)//tei:origDate/tei:date[@calendar = '#gregorian'][@notBefore = $value]
+            case "date"             return collection($config:tablets-root)//tei:origDate/tei:date[@calendar = '#gregorian'][. = $value]
+            case "dateBabylonian"   return collection($config:tablets-root)//tei:origDate/tei:date[@calendar = '#babylonian'][. = $value]
+            case "ductus"           return collection($config:tablets-root)//tei:f[@name = 'ductus'][tei:symbol/@value = $value]
+            default return ()
+    return $facet
+};
+
+
+(:~ This helper function constructs a JSON array. :)
+declare function cfdb:array($objects as xs:string*) {
     concat("[", string-join($objects, ","), "]") 
 };
 
-
-declare %private function cfdb:object($properties as xs:string*) {
+(:~ This helper function constructs a JSON object skeleton. :)
+declare function cfdb:object($properties as xs:string*) {
     concat("{", string-join($properties, ","), "}") 
 }; 
 
-declare %private function cfdb:property($key as xs:string, $value) {
+(:~ This helper function constructs a JSON object property :) 
+declare function cfdb:property($key as xs:string, $value) {
     concat(
         '"',$key,'"',
         ':',
@@ -109,7 +131,7 @@ declare %private function cfdb:property($key as xs:string, $value) {
             case (starts-with($value, '[')) return () 
             case ($value instance of xs:integer) return ()
             default return  '"',
-        replace($value,"(['])","\\$1"),
+        $value,
         switch(true())
             case (starts-with($value, '[')) return () 
             case ($value instance of xs:integer) return ()
