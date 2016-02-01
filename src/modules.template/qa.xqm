@@ -71,12 +71,23 @@ declare %private function qa:test($name as xs:string, $description as xs:string,
         if ($assumptions-met) 
         then "one or more assumptive tests were not successful" 
         else "did not match requirement"
-    return qa:result($name, "This tests ensures that "||$description||".", $assumptions, $status, $warn, $reason, $failing-nodes)
+    return qa:result($name, "This test ensures that "||$description||".", $assumptions, $status, $warn, $reason, $failing-nodes)
 };
 
 
+(: This function runs all registered qa tests :)
+declare function qa:run() as element()*{(
+    qa:one-note-per-glyph(),
+    qa:one-reading-per-context(),
+    qa:note-exists-for-context(),
+    qa:only-one-xml-file-in-tablet-collection(),
+    qa:every-legacy-format-tablet-has-all-glyphs()
+)};
+
+
+
 (:~
- : This function tests, if there exists only one note to each g-Element.
+ : This function tests if there exists only one note to each g-Element.
  :)
 declare function qa:one-note-per-glyph() as element() {
     let $failing-nodes := 
@@ -101,7 +112,7 @@ declare function qa:one-note-per-glyph() as element() {
 
 
 (:~
- : This function tests, if there exists only one q-Element in each seg type context:
+ : This function tests if there exists only one q-Element in each seg type context:
  :)
 declare function qa:one-reading-per-context() as element() {
     let $failing-nodes :=   
@@ -119,6 +130,9 @@ declare function qa:one-reading-per-context() as element() {
 };
 
 
+(:~
+ : This function tests if there exists a note element for each context.
+ :)
 declare function qa:note-exists-for-context() as element() {
     let $failing-nodes :=
         for $c in collection($config:tablets-root)//tei:seg[@type = 'context']/tei:g
@@ -137,5 +151,61 @@ declare function qa:note-exists-for-context() as element() {
         "one-reading-per-context",
         $failing-nodes
     )
+};
+
+(:~
+ : This function tests if there exists only one TEI-XML file in a tablet collection (the old IMT setup had one TEI file for each surface and one TEI file for the whole tablet. This leads to unexpected behavior.)
+ :)
+declare function qa:only-one-xml-file-in-tablet-collection() as element(){
+    let $tablets := 
+        for $c in xmldb:get-child-collections($config:tablets-root)
+        let $path := $config:tablets-root||"/"||$c
+        let $resources := xmldb:get-child-resources($path)
+        return <c path="{$path}" name="{$c}">{
+            for $r in $resources 
+            let $mime-type := xmldb:get-mime-type(xs:anyURI($path||"/"||$r))
+            return
+            <r mime-type="{$mime-type}">{$r}</r>
+        }</c>
+    let $failing-tablets := 
+        for $t in $tablets[count(r[@mime-type='application/xml'][.!='__contents__.xml']) gt 1]
+        return map {
+            "tablet-id" := $t/xs:string(@name),
+            "filenames" := string-join($t/r[@mime-type = 'application/xml'][.!='__contents__.xml'][not(starts-with(.,'tablet'))],'&#10;')
+        }
+    return qa:test("legacy-format", "there is no tablet collection that contains more than one XML file", $failing-tablets)
+};
+
+(:~
+ : This function tests if every zone element in a surface TEI-XML (legacy setup) has a corresponding annotation in the combined tablet TEI file.
+ :)
+declare function qa:every-legacy-format-tablet-has-all-glyphs() as element()*{
+    let $tablets := 
+        for $c in xmldb:get-child-collections($config:tablets-root)
+        let $path := $config:tablets-root||"/"||$c
+        let $resources := xmldb:get-child-resources($path)
+        return <c path="{$path}" name="{$c}">{
+            for $r in $resources 
+            let $mime-type := xmldb:get-mime-type(xs:anyURI($path||"/"||$r))
+            return
+            <r mime-type="{$mime-type}">{$r}</r>
+        }</c>
+    let $tablets-with-more-than-one-xml-file := $tablets[count(r[@mime-type='application/xml'][.!='__contents__.xml']) gt 1]
+    let $failing-tablets := 
+        for $t in $tablets-with-more-than-one-xml-file
+            let $combined-tablet := $t/r[@mime-type = 'application/xml'][.!='__contents__.xml'][starts-with(.,'tablet')]/doc(parent::*/@path||"/"||.)
+            let $imt-surfaces := $t/r[@mime-type = 'application/xml'][.!='__contents__.xml'][not(starts-with(.,'tablet'))]/doc(parent::*/@path||"/"||.)
+            let $fails :=  
+                for $zone-id in $imt-surfaces//tei:zone/@xml:id
+                let $context-in-combined-tablet := $combined-tablet//tei:g[@xml:id = $zone-id]
+                return 
+                    if (exists($context-in-combined-tablet))
+                    then ()
+                    else map {
+                        "tablet-id" := $t/xs:string(@name),
+                        "zone" :=  $zone-id
+                    }
+        return $fails
+    return qa:test("every-legacy-format-tablet-has-all-glyphs", "there is no glyph missing in a combined surface tablet that has been annotated with the Image Markup Tool", $failing-tablets)
 };
 
