@@ -1,12 +1,12 @@
 xquery version "3.0";
 
-module namespace api = "@app.uri@/api";
+module namespace api = "http://www.oeaw.ac.at/acdh/cfdb/api";
 
-import module namespace config="@app.uri@/config" at "xmldb:exist:///db/apps/@app.name@/modules/config.xqm";
-import module namespace cfdb = "@app.uri@/db" at "xmldb:exist:///db/apps/@app.name@/modules/cfdb.xqm";
-import module namespace tablet = "@app.uri@/tablet" at "xmldb:exist:///db/apps/@app.name@/modules/tablet.xqm";
-import module namespace surface = "@app.uri@/surface" at "xmldb:exist:///db/apps/@app.name@/modules/surface.xqm";
-import module namespace annotation = "@app.uri@/annotations" at "xmldb:exist:///db/apps/@app.name@/modules/annotations.xqm";
+import module namespace config="http://www.oeaw.ac.at/acdh/cfdb/config" at "xmldb:exist:///db/apps/cfdb/modules/config.xqm";
+import module namespace cfdb = "http://www.oeaw.ac.at/acdh/cfdb/db" at "xmldb:exist:///db/apps/cfdb/modules/cfdb.xqm";
+import module namespace tablet = "http://www.oeaw.ac.at/acdh/cfdb/tablet" at "xmldb:exist:///db/apps/cfdb/modules/tablet.xqm";
+import module namespace surface = "http://www.oeaw.ac.at/acdh/cfdb/surface" at "xmldb:exist:///db/apps/cfdb/modules/surface.xqm";
+import module namespace annotation = "http://www.oeaw.ac.at/acdh/cfdb/annotations" at "xmldb:exist:///db/apps/cfdb/modules/annotations.xqm";
 
 
 declare namespace rest = "http://exquery.org/ns/restxq";
@@ -15,7 +15,7 @@ declare namespace json = "http://www.json.org";
 declare namespace tei = "http://www.tei-c.org/ns/1.0";
 
 declare function api:response($caller as xs:string, $items as map()*) as element(api:reponse) {
-    <response xmlns="@app.uri@/api">
+    <response xmlns="http://www.oeaw.ac.at/acdh/cfdb/api">
         <metadata>
             <query>{$caller}</query>
             <timeStamp>{current-dateTime()}</timeStamp>
@@ -77,7 +77,7 @@ declare
     %rest:produces("application/json")
     %output:media-type("application/json")
 function api:list-tablets() {
-    let $tablets := cfdb:tablets(),
+    (:let $tablets := cfdb:tablets(),
         $user := xmldb:get-current-user(),
         $log := util:log-app("DEBUG", $config:app-name, "api:list-tablets() called by "||$user)
     let $response := <cfdb:response>{
@@ -97,6 +97,11 @@ function api:list-tablets() {
     return 
         if ($user = $config:authorized-users)
         then util:serialize($response,"method=json")
+        else api:status("unauthorized", "You are not allowed to access this service"):)
+    let $user := xmldb:get-current-user()
+    return
+        if ($user = $config:authorized-users)
+        then cfdb:tabletsAsJSON()
         else api:status("unauthorized", "You are not allowed to access this service")
 };
 
