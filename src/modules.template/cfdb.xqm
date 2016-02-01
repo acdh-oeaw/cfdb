@@ -1,10 +1,10 @@
 xquery version "3.0";
 
-module namespace cfdb = "http://www.oeaw.ac.at/acdh/cfdb/db";
+module namespace cfdb = "@app.uri@/db";
 
 declare namespace tei = "http://www.tei-c.org/ns/1.0";
 
-import module namespace config = "http://www.oeaw.ac.at/acdh/cfdb/config" at "xmldb:exist:///db/apps/cfdb/modules/config.xqm";
+import module namespace config = "@app.uri@/config" at "xmldb:exist:///db/apps/@app.name@/modules/config.xqm";
 
 
 (:~ module containing functions and variables common to the model on database level
