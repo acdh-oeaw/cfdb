@@ -1,4 +1,16 @@
 ## data is synched into its own repository
-##src/data/
 backups/
 .DS_Store
+src/modules
+src/api
+src/annotate.xql
+src/controller.xql
+src/editArchives.html
+src/editStdSigns.html
+src/editTablets.html
+sync
+/src/repo.xml
+/src/expath-pkg.xml
+/src/post-install.xql
+/build
+/build.properties
