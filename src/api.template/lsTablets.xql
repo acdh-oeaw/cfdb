@@ -22,7 +22,7 @@ return
 <tablets xmlns="">{
 	for $t in $tablets
 	let $permissions := sm:get-permissions($t("path"))
-	let $editable := if ($permissions/*/@owner = $user or $user = $config:superusers) then true() else false()
+	let $editable := if ($permissions/*/@owner = $user or $user = sm:get-group-members("cfdbEditors")) then true() else false()
 	order by $t("title") 
 	return
 	<tablet editable="{if ($editable) then 1 else 0}">
