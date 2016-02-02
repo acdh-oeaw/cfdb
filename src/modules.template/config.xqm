@@ -45,11 +45,9 @@ declare variable $config:repo-descriptor := doc(concat($config:app-root, "/repo.
 
 declare variable $config:expath-descriptor := doc(concat($config:app-root, "/expath-pkg.xml"))/expath:package;
 
-declare variable $config:authorized-users := (sm:get-group-members("cfdbEditors"),sm:get-group-members("cfdbAnnotators")); 
+declare variable $config:authorized-users := (sm:get-group-members("cfdbEditors"),sm:get-group-members("cfdbAnnotators"));
 
-(:("daniel", "rPirngruber", "mJursa");:)
-
-declare variable $config:superusers := ("admin", "rPirngruber", "mJursa", "daniel");
+declare variable $config:editors := sm:get-group-members("cfdbEditors");
 
 (:~
  : Resolve the given path using the current application context.
