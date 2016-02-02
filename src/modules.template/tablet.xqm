@@ -149,8 +149,8 @@ declare function tablet:path($tablet as element(tei:TEI)) as xs:string? {
  : @param $mime-type-filter sequence of mime-types to find (optional)
  : @return full db-paths for each resource 
 ~:)
-declare function tablet:listResources($tablet as element(tei:TEI)) as xs:anyURI* {
-	tablet:listResources($id,())
+declare function tablet:listResources($tablet as element(tei:TEI)) as element(collection)? {
+	tablet:listResources($tablet,())
 };
 
 (:~
@@ -159,21 +159,13 @@ declare function tablet:listResources($tablet as element(tei:TEI)) as xs:anyURI*
  : @param $mime-type-filter sequence of mime-types to find (optional)
  : @return full db-paths for each resource 
 ~:)
-declare function tablet:listResources($tablet as element(tei:TEI), $mime-type-filter as xs:string*) as xs:anyURI* {
+declare function tablet:listResources($tablet as element(tei:TEI), $mime-type-filter as xs:string*) as element(collection)? {
     let $col := tablet:path($tablet)
     let $col-available := xmldb:collection-available($col)
     let $resources :=
     	if (not($col-available))
     	then util:log-app("INFO",$config:app-name,"Collection "||$col||" not found.")
-    	else
-	    	for $x in xmldb:get-child-resources(xs:anyURI($col))
-				let $dbpath := $col || "/" || $x
-				let $mime-type := xmldb:get-mime-type($dbpath)
-				return 
-					switch (true())
-						case (exists($mime-type-filter) and ($mime-type = $mime-type-filter)) return xs:anyURI($dbpath)
-						case (not(exists($mime-type-filter))) return xs:anyURI($dbpath)
-						default return ()
+    	else cfdb:ls($col, $mime-type-filter)
     return $resources
 };
 

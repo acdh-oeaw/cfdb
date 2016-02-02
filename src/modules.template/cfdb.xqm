@@ -138,3 +138,25 @@ declare function cfdb:property($key as xs:string, $value) {
             default return  '"'
     )
 }; 
+
+
+declare function cfdb:ls($path) {
+    cfdb:ls($path, ())
+};
+
+declare function cfdb:ls($path, $mime-type-filter as xs:string*) {
+    <collection path="{$path}" name="{tokenize($path,'/')[last()]}">{
+        if (not(xmldb:collection-available($path)))
+        then <error>Not available / no permission</error>
+        else 
+            (for $c in xmldb:get-child-collections($path) return cfdb:ls($path||"/"||$c, $mime-type-filter),
+             for $r in xmldb:get-child-resources($path) 
+                let $dbpath := $path||"/"||$r,
+                    $mime-type := xmldb:get-mime-type($dbpath)
+                return 
+                    if (not(exists($mime-type-filter)) or $mime-type = $mime-type-filter) 
+                    then <resource path="{$dbpath}" mime-type="{$mime-type}">{$r}</resource>
+                    else ()
+            )
+    }</collection>
+};
