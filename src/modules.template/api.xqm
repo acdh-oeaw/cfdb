@@ -45,6 +45,8 @@ declare function api:status($status, $msg) {
         switch(true())
             case $status = "error"          return 500
             case $status = "unauthorized"   return 401
+            case $status = "missing parameter" return 400
+            case $status = "insufficent permissions" return 403
             default return 200
     return 
         (<rest:response>
@@ -251,7 +253,7 @@ function api:delete-surface($tablet-id as xs:string, $surface-id as xs:string) {
     let $delete := 
         if (exists($tablet))
         then surface:delete(tablet:get($tablet-id), $surface-id)
-        else map {"status" := "error" , "msg" := "tablet with id "||$tablet-id||" not available"}
+        else map {"status" := "error" , "msg" := concat("tablet with id ", $tablet-id, " not available")}
     let $response := 
         <cfdb:response>
             <surface>
