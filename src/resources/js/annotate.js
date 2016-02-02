@@ -7,7 +7,7 @@ cfdb.annotation = {};
 cfdb.annotations = {};
 cfdb.taxonomies = {};
 
-cfdb.url = "/exist/restxq/cfdb/";
+/*cfdb.url = "/exist/restxq/cfdb/";*/
 
 cfdb.taxonomies.url = cfdb.url + "taxonomies/";
 
