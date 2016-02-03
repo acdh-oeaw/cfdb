@@ -3,19 +3,101 @@
     <link rel="stylesheet" type="text/css" href="resources/js/jquery-ui-1.11.3/jquery-ui.min.css"/>
     <script type="text/javascript" src="resources/js/jquery-ui-1.11.3/jquery-ui.min.js"/>
     <script type="text/javascript" src="resources/js/signlist.js"/>
-    <div class="row-fluid">
-        <div class="span12">
-            <div class="page-header">
-                <h1>cfdb <small>Corpus Browser</small>
-                </h1>
+    <div class="container text-center">
+        <h2>
+            <small>home</small>
+        </h2>
+        <div id="myCarousel" class="carousel slide" data-ride="carousel">
+            <!-- Indicators -->
+            <ol class="carousel-indicators">
+                <li data-target="#myCarousel" data-slide-to="0" class="active"/>
+                <li data-target="#myCarousel" data-slide-to="1"/>
+                <li data-target="#myCarousel" data-slide-to="2"/>
+            </ol>
+            
+            <!-- Wrapper for slides -->
+            <div class="carousel-inner" role="listbox">
+                <div class="item active">
+                    <img src="$app-root/resources/img/1200px-Teyseba_Cuneiform.jpg" alt="First" width="1200" height="700"/>
+                    <div class="carousel-caption">
+                        <h3>„Teyseba Cuneiform“</h3>
+                        <p>Lorem ipsum blablabla.</p>
+                        <p>„<a href="https://commons.wikimedia.org/wiki/File:Teyseba_Cuneiform.JPG#/media/File:Teyseba_Cuneiform.JPG">Teyseba Cuneiform</a>“ von <a href="//commons.wikimedia.org/wiki/User:Liveon001" title="User:Liveon001">Liveon001</a> © Travis K. Witt - <span class="int-own-work" lang="de">Eigenes Werk</span>. Lizenziert unter <a href="http://creativecommons.org/licenses/by-sa/3.0" title="Creative Commons Attribution-Share Alike 3.0">CC BY-SA 3.0</a> über <a href="https://commons.wikimedia.org/wiki/">Wikimedia Commons</a>.</p>
+                    </div>
+                </div>
+                <div class="item">
+                    <img src="" alt="a nice feature picture" width="1200" height="700"/>
+                    <div class="carousel-caption">
+                        <h3>lorem ipsum</h3>
+                        <p>tralalala</p>
+                    </div>
+                </div>
+                <div class="item">
+                    <img src="" alt="and a even nicer one" width="1200" height="700"/>
+                    <div class="carousel-caption">
+                        <h3>lorem ipsum</h3>
+                        <p>tralalala</p>
+                    </div>
+                </div>
             </div>
-            <div class="row-fluid">
-                <div class="span8">
-                    <div data-template="app:signlist"/>
-                </div>
-                <div class="span4">
-                    <div data-template="app:signlistNav"/>
-                </div>
+            
+            <!-- Left and right controls -->
+            <a class="left carousel-control" href="#myCarousel" role="button" data-slide="prev">
+                <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"/>
+                <!--<span class="sr-only">Previous</span>-->
+            </a>
+            <a class="right carousel-control" href="#myCarousel" role="button" data-slide="next">
+                <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"/>
+                <!--<span class="sr-only">Next</span>-->
+            </a>
+        </div>
+    </div>
+    <div class="container">
+        <h1 class="text-center">CFDB</h1>
+        <h1 class="text-center">
+            <small>a <strong>C</strong>unei<strong>F</strong>orm <strong>D</strong>ata<strong>b</strong>ase</small>
+        </h1>
+        <h4 class="text-center">Describe in one or two setences the projct's objectiv. Like a teaser for a newspaper article</h4>
+        <p>This research project will study for the first time in a comprehensive manner the relationship between the content
+                    of cuneiform tablets from first millennium BC Babylonia and their external features, namely tablet format and
+                    script. It thereby addresses an urgent desideratum as these aspects have hitherto been neglected although their
+                    importance for the purpose of dating a tablet or its attribution to a given archive has been established beyond
+                    doubt. It should be mentioned that the first millennium BC is a particularly suitable period for such studies, owing
+                    to the wealth of documentation available.<br/>
+                    Having gathered a representative sample of tablets, relevant extrinsic and intrinsic tablet features will be entered
+                    into a database that will serve as the foundation of the analysis. The principal interest is to establish the correlation
+                    of the physical shape of the tablets with the main text types on the basis of the current knowledge of formularies
+                    and document categories. In this context, particular attention will also be paid to scribal practices such as sealing
+                    practices and the adding of Aramaic dockets which so far have not been investigated in the context of diplomatics. 
+                    The second focal point of the project is palaeography, a much underdeveloped research tool in Ancient Near
+                    Eastern studies. After identifying normative sign forms and documenting possible regional and diachronic
+                    variations, the main aim is to establish criteria for an objectification of the different ductus (calligraphic and
+                    cursive) attested. For this purpose, also a corpus of well-dated chronographic texts shall be analysed and its script
+                    compared to the evidence of archival documents. <br/>
+                    The basic research into diplomatics and palaeography will be supplemented by several detailed case studies. 
+                    For both fields under investigation, the project will provide for the first time an attempt at establishing a
+                    standardized terminology. The research results will be published primarily in form of a co-authored monograph.
+                    Moreover, a searchable sign list documenting the development of the Babylonian cuneiform script during the first
+                    millennium BC will be made accessible on the project website.</p>
+    </div>
+    <div class="container text-center">
+        <h3>Cooperation</h3>
+        <div class="row text-center">
+            <div class="span6">
+                <a href="http://www.univie.ac.at/Geschichte" class="navlink" target="_blank">
+                    <img src="resources/img/UNI-Logo_RGB_01.jpg" alt="ifg" width="50%"/>
+                    <p>
+                        <strong>Department of Oriental Studies - University of Vienna</strong>
+                    </p>
+                </a>
+            </div>
+            <div class="span6">
+                <a href="https://acdh.oeaw.ac.at/acdh/" class="navlink" target="_blank">
+                    <img src="resources/img/logo.png" alt="ACDH" width="30%"/>
+                    <p>
+                        <strong>Austrian Centre for Digital Humanities</strong>
+                    </p>
+                </a>
             </div>
         </div>
     </div>
