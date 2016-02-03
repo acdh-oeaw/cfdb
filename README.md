@@ -48,7 +48,7 @@ e.g: https://pandorfer@acdh.oeaw.ac.at/redmine/cfdb.git
 
 7. before happily clicking on it
 
-8. click on the ‘User Manager’-tile and add your user (probably the ‘admin’) to ‘cfdbEditors’. 
+8. click on the ‘User Manager’-tile and add your user (probably the ‘admin’) to ‘cfdbEditors’. **Important:** Make sure that the user has a non-empty password.     
 
 # Try it
 
