@@ -9,12 +9,6 @@ import module namespace cfdb = "@app.uri@/db" at "xmldb:exist:///db/apps/@app.na
 
 declare namespace tei = "http://www.tei-c.org/ns/1.0";
 
-declare variable $tablet:template-filepath := $config:app-root||"/tabletTpl.xml";
-declare variable $tablet:template := doc($tablet:template-filepath);
-
-declare variable $tablet:seed-xsl-filepath := $config:app-root||"/seed.xsl";
-declare variable $tablet:seed-xsl := doc($tablet:seed-xsl-filepath);
-
 (:~ This module combines function that operate on one single tablet. 
  : Operations on more than one tablet are kept under cfdb.xqm, 
  : operations on annotations under annotations.xqm
@@ -38,15 +32,16 @@ declare function tablet:new($tei as element(tei:TEI)) as map() {
     let $collection-created := 
     	if ($create-collection)
     	then util:log-app("INFO",$config:app-name,"Created collection for new tablet "||$id)
-    	else (util:log-app("INFO",$config:app-name,"An error occured. Could not create collection "||$id||" in "||$config:tablets-root),false())
+    	else (util:log-app("ERROR",$config:app-name,"An error occured. Could not create collection "||$id||" in "||$config:tablets-root),false())
     let $store-tei := 
         try {
             xmldb:store($config:tablets-root || "/" || $id ,
             			$id||".xml", 
             			$tei)
         } catch * {
-            util:log-app("INFO",$config:app-name,"An error occured. Could not store tablet "||$id||".")
+            util:log-app("ERROR",$config:app-name,"An error occured. Could not store tablet "||$id||".")
         }
+	let $set-creator := if ($store-tei) then tablet:set-attribute($id, "creator", xmldb:get-current-user()) else ()
 	let $setACL := 
 	   if ($create-collection and $store-tei)
 	   then (
@@ -56,7 +51,7 @@ declare function tablet:new($tei as element(tei:TEI)) as map() {
 	   )
 	   else ()
 	let $returnVal := 
-		if ($create-collection and $store-tei)
+		if ($create-collection and $store-tei and $set-creator("creator") = xmldb:get-current-user())
 		then true()
 		else false()
 	
@@ -243,6 +238,7 @@ declare %private function tablet:index2node($node as node(), $attribute as xs:st
             case "dossier" return $tablet//tei:collection[@type='dossier']
             case "scribe" return $tablet//tei:persName[@role = 'scribe']
             case "ductus" return $tablet//tei:f[@name = 'ductus']/tei:symbol/@value
+            case "creator" return $tablet//tei:respStmt[tei:resp = 'creator']/tei:name
             default return $node
 };
 
