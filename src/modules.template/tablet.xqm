@@ -9,12 +9,6 @@ import module namespace cfdb = "@app.uri@/db" at "xmldb:exist:///db/apps/@app.na
 
 declare namespace tei = "http://www.tei-c.org/ns/1.0";
 
-declare variable $tablet:template-filepath := $config:app-root||"/tabletTpl.xml";
-declare variable $tablet:template := doc($tablet:template-filepath);
-
-declare variable $tablet:seed-xsl-filepath := $config:app-root||"/seed.xsl";
-declare variable $tablet:seed-xsl := doc($tablet:seed-xsl-filepath);
-
 (:~ This module combines function that operate on one single tablet. 
  : Operations on more than one tablet are kept under cfdb.xqm, 
  : operations on annotations under annotations.xqm
@@ -34,19 +28,31 @@ declare function tablet:new($tei as element(tei:TEI)) as map() {
  	: do an identity transform in order to get rid of any 
  	: spurious namespace prefixes :)
     let $id := $tei/@xml:id
-    let $create-collection := xmldb:create-collection($config:tablets-root,$id)
+    let $create-collection := 
+        try {
+            xmldb:create-collection($config:tablets-root,$id)
+        } catch * {
+            util:log-app("ERROR",$config:app-name,"Could not create collection "||$id||" in tablets-root.")
+        } 
     let $collection-created := 
     	if ($create-collection)
     	then util:log-app("INFO",$config:app-name,"Created collection for new tablet "||$id)
-    	else (util:log-app("INFO",$config:app-name,"An error occured. Could not create collection "||$id||" in "||$config:tablets-root),false())
+    	else (util:log-app("ERROR",$config:app-name,"An error occured. Could not create collection "||$id||" in "||$config:tablets-root),false())
     let $store-tei := 
         try {
             xmldb:store($config:tablets-root || "/" || $id ,
             			$id||".xml", 
             			$tei)
         } catch * {
-            util:log-app("INFO",$config:app-name,"An error occured. Could not store tablet "||$id||".")
+            util:log-app("ERROR",$config:app-name,"An error occured. Could not store tablet "||$id||".")
         }
+	let $set-creation-metadata := 
+	   if ($store-tei) 
+	   then (
+	       tablet:set-attribute($id, "creator", xmldb:get-current-user()),
+	       tablet:set-attribute($id, "creation", current-dateTime())
+	   )[last()] 
+	   else () 
 	let $setACL := 
 	   if ($create-collection and $store-tei)
 	   then (
@@ -55,15 +61,16 @@ declare function tablet:new($tei as element(tei:TEI)) as map() {
 	       sm:add-group-ace($store-tei, "cfdbEditors", true(), "rwx")
 	   )
 	   else ()
-	let $returnVal := 
-		if ($create-collection and $store-tei)
-		then true()
-		else false()
-	
+    let $returnVal := 
+	   if (not($create-collection)) then "failed creating collection"
+	   else if (not($store-tei)) then "failed storing tablet"
+	   else if (not($set-creation-metadata("creator") = xmldb:get-current-user())) then "creator was not set"
+	   else if (not(xs:dateTime($set-creation-metadata("creation")) eq current-dateTime())) then "creation timestamp was not set"
+	   else true()
 	let $msg := 
-		if ($returnVal)
+		if ($returnVal instance of xs:boolean and $returnVal eq true())
 		then "Tablet has been created."
-		else "An error occured storing the tablet."
+		else "Tablet not created: "||$returnVal
 	return 
 		map {"outcome" := $returnVal, "message" := $msg}	 
 };
@@ -192,7 +199,24 @@ declare function tablet:listSurfaces($tablet as element(tei:TEI)) as element(tei
  : @return a map with one key for each attribute value
  :)
 declare function tablet:get-attributes($id as xs:string) as map() {
-     tablet:get-attributes($id, ("id", "text", "period", "date-babylonian", "date", "postQuem", "anteQuem", "region", "archive", "dossier", "scribe", "ductus", "editable"))
+     tablet:get-attributes($id, (
+        "id", 
+        "text", 
+        "period", 
+        "date-babylonian", 
+        "date", 
+        "postQuem", 
+        "anteQuem", 
+        "region", 
+        "archive", 
+        "dossier", 
+        "scribe", 
+        "ductus", 
+        "editable", 
+        "creator", 
+        "creation", 
+        "status")
+    )
 };
 
 (:~ returns 1-n maps containing values of given attributes for a given tablet
@@ -243,6 +267,9 @@ declare %private function tablet:index2node($node as node(), $attribute as xs:st
             case "dossier" return $tablet//tei:collection[@type='dossier']
             case "scribe" return $tablet//tei:persName[@role = 'scribe']
             case "ductus" return $tablet//tei:f[@name = 'ductus']/tei:symbol/@value
+            case "creator" return $tablet//tei:respStmt[tei:resp = 'creator']/tei:name
+            case "creation" return $tablet//tei:revisionDesc/tei:listChange/tei:change[1]/@when
+            case "status" return $tablet//tei:revisionDesc/@status
             default return $node
 };
 
@@ -254,6 +281,7 @@ declare %private function tablet:index2data($node as node(), $attribute as xs:st
             switch (true())
                 (: should eventually become xs:integer :)
                 case ($attribute = ("date-gregorian", "postQuem", "anteQuem")) return xs:string($node)
+                case $node instance of attribute() return xs:string($node)
                 case ($attribute = "editable") return 
                     let $owner := sm:get-permissions(base-uri($node))/*/@owner,
                         $cfdbEditors := sm:get-group-members("cfdbEditors")
