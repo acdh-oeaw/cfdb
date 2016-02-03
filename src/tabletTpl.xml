@@ -11,7 +11,11 @@
       </titleStmt>
       
       <publicationStmt>
-        <p/>
+        <publisher/>
+        <idno/>
+        <availability>
+          <licence/>
+        </availability>
       </publicationStmt>
       <sourceDesc>
         <msDesc>
@@ -26,6 +30,9 @@
               <idno/>
             </altIdentifier>
             <altIdentifier type="NABUCCO">
+              <idno/>
+            </altIdentifier>
+            <altIdentifier type="museumNumber">
               <idno/>
             </altIdentifier>
           </msIdentifier>
@@ -57,12 +64,13 @@
     </fileDesc>
     <profileDesc>
       <creation>
-        <origPlace cert="">
+        <origPlace>
           <placeName/>
         </origPlace>
         <origDate>
-          <date period="" cert=""/>
-        </origDate>
+          <date calendar="#gregorian" period="" notAfter="" notBefore=""/>
+        <date calendar="#babylonian"/>
+                </origDate>
       </creation>
       <particDesc>
         
@@ -74,7 +82,7 @@
         </keywords>
       </textClass>
       <!-- paraphrase -->
-      <abstract xml:lang="">
+      <abstract xml:lang="en">
         <ab/>
       </abstract>
     </profileDesc>
@@ -82,11 +90,9 @@
       <charDecl>
       </charDecl>
     </encodingDesc>
-    <revisionDesc>
+    <revisionDesc status="draft">
       <listChange>
-        <change>
-          <!-- to be replaced by seed.xsl -->
-        </change>
+        <change status="draft" when=""/>
       </listChange>
     </revisionDesc>
   </teiHeader>
