@@ -1,13 +1,13 @@
 xquery version "3.0";
 
-module namespace archive = "http://www.oeaw.ac.at/acdh/cfdb0.9/archive";
+module namespace archive = "@app.uri@/archive";
 
 declare namespace tei = "http://www.tei-c.org/ns/1.0";
 declare namespace http="http://expath.org/ns/http-client";
 
-import module namespace config = "@app.uri@/config" at "xmldb:exist:///db/apps/cfdb0.9/modules/config.xqm";
-import module namespace cfdb = "@app.uri@/db" at "xmldb:exist:///db/apps/cfdb0.9/modules/cfdb.xqm";
-import module namespace tablet = "@app.uri@/tablet" at "xmldb:exist:///db/apps/cfdb0.9/modules/tablet.xqm";
+import module namespace config = "@app.uri@/config" at "xmldb:exist:///db/apps/@app.name@/modules/config.xqm";
+import module namespace cfdb = "@app.uri@/db" at "xmldb:exist:///db/apps/@app.name@/modules/cfdb.xqm";
+import module namespace tablet = "@app.uri@/tablet" at "xmldb:exist:///db/apps/@app.name@/modules/tablet.xqm";
 
 (:~ The cfdb repository contains snapshots of the database that have been created by archive:create().
  : These contain only TEI files and cropped sign images along some metadata. These archives are world-readable
