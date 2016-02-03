@@ -12,7 +12,7 @@ import module namespace config = "@app.uri@/config" at "xmldb:exist:///db/apps/@
  :)
 declare variable $cfdb:stdSigns :=  
     for $s at $pos in cfdb:listStdSigns()
-    let $n := xs:integer(replace($s/@n,'[a-z\s\*]','')) 
+    let $n := xs:integer(replace($s/@n,'\P{N}','')) 
     order by $n ascending
     return $s;
 
