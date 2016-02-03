@@ -66,10 +66,12 @@ xmldb:move($target||"/data/etc", "/db/@data.dir@"),
 
 (: ACL for data collection :)
 sm:chgrp(xs:anyURI("/db/@data.dir@"), "cfdbEditors"),
+sm:chmod(xs:anyURI("/db/@data.dir@"), "rwxrwxr-x"),
 sm:add-group-ace(xs:anyURI("/db/@data.dir@"), "cfdbAnnotators", true(), "r-x"),
 
 (: ACL for tablets collection:)
-sm:chgrp(xs:anyURI("/db/@data.dir@/tablets"), "cfdbAnnotators"),
+sm:chgrp(xs:anyURI("/db/@data.dir@/tablets"), "cfdbEditors"),
+sm:chmod(xs:anyURI("/db/@data.dir@"), "rwxrwxr-x"),
 sm:add-group-ace(xs:anyURI("/db/@data.dir@/tablets"), "cfdbAnnotators", true(), "rwx"),
 
 (: ACL for taxonomies et alt. :)
