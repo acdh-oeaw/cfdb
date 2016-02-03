@@ -7,6 +7,7 @@ import module namespace cfdb = "@app.uri@/db" at "xmldb:exist:///db/apps/@app.na
 import module namespace tablet = "@app.uri@/tablet" at "xmldb:exist:///db/apps/@app.name@/modules/tablet.xqm";
 import module namespace surface = "@app.uri@/surface" at "xmldb:exist:///db/apps/@app.name@/modules/surface.xqm";
 import module namespace annotation = "@app.uri@/annotations" at "xmldb:exist:///db/apps/@app.name@/modules/annotations.xqm";
+import module namespace archive = "@app.uri@/archive" at "xmldb:exist:///db/apps/cfdb0.9/modules/archive.xqm";
 
 
 declare namespace rest = "http://exquery.org/ns/restxq";
@@ -445,3 +446,61 @@ function api:login($user as xs:string*, $password as xs:string*) {
     return util:serialize($response,"method=json")
     
 };:)
+
+(: ARCHIVE endpoints :)
+
+declare 
+    %rest:GET
+    %rest:path("/cfdb/archive")
+    %rest:produces("application/json")
+    %output:media-type("application/json")
+function api:list-archive() {
+    util:serialize(<response>{archive:list()}</response>, "method=json")
+};
+
+declare 
+    %rest:POST
+    %rest:path("/cfdb/archive")
+    %rest:produces("application/json")
+    %rest:query-param("version", "{$version}")
+    %rest:query-param("pid", "{$pid}")
+    %rest:header-param("user", "{$user}")
+    %rest:header-param("password", "{$password}")
+    %output:media-type("application/json")
+function api:create-snapshot($user as xs:string*, $password as xs:string*, $version as xs:string*, $pid as xs:string*) {
+    let $login := xmldb:login($config:data-root, $user[1], $password[1])
+    let $response := 
+        if ($login)
+        then
+            if (xmldb:get-current-user() = $config:editors)
+            then
+                if ($version[1] != "")
+                then 
+                    let $md := archive:create($version, $pid[1])
+                    return util:serialize($md,"method=json")
+                else api:status("missing parameter", "missing required parameter 'version'")
+            else api:status("insufficient permissions", "Unknown user or invalid credentials")
+        else api:status("unauthorized", "Unknown user or invalid credentials")
+    return $response
+};
+
+declare 
+    %rest:DELETE
+    %rest:path("/cfdb/archive/{$id}")
+    %rest:produces("application/json")
+    %rest:header-param("user", "{$user}")
+    %rest:header-param("password", "{$password}")
+    %output:media-type("application/json")
+function api:remove-snapshot($user as xs:string*, $password as xs:string*, $id as xs:string) {
+    let $login := xmldb:login($config:data-root, $user[1], $password[1])
+    let $response := 
+        if ($login)
+        then
+            if (xmldb:get-current-user() = $config:editors)
+            then
+                let $md := archive:remove($id)
+                return util:serialize($md,"method=json")
+            else api:status("insufficient permissions", "Unknown user or invalid credentials")
+        else api:status("unauthorized", "Unknown user or invalid credentials")
+    return $response
+};

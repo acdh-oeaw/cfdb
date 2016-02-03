@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<div xmlns="http://www.w3.org/1999/xhtml" data-template="templates:surround" data-template-with="templates/page.html" data-template-at="content">
+    <script type="text/javascript" src="resources/js/archive.js"/>
+    <div class="row-fluid">
+        <div class="span12">
+            <div class="page-header">
+                <h1>cfdb <small>Archive</small>
+                </h1>
+            </div>
+            <div class="row-fluid">
+                <div class="span8">
+                    <div data-template="app:archivelist"/>
+                </div>
+                <div class="span4">
+                    <p>This page lists snapshots of the cfdb corpus available at this instance. Each archive is served as a zip file containing:</p>
+                    <ul>
+                        <li>A Dublin Core metadata entry</li>
+                        <li>each tablet's metadata as a TEI file, containing glyph annotations</li>
+                        <li>cropped glyph images (as png files)</li>
+                        <li>the used standard sign list</li>
+                        <li>controlled vocabularies for persons, places, terms etc.</li>
+                    </ul>
+                    <div data-template="app:input-create-snapshot"/>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

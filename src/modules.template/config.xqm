@@ -13,6 +13,11 @@ declare namespace expath="http://expath.org/ns/pkg";
 
 declare variable $config:debug := false();
 
+(:~ $config:UUID holds a UUID for the instance in quesstion
+ : The UUID is generated via the ant build. 
+ :)
+declare variable $config:UUID := "@instance.uuid@";
+
 (: 
     Determine the application root collection from the current module load path.
 :)
@@ -30,6 +35,32 @@ declare variable $config:app-root :=
     return
         substring-before($modulePath, "/modules")
 ;
+
+(:~ $config:config contains the data of the config.xml file 
+ :  where instance specific settings can be made without touching a xqm / xql file.  
+ :)
+declare variable $config:config := doc($config:app-root||"/config.xml");
+declare variable $config:map := map:new(for $e in $config:config/config/* return map:entry(local-name($e), data($e)));
+
+(:~ $config:operation-mode contains the value of the operation-mode setting. 
+ : each cfdb instance can work in two modes of operation: either "public mode" or 
+ : "curation mode". 
+ : Instances operating in "curation mode" contain the full set of data (i.e. full 
+ : images and ACL settings for ownership) and serve for corpus curation. Annotators and 
+ : editors can create new tablets, surfaces, annotations etc. and edit metdata.    
+ : "public" instances are read-only and contain only TEI-files and 
+ : cropped glyph images. All tablets are world-readable. Routes to the "edit"-XForms 
+ : are disactivated in the controller.  
+ :)
+declare variable $config:operation-mode := $config:map("operation-mode");
+
+(:~ $config:isPublicInstance contains a boolean indicating that operation mode. 
+ : "True" when instance is running in public mode.
+ :)
+declare variable $config:isPublicInstance := $config:operation-mode eq "public"; 
+
+
+
 
 declare variable $config:tablet2html := $config:app-root||"/tablet2html.xsl";
 

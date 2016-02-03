@@ -3,6 +3,8 @@ xquery version "3.0";
 module namespace app="@app.uri@/templates";
 
 declare namespace tei = "http://www.tei-c.org/ns/1.0";
+declare namespace dc = "http://purl.org/dc/elements/1.1/";
+declare namespace dcterms = "http://purl.org/dc/terms/";
 
 
 import module namespace templates="http://exist-db.org/xquery/templates" ;
@@ -11,6 +13,7 @@ import module namespace tablet="@app.uri@/tablet" at "tablet.xqm";
 import module namespace a="@app.uri@/annotations" at "annotations.xqm";
 import module namespace search = "@app.uri@/search" at "search.xqm";
 import module namespace cfdb = "@app.uri@/db" at "cfdb.xqm";
+import module namespace archive="@app.uri@/archive" at "archive.xqm";
 
 (:~
  : This is a sample templating function. It will be called by the templating module if
@@ -274,4 +277,92 @@ function app:signlist($node as node(), $model as map(), $s as xs:string*, $order
                 }
                 </div>
             </div>
+};
+
+declare function app:archivelist($node, $model) {
+    <div xmlns="http://www.w3.org/1999/xhtml">
+        <table class="table">
+            <thead>
+                <th>Name</th>
+                <th>Version</th>
+                <th>Issued</th>
+                <th>Size</th>
+                <th>Metadata</th>
+                {if (xmldb:get-current-user() = $config:editors) then <th>Remove</th> else ()}
+            </thead>
+            <tbody>{
+                for $md in archive:list()
+                let $md-filename := util:document-name($md),
+                    $zip-filename := replace($md-filename,"xml", "zip"),
+                    $zip-available := util:binary-doc-available($archive:repo-path||"/"||$zip-filename)
+                return
+                <tr>
+                    <td>{if ($zip-available) then <a href="archive/{$zip-filename}">{$md/dc:title}</a> else "file "||$zip-filename||" is missing (orphaned metadata entry)"}</td>
+                    <td>{$md/xs:string(@version)}</td>
+                    <td>{format-dateTime($md//dcterms:issued, "[D00]/[M00]/[Y0000] [h00]:[m00]")}</td>
+                    <td>{if ($zip-available) then round-half-to-even(xmldb:size($archive:repo-path, $zip-filename) div 1024 div 1024, 2)||" MB" else ()}</td>
+                    <td><a href="archive/{$md-filename}" class="archive-md-link"><span class="label">show</span>{transform:transform($md, doc($config:app-root||"/dc2html.xsl"), ())}</a></td>
+                    {if (xmldb:get-current-user() = $config:editors) then <td><a href="#"><i class="fa fa-times"></i></a></td> else ()}
+                </tr>
+            }</tbody>
+        </table>
+    </div>
+};
+
+(: MENUS :)
+declare function app:menu-edit($node, $model) {
+    if ($config:isPublicInstance)
+    then ()
+    else <li class="dropdown" id="edit" xmlns="http://www.w3.org/1999/xhtml">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Edit</a>
+            <ul class="dropdown-menu">
+                <li>
+                    <a href="editTablets.html">Tablets</a>
+                </li>
+                <li>
+                    <a href="editStdSigns.html">Standard Signs</a>
+                </li>
+                <li>
+                    <a href="editArchives.html">Regions, Archives and Dossiers</a>
+                </li>
+            </ul>
+        </li>
+};
+
+declare function app:menu-administration($node, $model) {
+    if (xmldb:get-current-user() = $config:editors)
+    then
+        <li class="dropdown" id="administration">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-wrench"/>&#160;Administration</a>
+                <ul class="dropdown-menu">
+                    <li>
+                        <a href="stats.html"><i class="fa fa-area-chart"/>&#160;Statistics</a>
+                    </li>
+                    <li>
+                        <a href="editUsers.html"><i class="fa fa-users"/>&#160;Edit Users</a>
+                    </li>
+                    {if ($config:isPublicInstance)
+                     then ()
+                     else 
+                        <li>
+                            <a href="archive.html?action=export"><i class="fa fa-file-archive-o"></i>&#160;Create corpus snapshot</a>
+                        </li>
+                    }
+                </ul>
+        </li>
+    else ()
+};
+
+declare function app:input-create-snapshot($node, $model) {
+    if (xmldb:get-current-user() = $config:editors and not($config:isPublicInstance))
+    then
+        <div class="well">
+            <h4>Create new snapshot</h4>
+            <form id="input-create-snapshot" action="" xmlns="http://www.w3.org/1999/xhtml">
+                <label for="version">Version</label>
+                <input id="version" name="version"/>
+                <button><i class="fa fa-file-archive-o"></i>&#160;create</button>
+            </form>
+        </div>
+    else $config:isPublicInstance
 };

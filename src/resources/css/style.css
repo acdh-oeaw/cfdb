@@ -59,3 +59,9 @@ body { background: none!important; }
 
 /* stats.html */
 .jsgrid-table {font-size: 12px;}
+
+/* archive */
+
+.archive-md {display:none;}
+.archive-md-link:hover {position:relative;}
+.archive-md-link:hover > .archive-md {display:block; position: absolute; background: white; border: 1px solid gray; left: 42pt; min-width: 400px; top: -40px;}

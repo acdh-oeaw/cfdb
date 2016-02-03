@@ -23,7 +23,16 @@
     </typedef>
     <typedef resource="net/sf/antcontrib/antlib.xml" classpath="${exist.dir}/tools/ant/lib/ant-contrib-1.0b3.jar"/>-->
     
-    
+    <!-- scriptdef stolen from here http://stackoverflow.com/questions/7717090/is-there-any-way-to-generate-a-guid-in-ant -->
+    <scriptdef name="generateguid" language="javascript">
+        <attribute name="property" />
+        <![CDATA[
+        load("nashorn:mozilla_compat.js");
+        importClass( java.util.UUID );
+        
+        project.setProperty( attributes.get( "property" ), UUID.randomUUID() );
+        ]]>
+    </scriptdef>
     
     
     <target name="xar" depends="configure-metafiles">   
@@ -110,7 +119,7 @@
             <fileset dir="modules.template"/>
         </copy>
         
-        
+        <generateguid property="instance.uuid"/>
         <replace 
             dir="modules" 
             includes="**"
@@ -130,6 +139,9 @@
             <replacefilter 
                 token="@system.account.pwd@" 
                 property="system.account.pwd"/>
+            <replacefilter
+                token="@instance.uuid@"
+                value="${instance.uuid}"/>
         </replace>
     </target>
     

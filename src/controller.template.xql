@@ -53,6 +53,19 @@ else if (contains($exist:path,"$app-root")) then
         </forward>
     </dispatch>
 
+(: when the instance is running in "public mode", access to the edit XForms and the annotate.xql is disabled :)
+else if ($config:isPublicInstance and $exist:resource = ("editTablets.html", "editArchives.html", "editStdSigns.html", "annotate.xql")) then
+    <dispatch xmlns="http://exist.sourceforge.net/NS/exist">
+        <forward url="{$exist:controller}/error-public-mode.html"/>
+        <view>
+            <forward url="{$exist:controller}/modules/view.xql"/>
+        </view>
+    	<error-handler>
+    		<forward url="{$exist:controller}/error-page.html" method="get"/>
+    		<forward url="{$exist:controller}/modules/view.xql"/>
+    	</error-handler>
+    </dispatch>
+    
 else if (ends-with($exist:resource, ".html") or $exist:resource = "annotate.xql") then
     (: the html page is run through view.xql to expand templates :)
     if ($userAllowed)
@@ -85,6 +98,36 @@ else if (contains($exist:path, "/$shared/")) then
             <set-header name="Cache-Control" value="max-age=3600, must-revalidate"/>
         </forward>
     </dispatch>
+    
+(: paths for snapshots (ending with .zip) are mapped to the data/archive collection, 
+   everything else is served by archive.html.
+   This must be placed _after_ the /$shared/ part, because otherwise css imports are not 
+   resolved correctly.
+ :)
+else if ($exist:path = "/archive") then
+    <dispatch xmlns="http://exist.sourceforge.net/NS/exist">
+        <redirect url="./archive.html"/>
+    </dispatch>
+    
+else if (starts-with($exist:path,"/archive")) then
+    if (ends-with($exist:resource, ".zip") or ends-with($exist:resource, ".xml"))
+    then
+        <dispatch xmlns="http://exist.sourceforge.net/NS/exist">
+            <forward url="/../../{$config:data-root}/archive{substring-after($exist:path,'/archive')}">
+                <set-header name="Cache-Control" value="no"/>
+            </forward>
+        </dispatch>
+    else 
+        <dispatch xmlns="http://exist.sourceforge.net/NS/exist">
+            <forward url="{$exist:controller}/archive.html"/>
+            <view>
+                <forward url="{$exist:controller}/modules/view.xql"/>
+            </view>
+    		<error-handler>
+    			<forward url="{$exist:controller}/error-page.html" method="get"/>
+    			<forward url="{$exist:controller}/modules/view.xql"/>
+    		</error-handler>
+        </dispatch>
 
 else
     (: everything else is passed through :)

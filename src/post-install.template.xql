@@ -61,8 +61,18 @@ sm:add-group-manager("@system.account.user@", "@system.account.user@"),
 
 (: create tablets collection :)
 local:mkcol("/db", "@data.dir@/tablets"),
-local:mkcol("/db", "@data.dir@/etc"),
-xmldb:move($target||"/data/etc", "/db/@data.dir@"),
+
+(: create snapshot repository and set ACL :)
+local:mkcol("/db", "@data.dir@/archive"),
+sm:chgrp(xs:anyURI("@data.dir@/archive"), "cfdbEditors"),
+sm:chmod(xs:anyURI("@data.dir@/archive"), "rwxrwxr-x"),
+
+(: if it does not exist: create data/etc collection and move data from 
+   the application package into it - important to not overwrite existing data:)
+if (not(xmldb:collection-available("@data.dir@/etc"))) 
+then (local:mkcol("/db", "@data.dir@/etc"), 
+      xmldb:move($target||"/data/etc", "/db/@data.dir@"))
+else (),
 
 (: ACL for data collection :)
 sm:chgrp(xs:anyURI("/db/@data.dir@"), "cfdbEditors"),
