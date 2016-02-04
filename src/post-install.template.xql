@@ -94,7 +94,8 @@ for $resource in xmldb:get-child-resources("/db/@data.dir@/etc/stdSigns")
 return sm:add-group-ace(xs:anyURI("/db/@data.dir@/etc/stdSigns/"||$resource), "cfdbAnnotators", true(), "rwx"),
 
 
-(: grant 'read' and 'execute' permissions on restxq endpoint module to annotators :)
+(: grant 'read' and 'execute' permissions on restxq endpoint module to editors and annotators :)
 sm:add-group-ace(xs:anyURI($target||"/modules/api.xqm"), "cfdbAnnotators", true(), "r-x"),
+sm:add-group-ace(xs:anyURI($target||"/modules/api.xqm"), "cfdbEditors", true(), "r-x"),
 (: revoke exec rights from guest on api.xqm :)
 sm:chmod(xs:anyURI($config:app-root||"/modules/api.xqm"), "rwxr-xr--") 
