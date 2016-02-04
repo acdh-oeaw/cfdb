@@ -58,6 +58,7 @@
         <delete file="editArchives.html"/>
         <delete file="editStdSigns.html"/>
         <delete file="editTablets.html"/>
+        <delete file="sync.xql"/>
     </target>
     
     <!-- insert the values from build.properties into the xar meta files: repo.xml and expath-pkg.xml -->  
@@ -70,6 +71,7 @@
         <copy file="editArchives.template.html" tofile="editArchives.html" overwrite="true" />
         <copy file="editStdSigns.template.html" tofile="editStdSigns.html" overwrite="true" />
         <copy file="editTablets.template.html" tofile="editTablets.html" overwrite="true" />
+        <copy file="sync.template.xql" tofile="sync.xql" overwrite="true" />
         
         <replace dir="." includes="*"
             excludes="build.xml *.template.*"
