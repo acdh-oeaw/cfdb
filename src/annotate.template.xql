@@ -66,11 +66,11 @@ return
         <link href="resources/js/jquery.ui.plupload/css/jquery.ui.plupload.css" rel="stylesheet"/>
         
         <link href="resources/css/annotate.css" rel="stylesheet"/>
-        <script type="text/javascript" src="resources/js/common.js">//</script>
         {if ($tablet-id != '')
         then 
             (
             <script type="text/javascript">{$js}</script>,
+            <script type="text/javascript" src="resources/js/common.js">//</script>,
             <script type="text/javascript" src="resources/js/annotate.js">//</script>,
             if ($annotation-id != '')
             then ()
