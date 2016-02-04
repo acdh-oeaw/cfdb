@@ -114,7 +114,7 @@ declare function archive:get-extra-metadata($id-or-element) as element() {
                     $size-formatted := if ($zip-available) then round-half-to-even($size div 1024 div 1024, 2)||" MB" else (),
                     $date-formatted := format-dateTime($stored-md//dcterms:issued, "[D00]/[M00]/[Y0000] [H00]:[m00]")
                 return 
-                <archive xmlns="http://www.oeaw.ac.at/acdh/cfdb0.8.4-public-instance/db">
+                <archive xmlns="@app.uri@/db">
                     {($stored-md/@*, $stored-md/*)}
                     <extra>
                         <md-filename>{$md-filename}</md-filename>
