@@ -7,8 +7,7 @@ import module namespace cfdb = "@app.uri@/db" at "xmldb:exist:///db/apps/@app.na
 import module namespace tablet = "@app.uri@/tablet" at "xmldb:exist:///db/apps/@app.name@/modules/tablet.xqm";
 import module namespace surface = "@app.uri@/surface" at "xmldb:exist:///db/apps/@app.name@/modules/surface.xqm";
 import module namespace annotation = "@app.uri@/annotations" at "xmldb:exist:///db/apps/@app.name@/modules/annotations.xqm";
-import module namespace archive = "@app.uri@/archive" at "xmldb:exist:///db/apps/cfdb0.9/modules/archive.xqm";
-
+import module namespace archive = "@app.uri@/archive" at "xmldb:exist:///db/apps/@app.name@/modules/archive.xqm";
 
 declare namespace rest = "http://exquery.org/ns/restxq";
 declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
