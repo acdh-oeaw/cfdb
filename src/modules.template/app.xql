@@ -280,8 +280,10 @@ function app:signlist($node as node(), $model as map(), $s as xs:string*, $order
 };
 
 declare function app:archivelist($node, $model) {
+    let $snapshots := archive:list()
+    return
     <div xmlns="http://www.w3.org/1999/xhtml">
-        <table class="table">
+        <table class="table" id="snapshots">
             <thead>
                 <th>Name</th>
                 <th>Version</th>
@@ -291,19 +293,25 @@ declare function app:archivelist($node, $model) {
                 {if (xmldb:get-current-user() = $config:editors) then <th>Remove</th> else ()}
             </thead>
             <tbody>{
-                for $md in archive:list()
-                let $md-filename := util:document-name($md),
-                    $zip-filename := replace($md-filename,"xml", "zip"),
-                    $zip-available := util:binary-doc-available($archive:repo-path||"/"||$zip-filename)
-                return
-                <tr>
-                    <td>{if ($zip-available) then <a href="archive/{$zip-filename}">{$md/dc:title}</a> else "file "||$zip-filename||" is missing (orphaned metadata entry)"}</td>
-                    <td>{$md/xs:string(@version)}</td>
-                    <td>{format-dateTime($md//dcterms:issued, "[D00]/[M00]/[Y0000] [h00]:[m00]")}</td>
-                    <td>{if ($zip-available) then round-half-to-even(xmldb:size($archive:repo-path, $zip-filename) div 1024 div 1024, 2)||" MB" else ()}</td>
-                    <td><a href="archive/{$md-filename}" class="archive-md-link"><span class="label">show</span>{transform:transform($md, doc($config:app-root||"/dc2html.xsl"), ())}</a></td>
-                    {if (xmldb:get-current-user() = $config:editors) then <td><a href="#"><i class="fa fa-times"></i></a></td> else ()}
-                </tr>
+                if (not($snapshots))
+                then <tr xmlns="http://www.w3.org/1999/xhtml" id="no-snapshots-placeholder"><td style="text-align: center;" colspan="6"><i>No snapshots created so far.</i></td></tr> 
+                else 
+                    for $md in $snapshots
+                    let $md-extra := archive:get-extra-metadata($md)
+                    let $zip-filename := $md-extra//cfdb:zip-filename,
+                        $zip-available := $md-extra//cfdb:zip-available eq "true",
+                        $md-filename := $md-extra//cfdb:md-filename,
+                        $date-formatted := $md-extra//cfdb:date-formatted,
+                        $size-formatted := $md-extra//cfdb:size-formatted
+                    return
+                        <tr xmlns="http://www.w3.org/1999/xhtml" data-snapshot-id="{$md-extra/dc:identifier}" data-snapshot-title="{$md-extra/dc:title}">
+                            <td>{if ($zip-available) then <a href="archive/{$zip-filename}">{$md-extra/dc:title}</a> else "file "||$zip-filename||" is missing (orphaned metadata entry)"}</td>
+                            <td>{$md-extra/xs:string(@version)}</td>
+                            <td>{$date-formatted}</td>
+                            <td>{$size-formatted}</td>
+                            <td><a href="archive/{$md-filename}" class="archive-md-link"><span class="label">show</span>{transform:transform($md-extra, doc($config:app-root||"/dc2html.xsl"), ())}</a></td>
+                            {if (xmldb:get-current-user() = $config:editors) then <td><a href="#" data-action="removeSnapshot"><i class="fa fa-times"></i></a></td> else ()}
+                        </tr>
             }</tbody>
         </table>
     </div>
@@ -356,13 +364,14 @@ declare function app:menu-administration($node, $model) {
 declare function app:input-create-snapshot($node, $model) {
     if (xmldb:get-current-user() = $config:editors and not($config:isPublicInstance))
     then
-        <div class="well">
+        <div class="well" xmlns="http://www.w3.org/1999/xhtml">
             <h4>Create new snapshot</h4>
-            <form id="input-create-snapshot" action="" xmlns="http://www.w3.org/1999/xhtml">
+            <form id="input-create-snapshot" action="">
                 <label for="version">Version</label>
-                <input id="version" name="version"/>
+                <input id="version" name="version" value="{max(archive:list()/xs:integer(@version)) + 1}" type="number" min="{max(archive:list()/xs:integer(@version)) + 1}"/>
                 <button><i class="fa fa-file-archive-o"></i>&#160;create</button>
+                <span class="spinner">&#160;<i class="fa fa-spinner fa-spin"/></span>
             </form>
         </div>
-    else $config:isPublicInstance
+    else ()
 };

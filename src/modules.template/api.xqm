@@ -476,52 +476,67 @@ declare
     %rest:produces("application/json")
     %output:media-type("application/json")
 function api:list-archive() {
-    util:serialize(<response>{archive:list()}</response>, "method=json")
+    util:serialize(<response>{for $a in archive:list() return archive:get-extra-metadata($a)}</response>, "method=json")
+};
+
+
+declare 
+    %rest:GET
+    %rest:path("/cfdb/archive/{$version}")
+    %rest:header-param("format", "{$format}", "json")
+function api:get-snapshot-metadata($user as xs:string*, $password as xs:string*, $version as xs:string, $pid as xs:string*, $format as xs:string*) {
+    (:let $md-full := archive:get-metadata($version):)
+    ()
 };
 
 declare 
     %rest:POST
-    %rest:path("/cfdb/archive")
-    %rest:produces("application/json")
-    %rest:query-param("version", "{$version}")
+    %rest:path("/cfdb/archive/{$version}")
     %rest:query-param("pid", "{$pid}")
     %rest:header-param("user", "{$user}")
     %rest:header-param("password", "{$password}")
-    %output:media-type("application/json")
-function api:create-snapshot($user as xs:string*, $password as xs:string*, $version as xs:string*, $pid as xs:string*) {
-    let $login := xmldb:login($config:data-root, $user[1], $password[1])
-    let $response := 
+    %rest:header-param("format", "{$format}", "json")
+function api:create-snapshot($user as xs:string*, $password as xs:string*, $version as xs:string, $pid as xs:string*, $format as xs:string*) {
+    let $login := true()(:xmldb:login($config:data-root, $user[1], $password[1]):)
+    return 
         if ($login)
         then
             if (xmldb:get-current-user() = $config:editors)
             then
-                if ($version[1] != "")
-                then 
-                    let $md := archive:create($version, $pid[1])
-                    return util:serialize($md,"method=json")
-                else api:status("missing parameter", "missing required parameter 'version'")
-            else api:status("insufficient permissions", "Unknown user or invalid credentials")
-        else api:status("unauthorized", "Unknown user or invalid credentials")
-    return $response
+                let $md := archive:create($version, $pid[1])
+                return 
+                    if ($md instance of element(error))
+                    then 
+                        let $data :=  
+                            if ($format = "html") 
+                            then <p xmlns="http://www.w3.org/1999/xhtml">{xs:string($md)}</p> 
+                            else $md
+                        return api:status("error", $data, $format) 
+                    else 
+                        let $data := archive:get-extra-metadata($md)
+                        return api:status("ok", $data , $format) 
+            else api:status("insufficient permissions", "user "||xmldb:get-current-user()||" has insufficent rights to create an archive", $format)
+        else api:status("unauthorized", "Unknown user or invalid credentials", $format) 
 };
 
 declare 
     %rest:DELETE
     %rest:path("/cfdb/archive/{$id}")
-    %rest:produces("application/json")
     %rest:header-param("user", "{$user}")
     %rest:header-param("password", "{$password}")
-    %output:media-type("application/json")
-function api:remove-snapshot($user as xs:string*, $password as xs:string*, $id as xs:string) {
-    let $login := xmldb:login($config:data-root, $user[1], $password[1])
-    let $response := 
+    %rest:header-param("format", "{$format}", "json")
+function api:remove-snapshot($user as xs:string*, $password as xs:string*, $id as xs:string, $format as xs:string*) {
+    let $login := true()(:xmldb:login($config:data-root, $user[1], $password[1]):)
+    return
         if ($login)
         then
             if (xmldb:get-current-user() = $config:editors)
             then
                 let $md := archive:remove($id)
-                return util:serialize($md,"method=json")
-            else api:status("insufficient permissions", "Unknown user or invalid credentials")
-        else api:status("unauthorized", "Unknown user or invalid credentials")
-    return $response
+                return 
+                    if ($md instance of element(error))
+                    then api:status("error", $md, $format)
+                    else api:status("ok", "Successfully removed snapshot "||$id, $format)
+            else api:status("insufficient permissions", "Unknown user or invalid credentials", $format)
+        else api:status("unauthorized", "Unknown user or invalid credentials", $format)
 };

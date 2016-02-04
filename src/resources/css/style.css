@@ -64,4 +64,5 @@ body { background: none!important; }
 
 .archive-md {display:none;}
 .archive-md-link:hover {position:relative;}
-.archive-md-link:hover > .archive-md {display:block; position: absolute; background: white; border: 1px solid gray; left: 42pt; min-width: 400px; top: -40px;}
+.archive-md-link:hover > .archive-md {background: white; border: 1px solid gray; display: block; left: 42pt; min-width: 600px; padding: 5px; position: absolute; top: -40px; z-index: 1;}
+#input-create-snapshot .spinner {display:none;}

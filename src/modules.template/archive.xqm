@@ -4,6 +4,8 @@ module namespace archive = "@app.uri@/archive";
 
 declare namespace tei = "http://www.tei-c.org/ns/1.0";
 declare namespace http="http://expath.org/ns/http-client";
+declare namespace dc="http://purl.org/dc/elements/1.1/";
+declare namespace dcterms="http://purl.org/dc/terms/"; 
 
 import module namespace config = "@app.uri@/config" at "xmldb:exist:///db/apps/@app.name@/modules/config.xqm";
 import module namespace cfdb = "@app.uri@/db" at "xmldb:exist:///db/apps/@app.name@/modules/cfdb.xqm";
@@ -27,19 +29,20 @@ declare function archive:create($version as xs:string) as element(cfdb:archive)?
 (:~ archive:create creates a snipshot (archive) of the current state of the instance's data 
  : and places it inside the instance's public repository.
  :)
-declare function archive:create($version as xs:string, $pid as xs:string?) as element(cfdb:archive)? {
-    if ($config:isPublicInstance)
-    then util:log-app("WARN", $config:app-name, "Cannot create an archive from public instance")
+declare function archive:create($version as xs:string, $pid as xs:string?) as element() {
+    if ($config:isPublicInstance eq true()) then <error>Cannot create an archive from public instance.</error>
+    else if (exists(collection($archive:repo-path)//cfdb:archive[@version = $version])) then <error>Version {$version} already exists.</error>
+    else if (not($version castable as xs:integer and xs:integer($version) gt 0)) then <error>Version must be an integer greater than 0.</error>
+    else if (xs:integer($version) lt max(archive:list()/xs:integer(@version))) then <error>Version must be greater than the highest previous version number (i.e. {max(archive:list()/xs:integer(@version))}).</error>
     else
         let $all-tablets := cfdb:tablets()
         let $mime-types := ("application/xml", "image/png")
         let $tablets-data := for $t in $all-tablets return tablet:listResources($t, $mime-types),
             $tablets-data-paths := $tablets-data//resource/xs:anyURI(@path),
-            $etc-data-paths := cfdb:ls($config:data-root||"/etc")//resource/xs:anyURI(@path)
-        
-        let $filename := $config:app-name||"_"||$version||"SNAPSHOT_"||format-dateTime(current-dateTime(),'[Y0000][M00][D00]-[h00][m00][s00]')
+            $etc-data-paths := cfdb:ls($config:data-root||"/etc")//resource/xs:anyURI(@path) 
+        let $filename := $config:app-name||"_"||$version||"SNAPSHOT_"||format-dateTime(current-dateTime(),'[Y0000][M00][D00]-[H00][m00][s00]')
         let $md := 
-            <cfdb:archive xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" version="{$version}">
+            <cfdb:archive version="{$version}">
                 <dc:title>cfdb archive {$version}</dc:title>
                 <dc:identifier>{$filename}</dc:identifier>
                 <dcterms:URL>{($pid, $config:map("public-url")||"/archive/"||$version)[1]}</dcterms:URL>                
@@ -63,16 +66,68 @@ declare function archive:create($version as xs:string, $pid as xs:string?) as el
                 (xmldb:create-collection($archive:repo-parent-collection, $archive:repo-collection-name),
                 sm:chgrp(xs:anyURI($archive:repo-path), "cfdbEditors"),
                 sm:chmod(xs:anyURI($archive:repo-path), "rwxrwxr-x"))
-        let $store := (xmldb:store($archive:repo-path, $filename||".zip", $zip, "application/zip"), xmldb:store($archive:repo-path, $filename||".xml", $md))
-        let $set-resource-permissions :=  
+        let $store := 
+            try {
+                (xmldb:store($archive:repo-path, $filename||".zip", $zip, "application/zip"), 
+                xmldb:store($archive:repo-path, $filename||".xml", $md))
+            } catch * {
+                <error>An error occured storing the snapshot. ({$err:code} , {$err:description}, {$err:value})</error>
+            }
+        let $set-resource-permissions :=
+            try {
                 (sm:chgrp(xs:anyURI($archive:repo-path||"/"||$filename||".zip"), "cfdbEditors"),
                 sm:chmod(xs:anyURI($archive:repo-path||"/"||$filename||".zip"), "rwxrwxr-x"),
                 sm:chgrp(xs:anyURI($archive:repo-path||"/"||$filename||".xml"), "cfdbEditors"),
                 sm:chmod(xs:anyURI($archive:repo-path||"/"||$filename||".xml"), "rwxrwxr-x"))
-        return 
-            if (count($store) = 2)
-            then $md
-            else ()
+            } catch * {
+                let $rm-archive := archive:remove($md/dc:identifier)
+                return <error>An error occured setting resource permissions on newly created snapshot. Snapshot has not been created. ({$err:code} , {$err:description}, {$err:value})</error>
+            }
+        return  
+            if ($store instance of element(error)) then $store
+            else if ($set-resource-permissions instance of element(error)) then $set-resource-permissions
+            else doc($store[ends-with(., ".xml")])/cfdb:archive 
+};
+
+(:~ The function archive:get-metadata returns full metadata about the snapshot specified by $id. 
+ : It contains the original metdata created at the time of creation but also a formatted version for it 
+ : to be displayed, including an estimate size in the database.   
+ :)
+declare function archive:get-extra-metadata($id-or-element) as element() {
+    let $arg-type := typeswitch ($id-or-element) 
+                        case element(cfdb:archive) return "stored-md"
+                        case xs:string return "id"
+                        default return ()
+    return
+        if (not($arg-type))
+        then <error>parameter 1 of archive:get-metadata has wrong type: must be a snapshot ID (xs:string) or an element(cfdb:archive)</error>
+        else 
+            let $stored-md := if ($arg-type = "stored-md") then $id-or-element else collection($archive:repo-path)//cfdb:archive[dc:identifier = $id-or-element],
+                $id := if ($arg-type = "id") then $id-or-element else $id-or-element/dc:identifier/data(.)
+            return 
+                if ($id = "") then <error>archive:get-metadata() $id is empty</error> else 
+                if (not($stored-md)) then <error>archive:get-metadata() $stored-md is empty</error> else 
+                let $md-filename := util:document-name($stored-md),
+                    $zip-filename := replace($md-filename,"xml", "zip"),
+                    $zip-available := util:binary-doc-available($archive:repo-path||"/"||$zip-filename),
+                    $size := if ($zip-available) then xmldb:size($archive:repo-path, $zip-filename) else (),
+                    $size-formatted := if ($zip-available) then round-half-to-even($size div 1024 div 1024, 2)||" MB" else (),
+                    $date-formatted := format-dateTime($stored-md//dcterms:issued, "[D00]/[M00]/[Y0000] [H00]:[m00]")
+                return 
+                <archive xmlns="http://www.oeaw.ac.at/acdh/cfdb0.8.4-public-instance/db">
+                    {($stored-md/@*, $stored-md/*)}
+                    <extra>
+                        <md-filename>{$md-filename}</md-filename>
+                        <md-url>archive/{$md-filename}</md-url>
+                        <zip-filename>{$zip-filename}</zip-filename>
+                        <zip-available>{$zip-available}</zip-available>
+                        <zip-url>archive/{$zip-filename}</zip-url>
+                        <size>{$size}</size>
+                        <size-formatted>{$size-formatted}</size-formatted>
+                        <date-formatted>{$date-formatted}</date-formatted>
+                        <removable>{xmldb:get-current-user() = $config:editors}</removable>
+                    </extra>
+                </archive>
 };
 
 
@@ -82,14 +137,20 @@ declare function archive:list() as element(cfdb:archive)* {
     collection($archive:repo-path)//cfdb:archive
 };
 
-declare function archive:remove($identifier) {(
-    if (util:binary-doc-available($archive:repo-path||"/"||$identifier||".zip"))
-    then (xmldb:remove($archive:repo-path, $identifier||".zip"))
-    else (),
-    if (doc-available($archive:repo-path||"/"||$identifier||".xml"))
-    then (xmldb:remove($archive:repo-path, $identifier||".xml"))
-    else ()
-)};
+declare function archive:remove($identifier) {
+    let $remove := 
+        try {
+            if (util:binary-doc-available($archive:repo-path||"/"||$identifier||".zip"))
+            then (xmldb:remove($archive:repo-path, $identifier||".zip"))
+            else (),
+            if (doc-available($archive:repo-path||"/"||$identifier||".xml"))
+            then (xmldb:remove($archive:repo-path, $identifier||".xml"))
+            else ()
+        } catch * {
+            <error>An error occured. Could not remove snapshot {$identifier}. ({$err:code} , {$err:description}, {$err:value})</error>
+        } 
+    return $remove 
+};
 
 declare function archive:import($url as xs:anyURI){
     let $request := <http:request method="GET" href="{$url}"/>,
