@@ -30,7 +30,7 @@ declare variable $qa:namespace := "@app.uri@/qa";
         {for $r in $results return 
             <qa:issue>{
                 for $k in map:keys($r)
-                return element {"qa:"||$k} {map:get($r, $k)}
+                return element {"qa:"||$k} {xs:string(map:get($r, $k))}
             }</qa:issue>}
     </qa:test-results>
 };
@@ -81,7 +81,8 @@ declare function qa:run() as element()*{(
     qa:one-reading-per-context(),
     qa:note-exists-for-context(),
     qa:only-one-xml-file-in-tablet-collection(),
-    qa:every-legacy-format-tablet-has-all-glyphs()
+    qa:every-legacy-format-tablet-has-all-glyphs(),
+    qa:all-sign-numbers-are-integers()
 )};
 
 
@@ -207,5 +208,22 @@ declare function qa:every-legacy-format-tablet-has-all-glyphs() as element()*{
                     }
         return $fails
     return qa:test("every-legacy-format-tablet-has-all-glyphs", "there is no glyph missing in a combined surface tablet that has been annotated with the Image Markup Tool", $failing-tablets)
+};
+
+(:~ This function tests if all @n attributes on standard signs can be cast to xs:integer 
+ :)
+declare function qa:all-sign-numbers-are-integers() as element()* {
+   let $test-name := "all-sign-numbers-are-integers",
+       $description := (:This test ensures that :) "every sign number can be cast to an integer"
+   let $not-castable-n-attributes := 
+       for $s in $cfdb:stdSigns[not(matches(@n,'^\d+$'))]
+       return map{"sign-id" := $s/@xml:id, "sign-n" := $s/@n}
+   return qa:test($test-name, $description, $not-castable-n-attributes)
+};
+
+(:~ This function tests for permission settings in the data-collection 
+ :)
+declare function qa:data-permissions-are-valid() as element()* {
+   ()
 };
 
