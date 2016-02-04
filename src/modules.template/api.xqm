@@ -40,21 +40,43 @@ declare function api:response($caller as xs:string, $items as map()*) as element
 };
 
 declare function api:status($status, $msg) {
-    let $load := <cfdb:response><status>{$status}</status><msg>{$msg}</msg></cfdb:response>
+    api:status($status, $msg, ())
+};
+
+declare function api:status($status, $msg, $method) {
     let $statusCode := 
         switch(true())
             case $status = "error"          return 500
             case $status = "unauthorized"   return 401
-            case $status = "missing parameter" return 400
+            case $status = "missing parameter" case $status = "invalid request data" return 400
+            (:case $status = "invalid request data" return 422:)
+            (: 422 is not accepted by RestXQ, so we have to use 400 :)
             case $status = "insufficent permissions" return 403
             default return 200
+    let $content-type := 
+        switch($method) 
+            case "json" return "application/json"
+            case "html" return "application/xhtml+xml"
+            case "text" return "text/plain"
+            default return "application/xml" 
+    let $ser :=
+        <output:serialization-parameters>
+            <output:method value="{$method}"/>
+        </output:serialization-parameters>
+    let $load := 
+        <cfdb:response>
+            <status>{$status}</status>
+            <msg>{$msg}</msg>
+        </cfdb:response>
     return 
         (<rest:response>
+            {$ser}
             <http:response status="{$statusCode}">
                 {if ($statusCode != 200) then attribute reason {$msg} else ()}
+                <http:header name="Content-Type" value="{$content-type}"/>
             </http:response>            
         </rest:response>,
-        $msg)
+        $load)
 };
 
 
