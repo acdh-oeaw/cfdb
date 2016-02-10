@@ -1,0 +1,250 @@
+<div xmlns="http://www.w3.org/1999/xhtml" data-template="templates:surround" data-template-with="templates/page.html" data-template-at="content">
+  
+    <div class="container">
+        <h2 style="text-align:center;"><small>documentation</small></h2>
+        <div class="row">
+            <div class="span2">
+                <h2>Table of Content</h2>
+                <ul>
+                    <li><a href="#Datenstruktur" class="wiki-anchor">Datenstruktur</a>
+                    <ul>
+                        <li><a href="#Tafeln">Tafeln</a></li>
+                        <ul>
+                            <li><a href="#Metadaten">Metadaten</a></li>
+                        </ul>
+                        <li><a href="#Daten">Daten</a></li>
+                        <ul>
+                            <li><a href="#Digitalisate">Digitalisate</a></li>
+                            <li><a href="#Kontexte_Zeichen">Kontexte / Zeichen</a></li>
+                        </ul>
+                        <li><a href="#Controlled_Vocabularies">Controlled Vocabularies</a></li>
+                        <ul>
+                            <li><a href="#region_archiv_dossier">Regionen, Archive, Dossiers</a></li>
+                        </ul>
+                    </ul></li>
+                </ul>
+            </div>
+            <div class="span10">
+       
+                <h1><a name="Datenstruktur"/>Datenstruktur</h1>
+        
+        
+                <a name="Tafeln"/>
+                <h2 >Tafeln</h2>
+        <p>Jede Tafel wird als eine eigene <code>&lt;TEI&gt;</code> Instanz abgebildet, die aus einem <code>&lt;sourceDoc&gt;</code> Element für die Digitalisate sowie einem <code>&lt;text&gt;</code> mit für transliterierte Zeichenkontexte besteht.</p>
+        
+        
+                <a name="Metadaten"/>
+        <h3>Metadaten</h3>
+        
+        
+        <table class="table table-bordered">
+            <tr>
+                <th>Feldname </th>
+                <th>Beschreibung                      </th>
+                <th>TEI Struktur                                                                                     </th>
+                <th>Anmerkungen </th>
+            </tr>
+            <tr>
+                <td> Text Reference </td>
+                <td> Eindeutiger Bezeichner des Textes </td>
+                <td> <code>teiHeader/fileDesc/sourceDesc/msDesc/msIdentifier/idno</code>                                      </td>
+                <td>              </td>
+            </tr>
+            <tr>
+                <td> (id)     </td>
+                <td> Datenbankweit eindeutiger Bezeichner </td>
+                <td> <code>TEI/@xml:id</code>                                                                                    </td>
+                <td> bei Anlegen aus Text Reference generiert, nicht veränderbar </td>
+            </tr>
+            <tr>
+                <td> (title)   </td>
+                <td> Titel der TEI Instanz             </td>
+                <td> <code>teiHeader/fileDesc/titleStmt/title</code>                                                                </td>
+                <td> = Text Reference, nicht veränderbar                               </td>
+            </tr>
+            <tr>
+                <td> Region   </td>
+                <td> Fundregion                         </td>
+                <td> <code>teiHeader/fileDesc/sourceDesc/msDesc/msIdentifier/region</code>                                         </td>
+                <td> *                 </td>
+            </tr>
+            <tr>
+                <td> Archive  </td>
+                <td> Archiv = Sammlung von Tafeln      </td>
+                <td> <code>teiHeader/fileDesc/sourceDesc/msDesc/msIdentifier/collection[@type='archive']</code>                     </td>
+                <td>  *           </td>
+            </tr>
+            <tr>
+                <td> Dossier  </td>
+                <td> Unterkategorisierung v. Archiven  </td>
+                <td> <code>teiHeader/fileDesc/sourceDesc/msDesc/msIdentifier/collection[@type='dossier']</code>                     </td>
+                <td>  *           </td>
+            </tr>
+            <tr>
+                <td> CDLI no. </td>
+                <td> Nummer der Tafel in CDLI          </td>
+                <td> <code>teiHeader/fileDesc/sourceDesc/msDesc/msIdentifier/altIdentifier[@type='CDLI']/idno</code>                </td>
+                <td>                </td>
+            </tr>
+            <tr>
+                <td> NABUCCO no. </td>
+                <td> Nummer der Tafel in NABUCCO    </td>
+                <td> <code>teiHeader/fileDesc/sourceDesc/msDesc/msIdentifier/altIdentifier[@type='NABUCCO']/idno</code>             </td>
+                <td>             </td>
+            </tr>
+            <tr>
+                <td> Scribe    </td>
+                <td> Schreiber </td>
+                <td> <code>teiHeader/fileDesc/sourceDesc/msDesc/physDesc/handDesc/handNote/persName</code> </td>
+                <td> *</td>
+            </tr>
+            <tr>
+                <td> Period </td>
+                <td>     </td>
+                <td>  <code>/TEI/teiHeader/profileDesc/creation/origDate/date/@period</code> </td>
+                <td> * </td>
+            </tr>
+            <tr>
+                <td> Date of Issue </td>
+                <td> </td>
+                <td>  <code>/TEI/teiHeader/profileDesc/creation/origDate/date</code> </td>
+                <td> </td>
+            </tr>
+            <tr>
+                <td> Place of Issue </td>
+                <td> </td>
+                <td>  <code>/TEI/teiHeader/profileDesc/creation/origPlace/placeName</code> </td>
+                <td> * </td>
+            </tr>
+            <tr>
+                <td> Ductus </td>
+                <td> Gerader oder schräger Schriftduktus </td>
+                <td><code>/TEI/teiHeader/fileDesc/sourceDesc/msDesc/physDesc/handDesc/handNote/fs/f/symbol/@value</code> </td>
+                <td> "normal" oder "slanting" </td>
+            </tr>
+            <tr>
+                <td> Text type </td>
+                <td> Textsorte                   </td>
+                <td> <code>/TEI/teiHeader/profileDesc/textClass/keywords[@scheme='local']/term </code></td>
+                <td> * </td>
+            </tr>
+            <tr>
+                <td> Content   </td>
+                <td> Zusammenfassung d. Inhalts </td>
+                <td> <code>/TEI/teiHeader/profileDesc/abstract</code></td>
+                <td>  </td>
+            </tr>
+            <tr>
+                <td> Distinctive Protagonists </td>
+                <td> Im Text erwähnte Personen </td>
+                <td> <code>/TEI/teiHeader/profileDesc/particDesc/persName</code> </td>
+                <td> </td>
+            </tr>
+            <tr>
+                <td> Bibliography </td>
+                <td> Transliterationen oder Abdrucke </td>
+                <td> <code>/TEI/teiHeader/fileDesc/sourceDesc/msDesc/additional/surrogates/listBibl</code> </td>
+                <td> </td>
+            </tr>
+        </table>
+        
+        
+        
+        
+        <p>Die mit Asteriskus gekennzeichneten Felder enthalten Werten aus kontrollierte Vokabularien.</p>
+        
+        
+        <a name="Daten"/>
+        <h2 >Daten</h2>
+        
+        
+       <a name="Digitalisate"/>
+        <h3 >Digitalisate</h3>
+        
+        
+        <p>Jedes annotierte Bild einer Tafel wird als eine <code>&lt;surface&gt;</code> in <code>/TEI/sourceDoc</code> abgebildet. Darin befindet sich eine <code>&lt;graphic/&gt;</code> , die den Dateipfad zum Digitalisat (<code>@url</code>) sowie seine Abmessungen (<code>@height, @width</code>) enthält.</p>
+        
+        
+        <p>Jedes <code>&lt;surface&gt;</code>-Element enthält ein oder mehrere <code>&lt;zone&gt;</code>-Elemente, die Zeichenkontexte repräsentieren.</p>
+        
+        
+        <p>Jeder dieser Zeichenkontexte enhält (mindestens und höchstens) eine weitere <code>&lt;zone&gt;</code>, in der die Koordinaten des annotierten Zeichen auf dem Digitalisat als Rechteck stehen (<code>@lrx, @lry, @ulx</code>@ und <code>@uly</code>). Diese "Zeichen"-<code>&lt;zone&gt;</code> enthält ein weiteres <code>&lt;graphic&gt;</code> Element mit dem Dateipfad zum extrahierten Bild des Zeichens.</p>
+        
+        
+        <p>Beispiel für eine solche Struktur:</p>
+        
+        
+        <pre><code class="xml syntaxhl"><span class="CodeRay"><span class="tag">&lt;surface&gt;</span>
+    <span class="tag">&lt;graphic</span> <span class="attribute-name">height</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">3456px</span><span class="delimiter">&quot;</span></span> <span class="attribute-name">url</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">PTS_2253_l2_marked.JPG</span><span class="delimiter">&quot;</span></span> <span class="attribute-name">width</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">5184px</span><span class="delimiter">&quot;</span></span><span class="tag">/&gt;</span>
+    <span class="tag">&lt;zone</span> <span class="attribute-name">corresp</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">#context_PTS2253_PTS_2253_l2_marked_0</span><span class="delimiter">&quot;</span></span><span class="tag">&gt;</span>
+        <span class="tag">&lt;zone</span> <span class="attribute-name">corresp</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">#glyph_PTS2253_PTS_2253_l2_marked_0</span><span class="delimiter">&quot;</span></span> <span class="attribute-name">lrx</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">2154</span><span class="delimiter">&quot;</span></span> <span class="attribute-name">lry</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">1651</span><span class="delimiter">&quot;</span></span> <span class="attribute-name">ulx</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">1724</span><span class="delimiter">&quot;</span></span> <span class="attribute-name">uly</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">1128</span><span class="delimiter">&quot;</span></span><span class="tag">&gt;</span>
+            <span class="tag">&lt;graphic</span> <span class="attribute-name">url</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">_glyphs/glyph_PTS2253_PTS_2253_l2_marked_0.jpg</span><span class="delimiter">&quot;</span></span> <span class="attribute-name">xml:id</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">graphic_glyph_PTS2253_PTS_2253_l2_marked_0</span><span class="delimiter">&quot;</span></span><span class="tag">/&gt;</span>
+        <span class="tag">&lt;/zone&gt;</span>
+    <span class="tag">&lt;/zone&gt;</span>
+<span class="tag">&lt;/surface&gt;</span>
+</span></code></pre>
+        
+                <a name="Kontexte_Zeichen"/>
+        <h3 >Kontexte / Zeichen</h3>
+        
+        
+        <p>Die Transliterationen des Kontexts eines Zeichens stehen in einem oder mehreren Elementen <code>&lt;seg type="context"&gt;</code> innerhalb von <code>TEI/text/body/ab</code>. Das annotierte Zeichen ist darin als <code>&lt;g&gt;</code>-Element (<em>glyph</em>) ausgezeichnet. Das Attribut <code>@type</code> enthält den Namen des Standardzeichens, <code>@facs</code> verwerist auf ein <code>&lt;graphic&gt;</code>-Element in einer <code>&lt;zone&gt;</code> und <code>@ana</code> auf ein <code>&lt;glyph&gt;</code>-Element im <code>teiHeader</code>, das ein <code>charProp</code>-Element für die Angabe der Sequenz (Anordnung der Keile) enthält.</p>
+        
+        
+        <pre><code class="xml syntaxhl"><span class="CodeRay"><span class="tag">&lt;text&gt;</span>
+    <span class="tag">&lt;body&gt;</span>
+        <span class="tag">&lt;ab&gt;</span>
+            <span class="tag">&lt;seg</span> <span class="attribute-name">type</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">context</span><span class="delimiter">&quot;</span></span> <span class="attribute-name">xml:id</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">context_PTS2253_PTS_2253_l2_marked_0</span><span class="delimiter">&quot;</span></span><span class="tag">&gt;</span>
+                DINGIR.MEŠ GAL.<span class="tag">&lt;g</span> <span class="attribute-name">ana</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">#charDecl_PTS2253_PTS_2253_l2_marked_0</span><span class="delimiter">&quot;</span></span> <span class="attribute-name">facs</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">#graphic_glyph_PTS2253_PTS_2253_l2_marked_0</span><span class="delimiter">&quot;</span></span> <span class="attribute-name">type</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">MESH</span><span class="delimiter">&quot;</span></span> <span class="attribute-name">xml:id</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">glyph_PTS2253_PTS_2253_l2_marked_0</span><span class="delimiter">&quot;</span></span><span class="tag">&gt;</span>MEŠ<span class="tag">&lt;/g&gt;</span>
+            <span class="tag">&lt;/seg&gt;</span>
+        <span class="tag">&lt;/ab&gt;</span>
+    <span class="tag">&lt;/body&gt;</span>
+<span class="tag">&lt;/text&gt;</span>
+</span></code></pre>
+        
+        <pre><code class="xml syntaxhl"><span class="CodeRay"><span class="tag">&lt;glyph</span> <span class="attribute-name">xml:id</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">charDecl_PTS2253_PTS_2253_l4_marked_0</span><span class="delimiter">&quot;</span></span><span class="tag">&gt;</span>
+    <span class="tag">&lt;charProp&gt;</span>
+        <span class="tag">&lt;localName&gt;</span>sequence<span class="tag">&lt;/localName&gt;</span>
+            <span class="tag">&lt;value&gt;</span>3d<span class="tag">&lt;/value&gt;</span>
+    <span class="tag">&lt;/charProp&gt;</span>
+<span class="tag">&lt;/glyph&gt;</span>
+</span></code></pre>
+        
+                <a name="Controlled_Vocabularies"></a>
+        <h2 >Controlled Vocabularies</h2>
+        
+        
+                <a name="region_archiv_dossier"></a>
+        <h3 >Regionen, Archive, Dossiers</h3>
+        
+        
+        <p>Die Angaben zu Region, Archiv und Dossier sind hierarchisch von einander abhängig. Die Liste der möglichen Werte wird in <code>data/etc/places.xml</code> gepflegt und hat folgende Struktur:</p>
+        
+        
+        <pre><code class="xml syntaxhl"><span class="CodeRay">...
+<span class="tag">&lt;body&gt;</span>
+<span class="tag">&lt;list</span> <span class="attribute-name">n</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">Regions</span><span class="delimiter">&quot;</span></span> <span class="attribute-name">xml:id</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">regions</span><span class="delimiter">&quot;</span></span><span class="tag">&gt;</span>
+    <span class="tag">&lt;item</span> <span class="attribute-name">xml:id</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">region_uruk</span><span class="delimiter">&quot;</span></span><span class="tag">&gt;</span>
+        <span class="tag">&lt;placeName&gt;</span>Uruk<span class="tag">&lt;/placeName&gt;</span>
+        <span class="tag">&lt;list</span> <span class="attribute-name">n</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">Archives</span><span class="delimiter">&quot;</span></span><span class="tag">&gt;</span>
+            <span class="tag">&lt;item</span> <span class="attribute-name">xml:id</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">archive_eanna_w0aaab3aa</span><span class="delimiter">&quot;</span></span><span class="tag">&gt;</span>
+                <span class="tag">&lt;name&gt;</span>Eanna<span class="tag">&lt;/name&gt;</span>
+                <span class="tag">&lt;list</span> <span class="attribute-name">n</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">Dossiers</span><span class="delimiter">&quot;</span></span><span class="tag">&gt;</span>
+                    <span class="tag">&lt;item</span> <span class="attribute-name">xml:id</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">dossier_ndinu_w0aaab3ab3aa</span><span class="delimiter">&quot;</span></span><span class="tag">&gt;</span>
+                        <span class="tag">&lt;name&gt;</span>Nādinu<span class="tag">&lt;/name&gt;</span>
+                    <span class="tag">&lt;/item&gt;</span>
+                <span class="tag">&lt;/list&gt;</span>
+            <span class="tag">&lt;/item&gt;</span>
+       <span class="tag">&lt;/list&gt;</span>
+    <span class="tag">&lt;/item&gt;</span>
+<span class="tag">&lt;/list&gt;</span>
+<span class="tag">&lt;/body&gt;</span>
+</span></code></pre>
+    </div>
+            
+        </div>
+    </div>
+    
+    
+</div>
