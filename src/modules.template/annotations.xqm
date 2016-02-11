@@ -203,17 +203,32 @@ declare function annotation:read($tablet-id as xs:string) {
     ()
 };
 
-(: reads one annotation by its ID :)
+(:~ reads one annotation by its ID
+ : @param $tablet: the tablet as a tei:TEI element
+ : @param $surface-id: the xml:id of the tei:surface element
+ : @param $annotation-id: the ID of the annotation - this is an abstract ID that is prefixed with "glyph_" to construct @xml:id on tei:g, "context_" to construct @xml:id values of tei:seg etc.
+ : @param $filter: a string to test again any annotation property 
+ : @return one annotation as a annotation element (no namespace)
+ :)
 declare function annotation:read($tablet as element(tei:TEI), $surface-id as xs:string, $annotation-id as xs:string, $filter as xs:string*) {
-    let $tablet-id := tablet:id($tablet)
-    let $context-zone := $tablet//tei:zone[@corresp = '#context_'||$annotation-id],
+    let $glyph := $tablet//tei:g[@xml:id = "glyph_"||$annotation-id]
+    return 
+        if (exists($glyph)) 
+        then annotation:get-attributes($glyph, $filter) 
+        else ()
+};
+
+declare function annotation:get-attributes($glyph as element(tei:g), $filter as xs:string*) as element(annotation)* {
+    let $annotation-id := substring-after($glyph/@xml:id, 'glyph_'),
+        $tablet := root($glyph)/tei:TEI,
+        $tablet-id := tablet:id($tablet),
+        $context-zone := $tablet//tei:zone[@corresp = '#context_'||$annotation-id],
         $glyph-zone := $context-zone/tei:zone,
         $glyph-img := $glyph-zone/tei:graphic/xs:string(@url),
-        $context := annotation:context($tablet, $annotation-id),
-        $glyph := $context/tei:g[1],
+        $surface-id := $glyph-zone/ancestor::tei:surface/xs:string(@xml:id),
+        $context := $glyph/parent::tei:seg[@type = "context"],
         $char := annotation:char($tablet, $annotation-id),
         $note := annotation:note($tablet, $annotation-id)[1]
-    
     let $data := 
         <annotation>
             <uuid>{$annotation-id}</uuid>
