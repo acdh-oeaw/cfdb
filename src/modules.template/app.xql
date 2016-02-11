@@ -341,21 +341,14 @@ declare function app:menu-administration($node, $model) {
     if (xmldb:get-current-user() = $config:editors)
     then
         <li class="dropdown" id="administration">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-wrench"/>&#160;Administration</a>
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Administration</a>
                 <ul class="dropdown-menu">
                     <li>
                         <a href="stats.html"><i class="fa fa-area-chart"/>&#160;Statistics</a>
                     </li>
                     <li>
-                        <a href="editUsers.html"><i class="fa fa-users"/>&#160;Edit Users</a>
+                        <a href="administration.html"><i class="fa fa-wrench"/>&#160;General Configuration</a>
                     </li>
-                    {if ($config:isPublicInstance)
-                     then ()
-                     else 
-                        <li>
-                            <a href="archive.html?action=export"><i class="fa fa-file-archive-o"></i>&#160;Create corpus snapshot</a>
-                        </li>
-                    }
                 </ul>
         </li>
     else ()

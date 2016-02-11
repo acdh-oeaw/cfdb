@@ -68,7 +68,7 @@ else if ($config:isPublicInstance and $exist:resource = ("editTablets.html", "ed
     
 else if (ends-with($exist:resource, ".html") or $exist:resource = "annotate.xql") then
     (: the html page is run through view.xql to expand templates :)
-    if ($userAllowed)
+    if ($userAllowed or ($config:isPublicInstance and $exist:resource != "administration.html" ))
     then 
         <dispatch xmlns="http://exist.sourceforge.net/NS/exist">
             <view>

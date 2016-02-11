@@ -65,4 +65,6 @@ body { background: none!important; }
 .archive-md {display:none;}
 .archive-md-link:hover {position:relative;}
 .archive-md-link:hover > .archive-md {background: white; border: 1px solid gray; display: block; left: 42pt; min-width: 600px; padding: 5px; position: absolute; top: -40px; z-index: 1;}
-#input-create-snapshot .spinner {display:none;}
+#input-create-snapshot .spinner {display:none;}/* administration.html */
+#form-configuration .tab-content { padding: 0 1em; margin-bottom: 4em; }
+#form-configuration input {height: 2em; width: 75%;} 

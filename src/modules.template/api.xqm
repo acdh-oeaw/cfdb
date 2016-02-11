@@ -568,4 +568,48 @@ function api:remove-snapshot($user as xs:string*, $password as xs:string*, $id a
                     else api:response("ok", "Successfully removed snapshot "||$id, $format, $caller)
             else api:response("insufficient permissions", "Unknown user or invalid credentials", $format, $caller)
         else api:response("unauthorized", "Unknown user or invalid credentials", $format, $caller)
+(: ******************************** :)
+(: **** DATABASE CONFIGURATION **** :)
+(: ******************************** :)
+
+declare 
+    %rest:GET
+    %rest:path("/cfdb/configuration")
+    %rest:header-param("format", "{$format}", "json")
+function api:get-instance-settings($format as xs:string*) {
+    api:get-instance-settings((), $format)
+};
+
+declare 
+    %rest:GET
+    %rest:path("/cfdb/configuration/{$key}")
+    %rest:header-param("format", "{$format}", "json")
+function api:get-instance-settings($key as xs:string*, $format as xs:string*) {
+    let $value := config:get($key[1])
+    return 
+        if (not(xmldb:get-current-user() = $config:editors)) then api:response("insufficient permissions", "must be editor to view configuration", $format, "api:get-instance-settings")
+        else if ($value instance of element(error)) then api:response("error", $value, $format, "api:get-instance-settings")
+        else api:response("ok", $value, $format, "api:get-instance-settings")
+};
+
+
+declare 
+    %rest:PUT("{$value}")
+    %rest:path("/cfdb/configuration")
+    %rest:header-param("format", "{$format}", "json")
+    %output:media-type("application/json")
+function api:set-instance-settings($key as xs:string*, $value as item()*, $format as xs:string*) {  
+        if (not(xmldb:get-current-user() = $config:editors)) 
+        then api:response("insufficient permissions", "must be editor to view configuration", $format, "api:get-instance-settings")
+        else 
+            let $data := util:base64-decode($value),
+                $log := util:log-app("DEBUG", $config:app-name, $value),
+                $xml := try { xqjson:parse-json($data) } catch * {<error>could not parse {$data} as a JSON object</error>},
+                $keys := $xml//pair/@name[. = $config:keys]/xs:string(.),
+                $map := map:new(for $k in $keys return map:entry($k, $xml//pair[@name = $k]/xs:string(.)))
+            let $response := config:set($map)
+            return 
+                if ($response instance of element(error))
+                then api:response("error", $response)
+                else api:response("ok", $response, $format, "api:set-instance-settings")
 };
