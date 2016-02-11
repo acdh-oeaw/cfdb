@@ -39,6 +39,13 @@ if ($exist:path eq "/") then
         <redirect url="index.html"/>
     </dispatch>
 
+else if (contains($exist:path,"$tablets-root")) then
+    <dispatch xmlns="http://exist.sourceforge.net/NS/exist">
+        <forward url="/../../{$config:tablets-root}/{substring-after($exist:path,'$tablets-root')}">
+            <set-header name="Cache-Control" value="no"/>
+        </forward>
+    </dispatch>
+
 else if (contains($exist:path,"$app-root/data")) then
     <dispatch xmlns="http://exist.sourceforge.net/NS/exist">
         <forward url="/../../{$config:data-root}/{substring-after($exist:path,'$app-root/data')}">

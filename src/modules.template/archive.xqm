@@ -45,12 +45,12 @@ declare function archive:create($version as xs:string, $pid as xs:string?) as el
             <cfdb:archive version="{$version}">
                 <dc:title>cfdb archive {$version}</dc:title>
                 <dc:identifier>{$filename}</dc:identifier>
-                <dcterms:URL>{($pid, $config:map("public-url")||"/archive/"||$version)[1]}</dcterms:URL>                
+                <dcterms:URL>{($pid, config:get("public-url")||"/archive/"||$version)[1]}</dcterms:URL>                
                 <dc:creator>{xmldb:get-current-user()}</dc:creator>
                 <dcterms:issued>{current-dateTime()}</dcterms:issued>
-                <dc:publisher>{$config:map("publisher")}</dc:publisher>
+                <dc:publisher>{config:get("publisher")}</dc:publisher>
                 <dcterms:extent>{count($all-tablets//tei:g)} annotated signs, {count($all-tablets)} tablets, {count(($tablets-data-paths, $etc-data-paths))} files</dcterms:extent>
-                <dcterms:license>{$config:map("license")}</dcterms:license>
+                <dcterms:license>{config:get("license")}</dcterms:license>
                 <dcterms:source>{$config:UUID}</dcterms:source>
                 <dc:description>This archive contains a snapshot of the data in the "{$config:app-name}" corpus at the time of its creation.</dc:description>
                 <dc:tableOfContents>For each tablet (under "tablets") cropped images (png files) and metadata, including image annotations (as TEI files), are provided. Additional data in "etc": lists of places, persons, archives and terms as well as standard sign lists and standard sign images ("stdSigs/stdSigns.xml").</dc:tableOfContents>
@@ -134,38 +134,150 @@ declare function archive:get-extra-metadata($id-or-element) as element() {
 (:~ This function returns a list of archive snapshots
  :)
 declare function archive:list() as element(cfdb:archive)* {
-    collection($archive:repo-path)//cfdb:archive
+    archive:get(())
 };
 
+
+(:~ The function archive:get retrieves the snaphot indicated by $id or lists all 
+ : snapshots if there is no $id given. 
+ :)
+declare function archive:get($id as xs:string?) as element(cfdb:archive)* {
+    if (exists($id))
+    then collection($archive:repo-path)//cfdb:archive[dc:identifier = $id]
+    else collection($archive:repo-path)//cfdb:archive
+};
+
+declare function archive:get-by-version($version) as element(cfdb:archive)* {
+    collection($archive:repo-path)//cfdb:archive[@version = $version]
+};
+
+(:~ Removes the archive of a snapshot as well as the unpacked files.  
+ :)
 declare function archive:remove($identifier) {
     let $remove := 
-        try {
-            if (util:binary-doc-available($archive:repo-path||"/"||$identifier||".zip"))
-            then (xmldb:remove($archive:repo-path, $identifier||".zip"))
-            else (),
+        try {(
             if (doc-available($archive:repo-path||"/"||$identifier||".xml"))
             then (xmldb:remove($archive:repo-path, $identifier||".xml"))
+            else (),
+            if (util:binary-doc-available($archive:repo-path||"/"||$identifier||".zip"))
+            then (xmldb:remove($archive:repo-path, $identifier||".zip"))
             else ()
-        } catch * {
+        )} catch * {
             <error>An error occured. Could not remove snapshot {$identifier}. ({$err:code} , {$err:description}, {$err:value})</error>
         } 
     return $remove 
 };
 
-declare function archive:import($url as xs:anyURI){
-    let $request := <http:request method="GET" href="{$url}"/>,
-        $response := http:send-request($request),
-        $status := $response/@status,
-        $msg := $response/@message
-    let $data := 
-        if ($status = 200)
-        then $response/http:body
-        else ()
-    return 
-        if (exists($data)) 
-        then xmldb:store($archive:repo-path, "name.zip", $data, "application/zip") 
-        else () 
+(:~ Removes the artefacts of a unpacked snapshot without removing the archive itself.
+ :)
+declare function archive:remove-artefacts($identifier) {
+    let $remove := 
+        try {
+            if (xmldb:collection-available($archive:repo-path||"/"||$identifier))
+            then (xmldb:remove($archive:repo-path||"/"||$identifier))
+            else ()
+        } catch * {
+            <error>An error occured. Could not remove artefacts of snapshot {$identifier}. ({$err:code} , {$err:description}, {$err:value})</error>
+        } 
+    return $remove 
 };
 
-(:compression:unzip(util:binary-doc($a/@path), $entry-filter, (), $entry-data, ()):)
- 
+(: Stores a user-provided snapshot in the database :)
+declare function archive:import($filename as xs:string, $archive as item()) {
+    let $entry-filter := function($path as xs:string, $data-type as xs:string, $param as item()?) as xs:boolean {
+            (: only export dublin core metadata entry  :)
+            $path eq "dc.xml" 
+        },
+        $entry-data := function($path as xs:string, $data-type as xs:string, $data as item()*, $param as item()*) as document-node() {
+            document { $data }
+        }
+    let $store-archive := try { xmldb:store($archive:repo-path, $filename, $archive, "application/zip") } catch * { <error>Could not store snapshot under {$archive:repo-path}/{$filename}. ({$err:code} , {$err:description}, {$err:value})</error> }
+    let $md := if (not($store-archive instance of element(error))) then try { compression:unzip( $archive, $entry-filter, (), $entry-data, ()) } catch * { <error>Could not uncompress archive. ({$err:code} , {$err:description}, {$err:value})</error> } else ()
+    let $identifier := $md//dc:identifier[1]/xs:string(.)
+    let $store-md:= if ($identifier != "" and not($store-archive instance of element(error))) then try { xmldb:store($archive:repo-path, $identifier||".xml", $md, "application/xml") } catch * { <error>Could not store metadata entry under {$archive:repo-path}/{$identifier}.xml. ({$err:code} , {$err:description}, {$err:value})</error> } else <error>Invalid snapshot metadata: No dc:identifier found.</error>
+    let $rename := if (not($store-md instance of element(error)) and $identifier != "") then try { xmldb:rename($archive:repo-path, $filename, $identifier||".zip") } catch * {<error>Could not rename {$filename} to {$identifier}.zip. ({$err:code} , {$err:description}, {$err:value})</error>}else ()
+    return 
+        if ($md instance of element(error)) then $md else 
+        if ($store-archive instance of element(error)) then $store-archive else
+        if ($store-md instance of element(error)) then $store-md else 
+        if ($rename instance of element(error)) then $rename else $md
+};
+
+declare function archive:check-deployment-sanity() as map()? {
+    let $id := config:get("deployed-snapshot")
+    return archive:check-deployment-sanity($id)
+};
+
+declare function archive:check-deployment-sanity($id as xs:string) as map()? {
+    let $snapshot := archive:get($id) 
+    return
+        if (exists($snapshot))
+        then
+            let $snapshot-path := ($archive:repo-path||"/"||$id)
+            let $snapshot-col-available := if (xmldb:collection-available($snapshot-path)) then () else "Snapshot collection is not found.",
+                $etc-col-exists := if (xmldb:collection-available($snapshot-path||"/etc")) then () else "Collection /etc is missing.",
+                $tablets-col-exists := if (xmldb:collection-available($snapshot-path||"/tablets")) then () else "Colection /tablets is missing."
+            let $errors := ($snapshot-col-available, $etc-col-exists, $tablets-col-exists)[. instance of xs:string]
+            return
+                if (not(exists($errors)))
+                then map {"status" := "ok"}
+                else map {"status" := "error", "msg" := string-join($errors, " ")}
+        else ()
+};
+
+declare %private function archive:create-collection-recursively($collection, $paths as xs:string*) {
+    let $create := 
+        if (count($paths) ge 1)
+        then 
+            if (xmldb:collection-available($collection||"/"||$paths[1])) 
+            then () 
+            else xmldb:create-collection($collection, $paths[1])
+        else ()
+    return 
+        if (count($paths) gt 1)
+        then archive:create-collection-recursively($collection||"/"||$paths[1], subsequence($paths, 2))
+        else ()
+};
+
+declare function archive:deploy($id as xs:string, $removeDeployedSnaphot as xs:boolean) {
+    let $current := config:get("deployed-snapshot")
+    let $snapshot := archive:get($id),
+        $snapshot-collection := $archive:repo-path||"/"||$id
+    let $entry-filter := function($path as xs:string, $data-type as xs:string, $param as item()?) as xs:boolean {
+            (: extract everything :)
+            true()
+        },
+        $entry-data := function($path as xs:string, $data-type as xs:string, $data as item()*, $param as item()*){
+            let $folders := if (contains($path,"/")) then subsequence(tokenize($path, "/"), 1, count(tokenize($path, "/"))-1) else (),
+                $create-folders := archive:create-collection-recursively($snapshot-collection, $folders) 
+            return 
+            if ($data instance of document-node() and $data/cfdb:archive) then () else 
+            if ($data-type eq "resource") then if (exists($folders)) then xmldb:store($snapshot-collection||"/"||string-join($folders,"/"), substring-after($path, string-join($folders,"/")||"/"), $data) else xmldb:store($snapshot-collection, $path, $data) else 
+            if ($data-type eq "folder") then xmldb:create-collection($snapshot-collection, $path) 
+            else ()
+        }
+    return 
+        if (exists($snapshot))
+        then 
+            let $col := try {
+                xmldb:create-collection($archive:repo-path, $id) }
+                catch * {
+                    <error>An error occured. Could not create collection for snaphot {$id}. ({$err:code} , {$err:description}, {$err:value})</error>
+                }
+            let $zip-filename := $id||".zip",
+                $zip-available := util:binary-doc-available($archive:repo-path||"/"||$zip-filename)
+            let $unzip := if (not($zip-available)) then () else   
+                try {
+                    compression:unzip(util:binary-doc($archive:repo-path||"/"||$zip-filename), $entry-filter, (), $entry-data, ())
+                } catch * {
+                    <error>An error occured uncompressing the snapshot {$id}. ({$err:code} , {$err:description}, {$err:value})</error>
+                }
+            let $set-current := if ($unzip instance of element(error)) then () else 
+                config:set("deployed-snapshot", $id) 
+            return 
+                if ($col instance of element(error)) then $col else 
+                if (not($zip-available)) then <error>Archive {$zip-filename} not available.</error> else 
+                if ($unzip instance of element(error)) then $unzip 
+                else $set-current
+        else <error>Unknown snapshot {$id}.</error>
+};

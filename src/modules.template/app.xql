@@ -31,7 +31,7 @@ declare function app:current-user($node as node(), $model as map(*)) {
             xmldb:get-current-user()||" ",
             <span>(<a href="?logout=true">logout</a>)</span>
         )
-        else 'not logged in'
+        else <a href="login.html">Log in</a>
     }</span>
 };
 
@@ -143,7 +143,7 @@ return
     <div class="pagination">
       <ul>
         {if (exists($prev)) then <li><a data-s="{$prev/tei:charName}" href="{concat('?groupby=',$groupby,'&amp;s=',$prev/tei:charName)}{if (exists($before)) then '&amp;before='||$before else ''}{if (exists($after)) then '&amp;after='||$after else ''}">« {$prev/tei:charName}</a></li> else ()}
-        <li class="disabled"><a href="#">{string-join($current-signs, " ")}</a></li>
+        <li class="disabled"><a href="#">{if (count($current-signs) gt 5) then concat($current-signs[1], " &#8230; ", $current-signs[last()]) else string-join($current-signs, " ")}</a></li>
         {if (exists($next)) then <li><a data-s="{$next/tei:charName}" href="{concat('?groupby=',$groupby,'&amp;s=',$next/tei:charName)}{if (exists($before)) then '&amp;before='||$before else ''}{if (exists($after)) then '&amp;after='||$after else ''}">{$next/tei:charName} »</a></li> else ()}
       </ul>
     </div>
@@ -238,7 +238,7 @@ function app:signlist($node as node(), $model as map(), $s as xs:string*, $order
                             let $tablet-id := $g/ancestor::tei:TEI/@xml:id,
                                 $glyph-id := $g/@xml:id,
                                 $facspath := root($g)//tei:graphic[@xml:id = substring-after($g/@facs,'#')]/@url,
-                                $facsurl :=  concat('$app-root/data/tablets/',$tablet-id,'/',$facspath)
+                                $facsurl :=  concat('$tablets-root/',$tablet-id,'/',$facspath)
                             let $msIdentifier := root($g)//tei:msIdentifier,
                                 $archive := $msIdentifier/tei:collection[@type="archive"],
                                 $museumNo := $msIdentifier/tei:altIdentifier[@type="museumNumber"]
@@ -290,27 +290,61 @@ declare function app:archivelist($node, $model) {
                 <th>Issued</th>
                 <th>Size</th>
                 <th>Metadata</th>
-                {if (xmldb:get-current-user() = $config:editors) then <th>Remove</th> else ()}
+                {if (xmldb:get-current-user() = $config:editors) then <th>Actions</th> else ()}
             </thead>
             <tbody>{
                 if (not($snapshots))
                 then <tr xmlns="http://www.w3.org/1999/xhtml" id="no-snapshots-placeholder"><td style="text-align: center;" colspan="6"><i>No snapshots created so far.</i></td></tr> 
                 else 
                     for $md in $snapshots
-                    let $md-extra := archive:get-extra-metadata($md)
+                    let $md-extra := archive:get-extra-metadata($md),
+                        $identifier := $md-extra/dc:identifier/xs:string(.), 
+                        $isDeployed := config:get("deployed-snapshot") = $md-extra/dc:identifier
                     let $zip-filename := $md-extra//cfdb:zip-filename,
                         $zip-available := $md-extra//cfdb:zip-available eq "true",
                         $md-filename := $md-extra//cfdb:md-filename,
                         $date-formatted := $md-extra//cfdb:date-formatted,
-                        $size-formatted := $md-extra//cfdb:size-formatted
+                        $size-formatted := $md-extra//cfdb:size-formatted,
+                        $version := $md-extra/xs:integer(@version)
+                    order by $version
                     return
-                        <tr xmlns="http://www.w3.org/1999/xhtml" data-snapshot-id="{$md-extra/dc:identifier}" data-snapshot-title="{$md-extra/dc:title}">
-                            <td>{if ($zip-available) then <a href="archive/{$zip-filename}">{$md-extra/dc:title}</a> else "file "||$zip-filename||" is missing (orphaned metadata entry)"}</td>
-                            <td>{$md-extra/xs:string(@version)}</td>
+                        <tr xmlns="http://www.w3.org/1999/xhtml" data-snapshot-id="{$identifier}" data-snapshot-title="{$md-extra/dc:title}">
+                            <td>{
+                                if ($zip-available) 
+                                then (
+                                    <a href="archive/{$zip-filename}">{$md-extra/dc:title}</a>,
+                                    if ($config:isPublicInstance)
+                                    then
+                                        let $is-unpacked := xmldb:collection-available($archive:repo-path||"/"||$identifier),
+                                            $deployment-status := archive:check-deployment-sanity($identifier),
+                                            $deployment-status-ok := $deployment-status("status") eq "ok"
+                                        return
+                                            if (xmldb:get-current-user() = $config:editors) 
+                                            then 
+                                                if ($isDeployed and $deployment-status-ok) then <i class="fa fa-check-square deployed" title="This snapshot is deployed."></i>
+                                                else if ($deployment-status-ok) then <a href="#" title="This snapshot is unpacked but not deployed. Click here to remove unpacked files. Click on 'deploy' symbol on the right to deploy." data-action="remove-snapshot-artefacts"><i class="fa fa-check-square undeployed"></i><i class="fa fa-trash"></i></a>
+                                                else if ($is-unpacked and not($deployment-status-ok)) then <i class="fa fa-exclamation-triangle" title="There is a problem with the current deployment. {$deployment-status("msg")}"></i>
+                                                else ()
+                                            else
+                                                if ($isDeployed and $deployment-status-ok) 
+                                                then <i class="fa fa-check-square deployed" title="This snapshot is deployed."></i>
+                                                else ()
+                                    else ()
+                                )
+                                else "file "||$zip-filename||" is missing (orphaned metadata entry)"
+                            }</td>
+                            <td>{$version}</td>
                             <td>{$date-formatted}</td>
                             <td>{$size-formatted}</td>
                             <td><a href="archive/{$md-filename}" class="archive-md-link"><span class="label">show</span>{transform:transform($md-extra, doc($config:app-root||"/dc2html.xsl"), ())}</a></td>
-                            {if (xmldb:get-current-user() = $config:editors) then <td><a href="#" data-action="removeSnapshot"><i class="fa fa-times"></i></a></td> else ()}
+                            {if (xmldb:get-current-user() = $config:editors) then 
+                                <td>
+                                    <a href="#" data-action="removeSnapshot" title="Remove this snapshot"><i class="fa fa-times"></i></a>
+                                    {if (not($isDeployed) and $config:isPublicInstance)
+                                    then <a href="#" data-action="deploySnapshot" title="Deploy this snapshot"><i class="fa fa-upload"></i></a>
+                                    else ()}
+                                </td> 
+                             else ()}
                         </tr>
             }</tbody>
         </table>
@@ -356,15 +390,90 @@ declare function app:menu-administration($node, $model) {
 
 declare function app:input-create-snapshot($node, $model) {
     if (xmldb:get-current-user() = $config:editors and not($config:isPublicInstance))
-    then
+    then (
         <div class="well" xmlns="http://www.w3.org/1999/xhtml">
             <h4>Create new snapshot</h4>
+            <p>Archive metadata (publisher, public URL, license etc) can be entered in the <a href="administration.html">General&#160;Configuration</a> page.</p>
             <form id="input-create-snapshot" action="">
                 <label for="version">Version</label>
                 <input id="version" name="version" value="{max(archive:list()/xs:integer(@version)) + 1}" type="number" min="{max(archive:list()/xs:integer(@version)) + 1}"/>
                 <button><i class="fa fa-file-archive-o"></i>&#160;create</button>
                 <span class="spinner">&#160;<i class="fa fa-spinner fa-spin"/></span>
             </form>
+        </div>)
+    else ()
+};
+
+(:~ This function creates an upload field to upload corpus snapshots and deploy them on a public instance. 
+ : 
+ :)
+declare function app:input-upload-snapshot($node, $model) {
+    if (xmldb:get-current-user() = $config:editors and $config:isPublicInstance)
+    then (
+        <p xmlns="http://www.w3.org/1999/xhtml">Snapshots can be deployed by clicking on&#160;<i class="fa fa-upload"/>. The snapshot currently deployed is marked by the icon&#160;<i class="fa fa-check-square deployed" title="This snapshot is deployed."/>. The unzipped contents of the archive are kept in the system after undeploying. This is indicated by&#160;<i class="fa fa-check-square undeployed"/>. To re-deploy a snaphot, click on the <i>Deploy</i> icon again. Snapshot artefacts can be removed from the system by clicking on the&#160;<i class="fa fa-check-square undeployed"/> icon.</p>,    
+        <div class="well" xmlns="http://www.w3.org/1999/xhtml">
+            <h4>Upload snapshot</h4>
+            <div id="filelist"></div>
+            <form id="input-upload-snapshot" method="POST">
+                <input id="snapshot" name="snapshot" type="file"/>
+                <button type="submit" id="uploadarchive">Upload</button>
+                <span class="spinner">&#160;<i class="fa fa-spinner fa-spin"/></span>
+            </form>
         </div>
+        )
+    else ()
+};
+
+(:~ This function creates an upload field to upload corpus snapshots and deploy them on a public instance. 
+ : 
+ :)
+declare function app:form-configuration($node, $model) {
+    if (xmldb:get-current-user() = $config:editors)
+    then
+        <div xmlns="http://www.w3.org/1999/xhtml">
+            <form id="form-configuration" method="PUT" class="form-horizontal">
+                <div class="tabbable">
+                    <ul class="nav nav-tabs">
+                        <li class="active">
+                            <a href="#tab1" data-toggle="tab">Database Settings</a>
+                            
+                        </li>
+                        <li>
+                            <a href="#tab2" data-toggle="tab">Archive Settings</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="tab1">
+                            <h4>Database Settings</h4>
+                            <label for="operation-mode">Operation mode</label>
+                            <select id="operation-mode" name="operation-mode">
+                                <option value="public">{if (config:get("operation-mode") = "public") then attribute selected {"selected"} else ()}Public Mode</option>
+                                <option value="curation">{if (config:get("operation-mode") = "curation") then attribute selected {"selected"} else ()}Curation </option>
+                            </select>
+                        </div>
+                        <div class="tab-pane" id="tab2">
+                            <h4>Archive Settings</h4>    
+                            <label for="publisher">Publisher</label>
+                            <input id="publisher" type="text" class="form-control" name="publisher" value="{config:get("publisher")}"/>
+                            <label for="license">License</label>
+                            <input id="license" type="text" class="form-control" name="license" value="{config:get("license")}"/>
+                            <label for="public-url">Public URL</label>
+                            <input id="public-url" type="text" class="form-control" name="public-url" value="{config:get("public-url")}"/>
+                        </div>
+                    </div>
+                    <button type="submit">Save settings</button>
+                    <button type="resset">Reset</button>
+                </div>
+            </form>
+        </div>
+    else ()
+};
+
+declare function app:version($node, $model) {
+    if ($config:isPublicInstance)
+    then 
+        let $snapshot-id := config:get("deployed-snapshot"),
+            $md := archive:get($snapshot-id)
+        return <span xmlns="http://www.w3.org/1999/xhtml">Corpus version {$md/xs:string(@version)} ({$md//dc:identifier/xs:string(.)})</span>
     else ()
 };

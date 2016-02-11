@@ -1,8 +1,10 @@
 var cfdb = cfdb || {};
 
 cfdb.archive = {};
+cfdb.archive.url = cfdb.url + "archive";
+
 cfdb.archive.create = function(version){
-    var url = cfdb.url + "archive/" + version
+    var url =  cfdb.archive.url + "/" + version;
     return $.ajax({
             url: url,
             data: null,
@@ -11,32 +13,17 @@ cfdb.archive.create = function(version){
                 format: "json"
             },
             beforeSend: function(e){
-                $('#input-create-snapshot.spinner').show();
+                $('#input-create-snapshot .spinner').show();
             },
             complete: function(){
-                $('#input-create-snapshot.spinner').hide();
+                true
             },
             success: function(response){
-                var id = response.msg.archive.identifier,
-                    title = response.msg.archive.title,
-                    version = response.msg.archive.version,
-                    issued = response.msg.archive.extra["date-formatted"],
-                    size = response.msg.archive.extra["size-formatted"],
-                    mdUrl = response.msg.archive.extra["md-url"],
-                    zipUrl = response.msg.archive.extra["zip-url"],
-                    filename = response.msg.archive.extra["md-filename"],
-                    removable = response.msg.archive.extra.removable
-                $('#no-snapshots-placeholder').remove();
-                $('#snapshots > tbody').append("<tr data-snapshot-id='" + id + "' data-snapshot-title='" + title + "'>" +
-                    "<td><a href='" + zipUrl + "'>" + title + "</a></td>" + 
-                    "<td>" + version + "</td>" +
-                    "<td>" + issued + "</td>" +
-                    "<td>" + size + "</td>" + 
-                    "<td><a href='" + mdUrl + "'><span class='label'>show</span></a></td>" +
-                "</tr>")
-                if (removable) {
-                    $('#snapshots tbody tr:last').append("<td><a href='#' data-action='removeSnapshot'><i class='fa fa-times'></i></a></td>")
-                }
+                cfdb.archive.list();
+                var newMin = parseInt(response.payload.archive.version) + 1;
+                $('#version').attr("min", newMin);
+                $('#version').val(newMin);
+                $('#input-create-snapshot .spinner').hide();
             },
             error: function(jqXHR, textStatus, errorThrown){
                 alert(textStatus + ": " + errorThrown);
@@ -44,10 +31,33 @@ cfdb.archive.create = function(version){
         })
 };
 
+/* deployes the snapshot specified by identifier */
+cfdb.archive.deploy = function(identifier){
+    var url = cfdb.archive.url + "/" + identifier;
+    return $.ajax({
+        url : url,
+        data : null,
+        method : "PUT",
+        beforeSend : function(e){
+            $('body, a').css({"cursor":"wait"});
+        },
+        success : function(response) {
+            cfdb.archive.list();
+            $('body, a').css({"cursor":"default"});
+            alert("Successfully deployed archive ");
+        },
+        error: function(jqXHR, textStatus, errorThrown){
+            alert(textStatus + ": " + errorThrown);
+            $('body').css({"cursor":"default"});
+        }
+    })
+};
+
+/* deletes a snapshot specified by identifier */
 cfdb.archive.remove = function(identifier){
-    var url = cfdb.url + "archive/" + identifier,
+    var url = cfdb.archive.url + "/" + identifier,
         row = $('tr[data-snapshot-id="' + identifier + '"]'),
-        title = row.attr("data-snapshot-title") 
+        title = row.attr("data-snapshot-title");
     return $.ajax({
             url: url,
             data: null,
@@ -73,15 +83,137 @@ cfdb.archive.remove = function(identifier){
         })
 };
 
+
+/* deletes snapshot artefecats specified by identifier (without removing the archive itself) */
+cfdb.archive.removeArtefacts = function(identifier){
+    var url = cfdb.archive.url + "/artefacts/" + identifier,
+        row = $('tr[data-snapshot-id="' + identifier + '"]'),
+        title = row.attr("data-snapshot-title");
+    return $.ajax({
+            url: url,
+            data: null,
+            method: "delete",
+            headers : {
+                format: "json"
+            },
+            beforeSend: function(e){
+                var confirm = window.confirm("You are about to delete the artefacts of snapshot " + title + ". Proceed? ");
+                return confirm
+            },
+            complete: function(){
+                true
+            },
+            success: function(response){
+                cfdb.archive.list()
+            },
+            error: function(jqXHR, textStatus, errorThrown){
+                alert(textStatus + ": " + errorThrown);
+            }
+        })
+};
+
+/* fetches the full HTML list of snapshots with the output of app:archivelist() */
+cfdb.archive.list = function(){
+    var url = cfdb.archive.url
+    return $.ajax({
+            url: url,
+            data: null,
+            method: "GET",
+            headers : {
+                format: "html"
+            },
+            success: function(response){
+                $("#snapshots").parent("div").replaceWith(response.firstChild);   
+            },
+            error: function(jqXHR, textStatus, errorThrown){
+                alert(textStatus + ": " + errorThrown);
+            }
+        })
+};
+
+
+var uploader = new plupload.Uploader({
+    runtimes : 'html5,flash,silverlight,html4',
+     
+    browse_button : 'snapshot', // you can pass in id...
+     
+    url : cfdb.archive.url,
+    multipart: false,
+     
+    filters : {
+        mime_types: [
+            {title : "Zip files", extensions : "zip"}
+        ]
+    },
+ 
+    // Flash settings
+    flash_swf_url : '/plupload/js/Moxie.swf',
+ 
+    // Silverlight settings
+    silverlight_xap_url : '/plupload/js/Moxie.xap',
+     
+ 
+    init: {
+        PostInit: function() {
+            document.getElementById('filelist').innerHTML = '';
+ 
+            document.getElementById('uploadarchive').onclick = function() {
+                uploader.start();
+                $('#input-upload-snapshot .spinner').show();
+                return false;
+            };
+        },
+ 
+        FilesAdded: function(up, files) {
+            plupload.each(files, function(file) {
+                document.getElementById('filelist').innerHTML += '<div id="' + file.id + '">' + file.name + ' (' + plupload.formatSize(file.size) + ') <b></b></div>';
+            });
+        },
+        
+        FileUploaded: function(up, file, response) {
+            $('#input-upload-snapshot .spinner').hide();
+            var entry = document.getElementById(file.id);
+            entry.parentNode.removeChild(entry);
+            cfdb.archive.list();
+        },
+        
+ /*
+        UploadProgress: function(up, file) {
+            document.getElementById(file.id).getElementsByTagName('b')[0].innerHTML = '<span>' + file.percent + "%</span>";
+        },
+ */
+        Error: function(up, err) {
+            /*document.getElementById('console').innerHTML += "\nError #" + err.code + ": " + err.message;*/
+            $('#input-upload-snapshot .spinner').hide();
+            var entry = document.getElementById(err.file.id);
+            entry.parentNode.removeChild(entry);
+            window.alert(err.response);
+        }
+    }
+});
+ 
+
+
 $(document).ready(function(){
-    $('#snapshots').on("click", "a[data-action = removeSnapshot]", function(e){
+    $('#snapshots-container').on("click", "a[data-action = removeSnapshot]", function(e){
         e.preventDefault();
         var identifier = $(this).parents("tr").attr("data-snapshot-id");
         return cfdb.archive.remove(identifier);
+    });
+    $('#snapshots-container').on("click", "a[data-action = deploySnapshot]", function(e){
+        e.preventDefault();
+        var identifier = $(this).parents("tr").attr("data-snapshot-id");
+        return cfdb.archive.deploy(identifier);
+    });
+    $('#snapshots-container').on("click", "a[data-action = remove-snapshot-artefacts]", function(e){
+        e.preventDefault();
+        var identifier = $(this).parents("tr").attr("data-snapshot-id");
+        cfdb.archive.removeArtefacts(identifier);
     });
     $('form[id = input-create-snapshot]').on("submit",function(e){
         e.preventDefault();
         var version = $(this).serializeArray()[0].value;
         cfdb.archive.create(version);
-    })
+    });
+    uploader.init();
 }); 

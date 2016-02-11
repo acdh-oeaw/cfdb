@@ -61,10 +61,20 @@ body { background: none!important; }
 .jsgrid-table {font-size: 12px;}
 
 /* archive */
-
 .archive-md {display:none;}
 .archive-md-link:hover {position:relative;}
-.archive-md-link:hover > .archive-md {background: white; border: 1px solid gray; display: block; left: 42pt; min-width: 600px; padding: 5px; position: absolute; top: -40px; z-index: 1;}
-#input-create-snapshot .spinner {display:none;}/* administration.html */
+.archive-md-link:hover > .archive-md {background: white; border: 1px solid gray; display: block; left: 42pt; min-width: 600px; padding: 5px; position: absolute; top: -40px; z-index: 5; }
+#input-upload-snapshot .spinner, #input-create-snapshot .spinner {display:none;}
+#snapshots tr:hover {background: lightgray; }
+#snapshots .fa {padding-left: 19px; font-size: large; }
+.fa.fa-check-square.deployed {color: #3db93d;}
+.fa.fa-check-square.undeployed {color: #AEA5A5;}
+.fa-exclamation-triangle {color: #e90000; }
+#snapshots a[data-action="remove-snapshot-artefacts"] .fa.fa-trash {display: none;}
+#snapshots a[data-action="remove-snapshot-artefacts"] .fa.fa-check-square {display: inline;}
+#snapshots a[data-action="remove-snapshot-artefacts"]:hover > .fa.fa-trash {display: inline; color: black; }
+#snapshots a[data-action="remove-snapshot-artefacts"]:hover > .fa.fa-check-square {display: none;}
+
+/* administration.html */
 #form-configuration .tab-content { padding: 0 1em; margin-bottom: 4em; }
 #form-configuration input {height: 2em; width: 75%;} 

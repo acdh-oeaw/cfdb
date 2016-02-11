@@ -496,8 +496,14 @@ function api:login($user as xs:string*, $password as xs:string*) {
     
 };:)
 
-(: ARCHIVE endpoints :)
 
+
+(: ******************************** :)
+(: ****** ARCHIVE endpoints ******* :)
+(: ******************************** :)
+
+(:~ Fetches a list of snaphots in JSON 
+ :)
 declare 
     %rest:GET
     %rest:path("/cfdb/archive")
@@ -507,16 +513,34 @@ function api:list-archive() {
     util:serialize(<response>{for $a in archive:list() return archive:get-extra-metadata($a)}</response>, "method=json")
 };
 
-
+(:~ Fetches a full HTML representation of the list of snaphots as presented by archive.html
+ :)
 declare 
     %rest:GET
-    %rest:path("/cfdb/archive/{$version}")
-    %rest:header-param("format", "{$format}", "json")
-function api:get-snapshot-metadata($user as xs:string*, $password as xs:string*, $version as xs:string, $pid as xs:string*, $format as xs:string*) {
-    (:let $md-full := archive:get-metadata($version):)
-    ()
+    %rest:path("/cfdb/archive")
+    %rest:produces("application/xhtml+xml")
+    %output:media-type("application/xhtml+xml")
+function api:list-archive() {
+    app:archivelist((),())
 };
 
+(:~ Uploads a new snaphot. 
+ :)
+declare 
+    %rest:POST("{$data}")
+    %rest:path("/cfdb/archive")
+    %rest:query-param("name", "{$filename}")
+    %rest:query-param("deploy", "{$deploy}")
+    %rest:header-param("format", "{$format}", "json")
+function api:upload-snapshot($data, $filename as xs:string*, $deploy as xs:boolean*, $format as xs:string*) {
+    let $import := archive:import($filename, $data)
+    (:let $deploy := if ($deploy[1] eq true()) then archive:deploy() else ():)
+(:    return api:response("ok", "uploaded successfully"):)
+    return api:response(if ($import instance of element(error)) then "error" else "ok", $import, $format, "api:upload-snapshot")
+};
+
+(:~ CREATES a new snaphot of the version $version 
+ :)
 declare 
     %rest:POST
     %rest:path("/cfdb/archive/{$version}")
@@ -525,7 +549,8 @@ declare
     %rest:header-param("password", "{$password}")
     %rest:header-param("format", "{$format}", "json")
 function api:create-snapshot($user as xs:string*, $password as xs:string*, $version as xs:string, $pid as xs:string*, $format as xs:string*) {
-    let $login := true()(:xmldb:login($config:data-root, $user[1], $password[1]):)
+    let $login := true()(:xmldb:login($config:data-root, $user[1], $password[1]):),
+        $caller := "api:create-snapshot"
     return 
         if ($login)
         then
@@ -539,14 +564,44 @@ function api:create-snapshot($user as xs:string*, $password as xs:string*, $vers
                             if ($format = "html") 
                             then <p xmlns="http://www.w3.org/1999/xhtml">{xs:string($md)}</p> 
                             else $md
-                        return api:status("error", $data, $format) 
+                        return api:response("error", $data, $format, $caller) 
                     else 
                         let $data := archive:get-extra-metadata($md)
-                        return api:status("ok", $data , $format) 
-            else api:status("insufficient permissions", "user "||xmldb:get-current-user()||" has insufficent rights to create an archive", $format)
-        else api:status("unauthorized", "Unknown user or invalid credentials", $format) 
+                        return api:response("ok", $data , $format, $caller)
+            else api:response("insufficient permissions", "user "||xmldb:get-current-user()||" has insufficent rights to create an archive", $format, $caller)
+        else api:response("unauthorized", "Unknown user or invalid credentials", $format, $caller) 
 };
 
+
+(:~ DEPLOYS the snaphot with the id $id  
+ :)
+declare 
+    %rest:PUT
+    %rest:path("/cfdb/archive/{$id}")
+    %rest:query-param("removeDeployedSnaphot", "{$removeDeployedSnaphot}")
+    %rest:header-param("format", "{$format}", "json")
+function api:deploy-snapshot($id as xs:string, $removeDeployedSnaphot as xs:string*, $format as xs:string*) {
+    let $login := true()(:xmldb:login($config:data-root, $user[1], $password[1]):),
+        $caller := "api:deploy-snapshot",
+        $rmCurrent := ($removeDeployedSnaphot[1],false())[. castable as xs:boolean][1]
+    return 
+        if ($login)
+        then
+            if (xmldb:get-current-user() = $config:editors)
+            then
+                if ($rmCurrent castable as xs:boolean)
+                then 
+                    let $deploy := archive:deploy($id, $rmCurrent)
+                    return 
+                        if ($deploy instance of element(error))
+                        then api:response("error", $deploy, $format, $caller) 
+                        else api:response("ok", $deploy , $format, $caller)
+                else api:response("error", "Query parameter 'removeDeployedSnapshot' ("||$removeDeployedSnaphot||") must be castable to xs:boolean.", $format, $caller)
+            else api:response("insufficient permissions", "user "||xmldb:get-current-user()||" has insufficent rights to deploy an archive", $format, $caller)
+        else api:response("unauthorized", "Unknown user or invalid credentials", $format, $caller) 
+};
+
+(:~ DELETES the snaphot with the id $id.:)
 declare 
     %rest:DELETE
     %rest:path("/cfdb/archive/{$id}")
@@ -568,6 +623,27 @@ function api:remove-snapshot($user as xs:string*, $password as xs:string*, $id a
                     else api:response("ok", "Successfully removed snapshot "||$id, $format, $caller)
             else api:response("insufficient permissions", "Unknown user or invalid credentials", $format, $caller)
         else api:response("unauthorized", "Unknown user or invalid credentials", $format, $caller)
+};
+
+
+(:~ DELETES the artefacts of snaphot with the id $id.:)
+declare 
+    %rest:DELETE
+    %rest:path("/cfdb/archive/artefacts/{$id}")
+    %rest:header-param("format", "{$format}", "json")
+function api:remove-snapshot-artefacts($id as xs:string, $format as xs:string*) {
+    let $caller := "api:remove-snapshot-artefacts"
+    return
+        if (xmldb:get-current-user() = $config:editors)
+        then
+            let $md := archive:remove-artefacts($id)
+            return 
+                if ($md instance of element(error))
+                then api:response("error", $md, $format, $caller)
+                else api:response("ok", "Successfully removed snapshot artefacts "||$id, $format, $caller)
+        else api:response("insufficient permissions", "Must be member of cfdb:editor group to remove artefacts", $format, $caller)
+};
+
 (: ******************************** :)
 (: **** DATABASE CONFIGURATION **** :)
 (: ******************************** :)
