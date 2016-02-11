@@ -8,4 +8,5 @@
    <license>SET LICENSE IN config.xml</license>
    <!-- The operation-mode ("public" or "curation") defines whether the edit forms will be displayed or not. -->
    <operation-mode>curation</operation-mode>   
+   <deployed-snapshot>myFirstArchive</deployed-snapshot>   
 </config>
