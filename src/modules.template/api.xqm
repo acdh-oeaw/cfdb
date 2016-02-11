@@ -8,42 +8,47 @@ import module namespace tablet = "@app.uri@/tablet" at "xmldb:exist:///db/apps/@
 import module namespace surface = "@app.uri@/surface" at "xmldb:exist:///db/apps/@app.name@/modules/surface.xqm";
 import module namespace annotation = "@app.uri@/annotations" at "xmldb:exist:///db/apps/@app.name@/modules/annotations.xqm";
 import module namespace archive = "@app.uri@/archive" at "xmldb:exist:///db/apps/@app.name@/modules/archive.xqm";
+import module namespace xqjson = "http://xqilla.sourceforge.net/lib/xqjson";
+import module namespace app="@app.uri@/templates" at "xmldb:exist:///db/apps/@app.name@/modules/app.xql";
 
 declare namespace rest = "http://exquery.org/ns/restxq";
 declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
 declare namespace json = "http://www.json.org";
 declare namespace tei = "http://www.tei-c.org/ns/1.0";
 
-declare function api:response($caller as xs:string, $items as map()*) as element(api:reponse) {
-    <response xmlns="@app.uri@/api">
-        <metadata>
-            <query>{$caller}</query>
-            <timeStamp>{current-dateTime()}</timeStamp>
-            <user>{xmldb:get-current-user()}</user>
-        </metadata>
-        <body>{
-            for $i in $items
-            return    
-                <item>{
-                    for $k in map:keys($i) 
-                    let $name := string-join((
-                        for $t at $p in tokenize($k,'\s+') 
-                        return  
-                            if ($p = 1) 
-                            then lower-case($t)
-                            else upper-case(substring($t,1,1))||lower-case(substring($t,2)) 
-                    ),'')
-                    return <property name="{$name}">{map:get($i,$k)}</property>
-                }</item>
-        }</body>
-    </response>
+declare function api:format-response-payload($items as item()*, $format as xs:string, $status, $caller as xs:string) as element(api:reponse) {
+    <cfdb:response status="{$status}" query="{$caller}" timestamp="{current-dateTime()}" user="{xmldb:get-current-user()}" format="{$format}" items="{count($items)}">{
+    for $i in $items
+    return
+        typeswitch ($i) 
+            case element() return 
+                if ($format eq "xml") then $i
+                else if ($format eq "json") then <cfdb:payload>{$i}</cfdb:payload> 
+                else data($i) 
+            case map() return
+                if ($format eq "xml") then <cfdb:item>{for $key in map:keys($i) return <cfdb:property name="{$key}">{map:get($i, $key)}</cfdb:property>}</cfdb:item> else
+                if ($format eq "json") then <cfdb:payload>{for $key in map:keys($i) return element {$key} {map:get($i, $key)}}</cfdb:payload> 
+                else string-join((for $key in $i return concat($key, ":", map:get($i, $key))), "
+")
+            default return 
+                if ($format eq "xml") then <cfdb:payload>{$i}</cfdb:payload> else 
+                if ($format eq "json") then <cfdb:payload>{$i}</cfdb:payload> 
+                else $i
+    }</cfdb:response>
 };
 
-declare function api:status($status, $msg) {
-    api:status($status, $msg, ())
+(:~ This function creates an empty, non-200 response with an empty payload 
+ : and $msg being used as the reason for the     
+ :)
+declare function api:response($status, $msg) {
+    api:response($status, $msg, (), ())
 };
 
-declare function api:status($status, $msg, $method) {
+(:~
+ : Creates a REST response, including status, status message and payload in a given format ("xml", "json" or "text")
+ : If status code is other than 200 the payload will be empty and the second paramter will be used as the status message to be passed as the http response code reason. 
+ :)
+declare function api:response($status, $load, $format as xs:string?, $caller as xs:string?) {
     let $statusCode := 
         switch(true())
             case $status = "error"          return 500
@@ -54,30 +59,27 @@ declare function api:status($status, $msg, $method) {
             case $status = "insufficent permissions" return 403
             default return 200
     let $content-type := 
-        switch($method) 
+        switch($format) 
             case "json" return "application/json"
             case "html" return "application/xhtml+xml"
             case "text" return "text/plain"
             default return "application/xml" 
     let $ser :=
         <output:serialization-parameters>
-            <output:method value="{$method}"/>
+            <output:method value="{$format}"/>
         </output:serialization-parameters>
-    let $load := 
-        <cfdb:response>
-            <status>{$status}</status>
-            <msg>{$msg}</msg>
-        </cfdb:response>
-    return 
-        (<rest:response>
+    return (
+        <rest:response>
             {$ser}
             <http:response status="{$statusCode}">
-                {if ($statusCode != 200) then attribute reason {$msg} else ()}
+                {if ($statusCode != 200) then attribute reason {$load} else ()}
                 <http:header name="Content-Type" value="{$content-type}"/>
             </http:response>            
         </rest:response>,
-        $load)
-};
+        if ($statusCode = 200) 
+        then api:format-response-payload($load, $format, $status, $caller)
+        else api:format-response-payload($load, "text", $status, $caller)
+)};
 
 
 declare function api:log($msg) as empty() {
