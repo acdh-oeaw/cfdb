@@ -343,7 +343,31 @@ function api:list-surfaces($tablet-id as xs:string) {
 };
 
 
+(: ********************************:)
 (: ********** ANNOTATIONS *********:)
+(: ********************************:)
+
+
+(:~ lists all occurences in the whole database :)
+declare 
+    %rest:GET
+    %rest:path("/cfdb/signs")
+    %rest:header-param("format", "{$format}", "xml")
+function api:list-all-annotations($format as xs:string*) {
+    let $payload := cfdb:list-annotations()
+    return api:response("ok", $payload, $format, "api:list-annotations()")
+};
+
+(:~ lists all occurences of a given sign type in the whole database :)
+declare 
+    %rest:GET
+    %rest:path("/cfdb/signs/type/{$type}")
+    %rest:header-param("format", "{$format}", "xml")
+function api:list-annotations-by-sign-type($type as xs:string, $format as xs:string*) {
+    let $payload :=  cfdb:list-annotations("sign-type", $type) 
+    return api:response("ok", $payload, $format, "api:list-annotations()")
+};
+
 
 (:~ lists annotations in a given surface :)
 declare 
@@ -424,7 +448,7 @@ function api:delete-annotation($tablet-id as xs:string, $surface-id as xs:string
 
 
 
-(:~ list all annotions standard signs :)
+(:~ list all standard signs :)
 declare 
     %rest:GET
     %rest:path("/cfdb/taxonomies/signs")
