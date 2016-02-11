@@ -242,7 +242,7 @@
         <!-- Returns a list of tablets containing their titles and locations in the database -->
         <xf:submission id="ls" method="execute" ref="instance('tablets')" replace="instance">
             <xf:resource value="'exist:/db/apps/@app.name@/api/lsTablets.xql'"/>
-            <xf:message ev:event="xforms-submit-error" level="ephemeral">tablets listing has failed</xf:message>
+            <xf:message ev:event="xforms-submit-error" level="ephemeral">tablets listing has failed (error-type: <xf:output value="event('error-type')"/>, status-code: <xf:output value="event('response-status-code')"/>)</xf:message>
             <!--<xf:message ev:event="xforms-submit-done" level="ephemeral">tablets listed successfully</xf:message>-->
         </xf:submission>
         
