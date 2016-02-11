@@ -132,12 +132,14 @@ function api:list-tablets-as-json($text as xs:string*, $region as xs:string*, $a
     let $tablets-filtered := api:do-filter-tablets($text, $region, $archive, $dossier, $scribe, $city, $period, $anteQuem, $postQuem, $date, $dateBabylonian, $ductus)
     let $tablets-as-objects := 
         for $t in $tablets-filtered
-        let $attributes := tablet:get-attributes($t/@xml:id)
-        return cfdb:object(for $k in map:keys($attributes) return cfdb:property($k, map:get($attributes, $k))) 
+            let $id := $t/xs:string(@xml:id)
+            let $attributes := tablet:get-attributes($id)
+            let $object := cfdb:object(for $k in map:keys($attributes) return cfdb:property($k, map:get($attributes, $k)))
+            return $object
     return
         if (xmldb:get-current-user() = $config:authorized-users)
         then cfdb:array($tablets-as-objects)
-        else api:status("unauthorized", "You are not allowed to access this service")
+        else api:response("unauthorized", "You are not allowed to access this service")
 };
 
 (:~ list tablets as XML 
@@ -180,7 +182,7 @@ function api:list-tablets-as-xml($text as xs:string*, $region as xs:string*, $ar
     return
         if (xmldb:get-current-user() = $config:authorized-users)
         then <cfdb:response items="{count($tablets-filtered)}">{$tablets-as-xml}</cfdb:response>
-        else api:status("unauthorized", "You are not allowed to access this service")
+        else api:response("unauthorized", "You are not allowed to access this service")
 };
 
 
@@ -223,7 +225,7 @@ function api:get-tablet-attributes($tablet-id) {
     return 
         if ($user = $config:authorized-users)
         then util:serialize($response,"method=json")
-        else api:status("unauthorized", "You are not allowed to access this service")
+        else api:response("unauthorized", "You are not allowed to access this service")
 };
 
 declare 
@@ -241,7 +243,7 @@ function api:get-tablet-attribute($tablet-id, $attribute) {
     return 
         if ($user = $config:authorized-users)
         then util:serialize($response,"method=json")
-        else api:status("unauthorized", "You are not allowed to access this service")
+        else api:response("unauthorized", "You are not allowed to access this service")
 };
 
 declare 
@@ -260,7 +262,7 @@ function api:get-tablet-attribute($tablet-id, $attribute, $data) {
     return 
         if ($user = $config:authorized-users)
         then util:serialize($response,"method=json")
-        else api:status("unauthorized", "You are not allowed to access this service")
+        else api:response("unauthorized", "You are not allowed to access this service")
 };
 
 
@@ -361,7 +363,7 @@ function api:list-annotations($tablet-id as xs:string, $surface-id as xs:string,
             return 
                 if ($user = $config:authorized-users)
                 then util:serialize($response,"method=json")
-                else api:status("unauthorized", "You are not allowed to access this service")
+                else api:response("unauthorized", "You are not allowed to access this service")
         else "tablet with id "||$tablet-id||" not available"
 };
 
@@ -528,7 +530,8 @@ declare
     %rest:header-param("password", "{$password}")
     %rest:header-param("format", "{$format}", "json")
 function api:remove-snapshot($user as xs:string*, $password as xs:string*, $id as xs:string, $format as xs:string*) {
-    let $login := true()(:xmldb:login($config:data-root, $user[1], $password[1]):)
+    let $login := true()(:xmldb:login($config:data-root, $user[1], $password[1]):),
+        $caller := "api:remove-snapshot"
     return
         if ($login)
         then
@@ -537,8 +540,8 @@ function api:remove-snapshot($user as xs:string*, $password as xs:string*, $id a
                 let $md := archive:remove($id)
                 return 
                     if ($md instance of element(error))
-                    then api:status("error", $md, $format)
-                    else api:status("ok", "Successfully removed snapshot "||$id, $format)
-            else api:status("insufficient permissions", "Unknown user or invalid credentials", $format)
-        else api:status("unauthorized", "Unknown user or invalid credentials", $format)
+                    then api:response("error", $md, $format, $caller)
+                    else api:response("ok", "Successfully removed snapshot "||$id, $format, $caller)
+            else api:response("insufficient permissions", "Unknown user or invalid credentials", $format, $caller)
+        else api:response("unauthorized", "Unknown user or invalid credentials", $format, $caller)
 };
