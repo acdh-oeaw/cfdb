@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<div xmlns="http://www.w3.org/1999/xhtml" data-template="templates:surround" data-template-with="templates/page.html" data-template-at="content">
+    <script type="text/javascript" src="resources/js/administration.js"/>
+    <div class="row-fluid"> 
+        <div class="span12">
+            <div class="page-header">
+                <h1>cfdb <small>Configuration</small>
+                </h1>
+            </div>
+            <div class="row-fluid">
+                <div class="span8">
+                    <div data-template="app:form-configuration"/>
+                </div>
+                <div class="span4">
+                    <h3>Configuration</h3>
+                    <p>
+                        <b>Operation mode</b> specifies wether this instance runs in <i>public</i> or <i>curation</i> mode. In public mode, the data cannot be altered.</p>
+                    <p>
+                        <b>Archive settings</b>: The information here will be written to the metadata of database snapshots created in the <a href="archive.html">archive</a>.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

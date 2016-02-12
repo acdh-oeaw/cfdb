@@ -1,10 +1,8 @@
 xquery version "3.0";
 
-(:declare namespace api = "http://acdh.oeaw.ac.at/cfdb2/api";:)
 declare namespace tei = "http://www.tei-c.org/ns/1.0";
-import module namespace api = "@app.uri@/api" at "xmldb:exist://db/apps/@app.name@/modules/api.xqm";
-import module namespace config="@app.uri@/config" at "xmldb:exist://db/apps/@app.name@/modules/config.xqm";
 
+import module namespace config="@app.uri@/config" at "xmldb:exist://db/apps/@app.name@/modules/config.xqm";
 import module namespace cfdb = "@app.uri@/db" at "xmldb:exist:///db/apps/@app.name@/modules/cfdb.xqm";
 
 let $user := xmldb:get-current-user()

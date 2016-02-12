@@ -9,6 +9,9 @@
         <!-- disable caching-->
         <meta http-equiv="cache-control" content="max-age=0"/>
         <meta http-equiv="cache-control" content="no-cache"/>
+        <meta http-equiv="cache-control" content="no-cache, must-revalidate, post-check=0, pre-check=0"/>
+        <meta http-equiv="expires" content="Sat, 31 Oct 2014 00:00:00 GMT"/>
+        <meta http-equiv="pragma" content="no-cache"/>
         <meta http-equiv="expires" content="0"/>
         <meta http-equiv="expires" content="Tue, 01 Jan 1980 1:00:00 GMT"/>
         <meta http-equiv="pragma" content="no-cache"/>
@@ -18,6 +21,8 @@
         <link rel="stylesheet" type="text/css" href="$app-root/resources/css/font-awesome.min.css"/>
         <link rel="stylesheet" type="text/css" href="$app-root/resources/css/style.css"/>
         <link rel="stylesheet" type="text/css" href="$app-root/resources/css/custom.css"/>
+        <script type="text/javascript" src="$app-root/resources/js/common.js"/>
+
         <!--<script type="text/javascript" src="$shared/resources/scripts/jquery/jquery-1.7.1.min.js"/>-->
         <script type="text/javascript" src="resources/js/jquery-2.1.3.min.js"/>
         <!--<script type="text/javascript" src="$shared/resources/scripts/loadsource.js"/>-->
@@ -54,20 +59,9 @@
                                 </li>
                             </ul>
                         </li>
-                        <li class="dropdown" id="edit">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Data Curation</a>
-                            <ul class="dropdown-menu">
-                                <li>
-                                    <a href="editTablets.html">Tablets</a>
-                                </li>
-                                <li>
-                                    <a href="editStdSigns.html">Standard Signs</a>
-                                </li>
-                                <li>
-                                    <a href="editArchives.html">Regions, Archives and Dossiers</a>
-                                </li>
-                            </ul>
-                        </li>
+                        
+                        <li data-template="app:menu-edit"/>
+                        
                         <li class="dropdown" id="explore">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">Data Exploration</a>
                             <ul class="dropdown-menu">
@@ -82,17 +76,10 @@
                                 </li>
                             </ul>
                         </li>
-                        <!--<li class="dropdown" id="administration">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Administration</a>
-                            <ul class="dropdown-menu">
-                                <li>
-                                    <a href="editUsers.html">Users</a>
-                                </li>
-                                <li>
-                                    <a href="exportDatabase.html">Export database</a>
-                                </li>
-                            </ul>
-                        </li>-->
+                        <li>
+                            <a href="archive.html">Corpus Repository</a>
+                        </li>
+                        <li data-template="app:menu-administration"/>
                     </ul>
                     <p class="navbar-text pull-right">
                         <i class="icon-user"/>&#160;
@@ -120,5 +107,10 @@
                   },
         });    
     </script>
+        <div class="navbar navbar-fixed-bottom">
+            <span class="pull-right">
+                <span data-template="app:version"/>
+            </span>
+        </div>
     </body>
 </html>

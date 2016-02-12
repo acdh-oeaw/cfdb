@@ -7,53 +7,79 @@ import module namespace cfdb = "@app.uri@/db" at "xmldb:exist:///db/apps/@app.na
 import module namespace tablet = "@app.uri@/tablet" at "xmldb:exist:///db/apps/@app.name@/modules/tablet.xqm";
 import module namespace surface = "@app.uri@/surface" at "xmldb:exist:///db/apps/@app.name@/modules/surface.xqm";
 import module namespace annotation = "@app.uri@/annotations" at "xmldb:exist:///db/apps/@app.name@/modules/annotations.xqm";
-
+import module namespace archive = "@app.uri@/archive" at "xmldb:exist:///db/apps/@app.name@/modules/archive.xqm";
+import module namespace xqjson = "http://xqilla.sourceforge.net/lib/xqjson";
+import module namespace app="@app.uri@/templates" at "xmldb:exist:///db/apps/@app.name@/modules/app.xql";
 
 declare namespace rest = "http://exquery.org/ns/restxq";
 declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
 declare namespace json = "http://www.json.org";
 declare namespace tei = "http://www.tei-c.org/ns/1.0";
 
-declare function api:response($caller as xs:string, $items as map()*) as element(api:reponse) {
-    <response xmlns="@app.uri@/api">
-        <metadata>
-            <query>{$caller}</query>
-            <timeStamp>{current-dateTime()}</timeStamp>
-            <user>{xmldb:get-current-user()}</user>
-        </metadata>
-        <body>{
-            for $i in $items
-            return    
-                <item>{
-                    for $k in map:keys($i) 
-                    let $name := string-join((
-                        for $t at $p in tokenize($k,'\s+') 
-                        return  
-                            if ($p = 1) 
-                            then lower-case($t)
-                            else upper-case(substring($t,1,1))||lower-case(substring($t,2)) 
-                    ),'')
-                    return <property name="{$name}">{map:get($i,$k)}</property>
-                }</item>
-        }</body>
-    </response>
+declare function api:format-response-payload($items as item()*, $format as xs:string, $status, $caller as xs:string) as element(api:reponse) {
+    <cfdb:response status="{$status}" query="{$caller}" timestamp="{current-dateTime()}" user="{xmldb:get-current-user()}" format="{$format}" items="{count($items)}">{
+    for $i in $items
+    return
+        typeswitch ($i) 
+            case element() return 
+                if ($format eq "xml") then $i
+                else if ($format eq "json") then <cfdb:payload>{$i}</cfdb:payload> 
+                else data($i) 
+            case map() return
+                if ($format eq "xml") then <cfdb:item>{for $key in map:keys($i) return <cfdb:property name="{$key}">{map:get($i, $key)}</cfdb:property>}</cfdb:item> else
+                if ($format eq "json") then <cfdb:payload>{for $key in map:keys($i) return element {$key} {map:get($i, $key)}}</cfdb:payload> 
+                else string-join((for $key in $i return concat($key, ":", map:get($i, $key))), "
+")
+            default return 
+                if ($format eq "xml") then <cfdb:payload>{$i}</cfdb:payload> else 
+                if ($format eq "json") then <cfdb:payload>{$i}</cfdb:payload> 
+                else $i
+    }</cfdb:response>
 };
 
-declare function api:status($status, $msg) {
-    let $load := <cfdb:response><status>{$status}</status><msg>{$msg}</msg></cfdb:response>
+(:~ This function creates an empty, non-200 response with an empty payload 
+ : and $msg being used as the reason for the     
+ :)
+declare function api:response($status, $msg) {
+    api:response($status, $msg, (), ())
+};
+
+(:~
+ : Creates a REST response, including status, status message and payload in a given format ("xml", "json" or "text")
+ : If status code is other than 200 the payload will be empty and the second paramter will be used as the status message to be passed as the http response code reason. 
+ :)
+declare function api:response($status, $load, $format as xs:string?, $caller as xs:string?) {
     let $statusCode := 
         switch(true())
             case $status = "error"          return 500
             case $status = "unauthorized"   return 401
+            case $status = "missing parameter" case $status = "invalid request data" return 400
+            (:case $status = "invalid request data" return 422:)
+            (: 422 is not accepted by RestXQ, so we have to use 400 :)
+            case $status = "insufficent permissions" return 403
             default return 200
-    return 
-        (<rest:response>
+    let $content-type := 
+        switch($format) 
+            case "json" return "application/json"
+            case "html" return "application/xhtml+xml"
+            case "text" return "text/plain"
+            default return "application/xml" 
+    let $ser :=
+        <output:serialization-parameters>
+            <output:method value="{$format}"/>
+        </output:serialization-parameters>
+    return (
+        <rest:response>
+            {$ser}
             <http:response status="{$statusCode}">
-                {if ($statusCode != 200) then attribute reason {$msg} else ()}
+                {if ($statusCode != 200) then attribute reason {$load} else ()}
+                <http:header name="Content-Type" value="{$content-type}"/>
             </http:response>            
         </rest:response>,
-        $msg)
-};
+        if ($statusCode = 200) 
+        then api:format-response-payload($load, $format, $status, $caller)
+        else api:format-response-payload($load, "text", $status, $caller)
+)};
 
 
 declare function api:log($msg) as empty() {
@@ -106,12 +132,14 @@ function api:list-tablets-as-json($text as xs:string*, $region as xs:string*, $a
     let $tablets-filtered := api:do-filter-tablets($text, $region, $archive, $dossier, $scribe, $city, $period, $anteQuem, $postQuem, $date, $dateBabylonian, $ductus)
     let $tablets-as-objects := 
         for $t in $tablets-filtered
-        let $attributes := tablet:get-attributes($t/@xml:id)
-        return cfdb:object(for $k in map:keys($attributes) return cfdb:property($k, map:get($attributes, $k))) 
+            let $id := $t/xs:string(@xml:id)
+            let $attributes := tablet:get-attributes($id)
+            let $object := cfdb:object(for $k in map:keys($attributes) return cfdb:property($k, map:get($attributes, $k)))
+            return $object
     return
         if (xmldb:get-current-user() = $config:authorized-users)
         then cfdb:array($tablets-as-objects)
-        else api:status("unauthorized", "You are not allowed to access this service")
+        else api:response("unauthorized", "You are not allowed to access this service")
 };
 
 (:~ list tablets as XML 
@@ -154,7 +182,7 @@ function api:list-tablets-as-xml($text as xs:string*, $region as xs:string*, $ar
     return
         if (xmldb:get-current-user() = $config:authorized-users)
         then <cfdb:response items="{count($tablets-filtered)}">{$tablets-as-xml}</cfdb:response>
-        else api:status("unauthorized", "You are not allowed to access this service")
+        else api:response("unauthorized", "You are not allowed to access this service")
 };
 
 
@@ -197,7 +225,7 @@ function api:get-tablet-attributes($tablet-id) {
     return 
         if ($user = $config:authorized-users)
         then util:serialize($response,"method=json")
-        else api:status("unauthorized", "You are not allowed to access this service")
+        else api:response("unauthorized", "You are not allowed to access this service")
 };
 
 declare 
@@ -215,7 +243,7 @@ function api:get-tablet-attribute($tablet-id, $attribute) {
     return 
         if ($user = $config:authorized-users)
         then util:serialize($response,"method=json")
-        else api:status("unauthorized", "You are not allowed to access this service")
+        else api:response("unauthorized", "You are not allowed to access this service")
 };
 
 declare 
@@ -234,7 +262,7 @@ function api:get-tablet-attribute($tablet-id, $attribute, $data) {
     return 
         if ($user = $config:authorized-users)
         then util:serialize($response,"method=json")
-        else api:status("unauthorized", "You are not allowed to access this service")
+        else api:response("unauthorized", "You are not allowed to access this service")
 };
 
 
@@ -251,7 +279,7 @@ function api:delete-surface($tablet-id as xs:string, $surface-id as xs:string) {
     let $delete := 
         if (exists($tablet))
         then surface:delete(tablet:get($tablet-id), $surface-id)
-        else map {"status" := "error" , "msg" := "tablet with id "||$tablet-id||" not available"}
+        else map {"status" := "error" , "msg" := concat("tablet with id ", $tablet-id, " not available")}
     let $response := 
         <cfdb:response>
             <surface>
@@ -315,7 +343,31 @@ function api:list-surfaces($tablet-id as xs:string) {
 };
 
 
+(: ********************************:)
 (: ********** ANNOTATIONS *********:)
+(: ********************************:)
+
+
+(:~ lists all occurences in the whole database :)
+declare 
+    %rest:GET
+    %rest:path("/cfdb/signs")
+    %rest:header-param("format", "{$format}", "xml")
+function api:list-all-annotations($format as xs:string*) {
+    let $payload := cfdb:list-annotations()
+    return api:response("ok", $payload, $format, "api:list-annotations()")
+};
+
+(:~ lists all occurences of a given sign type in the whole database :)
+declare 
+    %rest:GET
+    %rest:path("/cfdb/signs/type/{$type}")
+    %rest:header-param("format", "{$format}", "xml")
+function api:list-annotations-by-sign-type($type as xs:string, $format as xs:string*) {
+    let $payload :=  cfdb:list-annotations("sign-type", $type) 
+    return api:response("ok", $payload, $format, "api:list-annotations()")
+};
+
 
 (:~ lists annotations in a given surface :)
 declare 
@@ -335,7 +387,7 @@ function api:list-annotations($tablet-id as xs:string, $surface-id as xs:string,
             return 
                 if ($user = $config:authorized-users)
                 then util:serialize($response,"method=json")
-                else api:status("unauthorized", "You are not allowed to access this service")
+                else api:response("unauthorized", "You are not allowed to access this service")
         else "tablet with id "||$tablet-id||" not available"
 };
 
@@ -396,7 +448,7 @@ function api:delete-annotation($tablet-id as xs:string, $surface-id as xs:string
 
 
 
-(:~ list all annotions standard signs :)
+(:~ list all standard signs :)
 declare 
     %rest:GET
     %rest:path("/cfdb/taxonomies/signs")
@@ -443,3 +495,197 @@ function api:login($user as xs:string*, $password as xs:string*) {
     return util:serialize($response,"method=json")
     
 };:)
+
+
+
+(: ******************************** :)
+(: ****** ARCHIVE endpoints ******* :)
+(: ******************************** :)
+
+(:~ Fetches a list of snaphots in JSON 
+ :)
+declare 
+    %rest:GET
+    %rest:path("/cfdb/archive")
+    %rest:produces("application/json")
+    %output:media-type("application/json")
+function api:list-archive() {
+    util:serialize(<response>{for $a in archive:list() return archive:get-extra-metadata($a)}</response>, "method=json")
+};
+
+(:~ Fetches a full HTML representation of the list of snaphots as presented by archive.html
+ :)
+declare 
+    %rest:GET
+    %rest:path("/cfdb/archive")
+    %rest:produces("application/xhtml+xml")
+    %output:media-type("application/xhtml+xml")
+function api:list-archive() {
+    app:archivelist((),())
+};
+
+(:~ Uploads a new snaphot. 
+ :)
+declare 
+    %rest:POST("{$data}")
+    %rest:path("/cfdb/archive")
+    %rest:query-param("name", "{$filename}")
+    %rest:query-param("deploy", "{$deploy}")
+    %rest:header-param("format", "{$format}", "json")
+function api:upload-snapshot($data, $filename as xs:string*, $deploy as xs:boolean*, $format as xs:string*) {
+    let $import := archive:import($filename, $data)
+    (:let $deploy := if ($deploy[1] eq true()) then archive:deploy() else ():)
+(:    return api:response("ok", "uploaded successfully"):)
+    return api:response(if ($import instance of element(error)) then "error" else "ok", $import, $format, "api:upload-snapshot")
+};
+
+(:~ CREATES a new snaphot of the version $version 
+ :)
+declare 
+    %rest:POST
+    %rest:path("/cfdb/archive/{$version}")
+    %rest:query-param("pid", "{$pid}")
+    %rest:header-param("user", "{$user}")
+    %rest:header-param("password", "{$password}")
+    %rest:header-param("format", "{$format}", "json")
+function api:create-snapshot($user as xs:string*, $password as xs:string*, $version as xs:string, $pid as xs:string*, $format as xs:string*) {
+    let $login := true()(:xmldb:login($config:data-root, $user[1], $password[1]):),
+        $caller := "api:create-snapshot"
+    return 
+        if ($login)
+        then
+            if (xmldb:get-current-user() = $config:editors)
+            then
+                let $md := archive:create($version, $pid[1])
+                return 
+                    if ($md instance of element(error))
+                    then 
+                        let $data :=  
+                            if ($format = "html") 
+                            then <p xmlns="http://www.w3.org/1999/xhtml">{xs:string($md)}</p> 
+                            else $md
+                        return api:response("error", $data, $format, $caller) 
+                    else 
+                        let $data := archive:get-extra-metadata($md)
+                        return api:response("ok", $data , $format, $caller)
+            else api:response("insufficient permissions", "user "||xmldb:get-current-user()||" has insufficent rights to create an archive", $format, $caller)
+        else api:response("unauthorized", "Unknown user or invalid credentials", $format, $caller) 
+};
+
+
+(:~ DEPLOYS the snaphot with the id $id  
+ :)
+declare 
+    %rest:PUT
+    %rest:path("/cfdb/archive/{$id}")
+    %rest:query-param("removeDeployedSnaphot", "{$removeDeployedSnaphot}")
+    %rest:header-param("format", "{$format}", "json")
+function api:deploy-snapshot($id as xs:string, $removeDeployedSnaphot as xs:string*, $format as xs:string*) {
+    let $login := true()(:xmldb:login($config:data-root, $user[1], $password[1]):),
+        $caller := "api:deploy-snapshot",
+        $rmCurrent := ($removeDeployedSnaphot[1],false())[. castable as xs:boolean][1]
+    return 
+        if ($login)
+        then
+            if (xmldb:get-current-user() = $config:editors)
+            then
+                if ($rmCurrent castable as xs:boolean)
+                then 
+                    let $deploy := archive:deploy($id, $rmCurrent)
+                    return 
+                        if ($deploy instance of element(error))
+                        then api:response("error", $deploy, $format, $caller) 
+                        else api:response("ok", $deploy , $format, $caller)
+                else api:response("error", "Query parameter 'removeDeployedSnapshot' ("||$removeDeployedSnaphot||") must be castable to xs:boolean.", $format, $caller)
+            else api:response("insufficient permissions", "user "||xmldb:get-current-user()||" has insufficent rights to deploy an archive", $format, $caller)
+        else api:response("unauthorized", "Unknown user or invalid credentials", $format, $caller) 
+};
+
+(:~ DELETES the snaphot with the id $id.:)
+declare 
+    %rest:DELETE
+    %rest:path("/cfdb/archive/{$id}")
+    %rest:header-param("user", "{$user}")
+    %rest:header-param("password", "{$password}")
+    %rest:header-param("format", "{$format}", "json")
+function api:remove-snapshot($user as xs:string*, $password as xs:string*, $id as xs:string, $format as xs:string*) {
+    let $login := true()(:xmldb:login($config:data-root, $user[1], $password[1]):),
+        $caller := "api:remove-snapshot"
+    return
+        if ($login)
+        then
+            if (xmldb:get-current-user() = $config:editors)
+            then
+                let $md := archive:remove($id)
+                return 
+                    if ($md instance of element(error))
+                    then api:response("error", $md, $format, $caller)
+                    else api:response("ok", "Successfully removed snapshot "||$id, $format, $caller)
+            else api:response("insufficient permissions", "Unknown user or invalid credentials", $format, $caller)
+        else api:response("unauthorized", "Unknown user or invalid credentials", $format, $caller)
+};
+
+
+(:~ DELETES the artefacts of snaphot with the id $id.:)
+declare 
+    %rest:DELETE
+    %rest:path("/cfdb/archive/artefacts/{$id}")
+    %rest:header-param("format", "{$format}", "json")
+function api:remove-snapshot-artefacts($id as xs:string, $format as xs:string*) {
+    let $caller := "api:remove-snapshot-artefacts"
+    return
+        if (xmldb:get-current-user() = $config:editors)
+        then
+            let $md := archive:remove-artefacts($id)
+            return 
+                if ($md instance of element(error))
+                then api:response("error", $md, $format, $caller)
+                else api:response("ok", "Successfully removed snapshot artefacts "||$id, $format, $caller)
+        else api:response("insufficient permissions", "Must be member of cfdb:editor group to remove artefacts", $format, $caller)
+};
+
+(: ******************************** :)
+(: **** DATABASE CONFIGURATION **** :)
+(: ******************************** :)
+
+declare 
+    %rest:GET
+    %rest:path("/cfdb/configuration")
+    %rest:header-param("format", "{$format}", "json")
+function api:get-instance-settings($format as xs:string*) {
+    api:get-instance-settings((), $format)
+};
+
+declare 
+    %rest:GET
+    %rest:path("/cfdb/configuration/{$key}")
+    %rest:header-param("format", "{$format}", "json")
+function api:get-instance-settings($key as xs:string*, $format as xs:string*) {
+    let $value := config:get($key[1])
+    return 
+        if (not(xmldb:get-current-user() = $config:editors)) then api:response("insufficient permissions", "must be editor to view configuration", $format, "api:get-instance-settings")
+        else if ($value instance of element(error)) then api:response("error", $value, $format, "api:get-instance-settings")
+        else api:response("ok", $value, $format, "api:get-instance-settings")
+};
+
+
+declare 
+    %rest:PUT("{$value}")
+    %rest:path("/cfdb/configuration")
+    %rest:header-param("format", "{$format}", "json")
+    %output:media-type("application/json")
+function api:set-instance-settings($key as xs:string*, $value as item()*, $format as xs:string*) {  
+        if (not(xmldb:get-current-user() = $config:editors)) 
+        then api:response("insufficient permissions", "must be editor to view configuration", $format, "api:get-instance-settings")
+        else 
+            let $data := util:base64-decode($value),
+                $log := util:log-app("DEBUG", $config:app-name, $value),
+                $xml := try { xqjson:parse-json($data) } catch * {<error>could not parse {$data} as a JSON object</error>},
+                $keys := $xml//pair/@name[. = $config:keys]/xs:string(.),
+                $map := map:new(for $k in $keys return map:entry($k, $xml//pair[@name = $k]/xs:string(.)))
+            let $response := config:set($map)
+            return 
+                if ($response instance of element(error))
+                then api:response("error", $response)
+                else api:response("ok", $response, $format, "api:set-instance-settings")
+};

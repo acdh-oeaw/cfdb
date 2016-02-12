@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+   <!-- the public url is used to construct snapshot identifiers if no PID is provided in archive:create() -->
+   <public-url>SET PUBLIC URL IN config.xml</public-url>
+   <!-- The publisher metadata field is used to populate the dc:publisher field in the snapshot metadata. -->
+   <publisher>SET PUBLISHER IN config.xml</publisher>
+   <!-- The license under which the corpus data is issued. This value is used to populate the dc:publisher field in the snapshot metadata. -->
+   <license>SET LICENSE IN config.xml</license>
+   <!-- The operation-mode ("public" or "curation") defines whether the edit forms will be displayed or not. -->
+   <operation-mode>curation</operation-mode>   
+   <deployed-snapshot>myFirstArchive</deployed-snapshot>   
+</config>

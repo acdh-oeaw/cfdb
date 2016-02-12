@@ -22,7 +22,7 @@ let $tablet-id := request:get-parameter("t", ""),
     $tablet-col := if ($tablet-id = '' or not(exists($tablet))) then () else util:collection-name($tablet),
     $tablet-doc := if ($tablet-id = '' or not(exists($tablet))) then () else util:document-name($tablet),
     $tablet-owner := if ($tablet-id = '' or not(exists($tablet))) then () else xmldb:get-owner($tablet-col, $tablet-doc),
-    $tablet-writeable := if ($user = $config:superusers) 
+    $tablet-writeable := if ($user = $config:editors) 
                          then true()
                          else 
                             if ($user = $tablet-owner)
@@ -66,11 +66,11 @@ return
         <link href="resources/js/jquery.ui.plupload/css/jquery.ui.plupload.css" rel="stylesheet"/>
         
         <link href="resources/css/annotate.css" rel="stylesheet"/>
-        
         {if ($tablet-id != '')
         then 
             (
             <script type="text/javascript">{$js}</script>,
+            <script type="text/javascript" src="resources/js/common.js">//</script>,
             <script type="text/javascript" src="resources/js/annotate.js">//</script>,
             if ($annotation-id != '')
             then ()

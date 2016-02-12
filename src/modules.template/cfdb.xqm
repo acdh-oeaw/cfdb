@@ -5,6 +5,7 @@ module namespace cfdb = "@app.uri@/db";
 declare namespace tei = "http://www.tei-c.org/ns/1.0";
 
 import module namespace config = "@app.uri@/config" at "xmldb:exist:///db/apps/@app.name@/modules/config.xqm";
+import module namespace annotations = "@app.uri@/annotations" at "xmldb:exist:///db/apps/@app.name@/modules/annotations.xqm";
 
 
 (:~ module containing functions and variables common to the model on database level
@@ -37,6 +38,23 @@ declare function cfdb:stdSign-by-charname($n as xs:string) {
 declare function cfdb:listStdSigns() as element(tei:char)* {
     let $data := $config:data-root||"/etc/stdSigns/stdSigns.xml"
     return doc($data)//tei:char
+};
+
+(: lists all annotations in the database :)
+declare function cfdb:list-annotations() {
+    cfdb:list-annotations((),())
+};
+
+(: lists all annotations in the database, optionally filtering by a given $category and value:)
+declare function cfdb:list-annotations($category as xs:string?, $value as xs:string?) {
+    let $glyphs := 
+        if ($category = "sign-type") then collection($config:tablets-root)//tei:g[@type = $value] else
+        if ($category = "sign-number") then collection($config:tablets-root)//tei:g[@n = $value] else
+        if ($category = "id") then collection($config:tablets-root)//tei:g[@xml:id = $value] else
+        if ($category = "period") then collection($config:tablets-root)//tei:g[root(.)//tei:origPlace/tei:placeName = $value] else 
+        if (not(exists($category))) then collection($config:tablets-root)//tei:g
+        else ()
+    return <annotations>{$glyphs!annotations:get-attributes(., ())}</annotations>
 };
 
 
@@ -138,3 +156,25 @@ declare function cfdb:property($key as xs:string, $value) {
             default return  '"'
     )
 }; 
+
+
+declare function cfdb:ls($path) {
+    cfdb:ls($path, ())
+};
+
+declare function cfdb:ls($path, $mime-type-filter as xs:string*) {
+    <collection path="{$path}" name="{tokenize($path,'/')[last()]}">{
+        if (not(xmldb:collection-available($path)))
+        then <error>Not available / no permission</error>
+        else 
+            (for $c in xmldb:get-child-collections($path) return cfdb:ls($path||"/"||$c, $mime-type-filter),
+             for $r in xmldb:get-child-resources($path) 
+                let $dbpath := $path||"/"||$r,
+                    $mime-type := xmldb:get-mime-type($dbpath)
+                return 
+                    if (not(exists($mime-type-filter)) or $mime-type = $mime-type-filter) 
+                    then <resource path="{$dbpath}" mime-type="{$mime-type}">{$r}</resource>
+                    else ()
+            )
+    }</collection>
+};

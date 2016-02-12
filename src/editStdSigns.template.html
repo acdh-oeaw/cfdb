@@ -11,8 +11,8 @@
         </xf:instance>
         
         <!-- holds all tei:g elements in the database-->
-        <xf:instance xmlns="" id="allSigns">
-            <signs/>
+        <xf:instance xmlns="" id="occurences">
+            <annotations/>
         </xf:instance>
 
         <!-- a generic way to remove resources -->
@@ -75,8 +75,8 @@
         </xf:submission>
         
         
-        <!-- loads all tei:g elements into the 'allSigns' instance -->
-        <xf:submission id="retrieveAllSigns" method="execute" ref="instance('allSigns')" replace="instance" resource="exist:/db/apps/@app.name@/api/lsSigns.xql">
+        <!-- loads all tei:g elements of the selected type into the 'occurences' instance -->
+        <xf:submission id="retrieveAllOccurences" method="execute" ref="instance('occurences')" replace="instance" resource="exist:/db/apps/@app.name@/api/lsSigns.xql">
             <xf:message ev:event="xforms-submit-error" level="ephemeral">an error occured loading sign occurences</xf:message>
         </xf:submission>
         
@@ -123,8 +123,6 @@
         <xf:action ev:event="xforms-ready">
             <!-- copy standard signs from db into list -->
             <xf:insert context="instance('listSort')" origin="instance('stdSigns')//tei:char"/>
-            <!-- copy all occurences into list - WATCHME this might get long-->
-            <xf:send submission="retrieveAllSigns"/>
             <xf:message level="ephemeral">form loaded</xf:message>
         </xf:action>
     </xf:model>
@@ -182,6 +180,8 @@
                                     <!-- the dummy node is necessary to have a target for the insert @ref of the 'edit' action; 
                                         @context does not work if we want to use context() in the @origin attribute --> 
                                     <xf:insert nodeset="instance('currentSign')/dummy" origin="instance('stdSigns')//tei:char[@xml:id = context()/@xml:id]" position="after"/>
+                                    <xf:insert nodeset="instance('occurences')" origin="instance('currentSign')//tei:charName"/>
+                                    <xf:send submission="retrieveAllOccurences"/>
                                 </xf:trigger>
 
                                 
@@ -287,29 +287,35 @@
                 </xf:group>
                 
                 <xf:group>
-                    <h4 id="occurences">Occurences</h4>
+                    <h4>Occurences</h4>
+                    <p>
+                        <xf:output value="count(instance('occurences')//annotation)"/> occurence(s) in corpus.</p>
                     <table class="table">
                         <thead>
                             <tr>
+                                <th>Image</th>
                                 <th>Reading</th>
-                                <th>Text Reference</th>
-                                <th>Period</th>
-                                <th>Place</th>
+                                <th>Context</th>
+                                <th>Sequence</th>
+                                <th>Note</th>
                             </tr>
                         </thead>
-                        <tbody xf:repeat-nodeset="instance('allSigns')//api:item[api:property[@name = 'type'] = instance('currentSign')/tei:char/tei:charName/text()]">
+                        <tbody xf:repeat-nodeset="instance('occurences')//annotation">
                             <tr>
                                 <td>
-                                    <xf:output ref="api:property[@name = 'reading']"/>
+                                    <xf:output ref="img" mediatype="image/png"/>
                                 </td>
                                 <td>
-                                    <xf:output ref="api:property[@name = 'textReference']"/>
+                                    <xf:output value="reading"/>
                                 </td>
                                 <td>
-                                    <xf:output ref="api:property[@name = 'period']"/>
+                                    <xf:output ref="context"/>
                                 </td>
                                 <td>
-                                    <xf:output ref="api:property[@name = 'place']"/>
+                                    <xf:output ref="sequence"/>
+                                </td>
+                                <td>
+                                    <xf:output ref="note"/>
                                 </td>
                             </tr>
                         </tbody>

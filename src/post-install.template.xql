@@ -61,8 +61,18 @@ sm:add-group-manager("@system.account.user@", "@system.account.user@"),
 
 (: create tablets collection :)
 local:mkcol("/db", "@data.dir@/tablets"),
-local:mkcol("/db", "@data.dir@/etc"),
-xmldb:move($target||"/data/etc", "/db/@data.dir@"),
+
+(: create snapshot repository and set ACL :)
+local:mkcol("/db", "@data.dir@/archive"),
+sm:chgrp(xs:anyURI("@data.dir@/archive"), "cfdbEditors"),
+sm:chmod(xs:anyURI("@data.dir@/archive"), "rwxrwxr-x"),
+
+(: if it does not exist: create data/etc collection and move data from 
+   the application package into it - important to not overwrite existing data:)
+if (not(xmldb:collection-available("@data.dir@/etc"))) 
+then (local:mkcol("/db", "@data.dir@/etc"), 
+      xmldb:move($target||"/data/etc", "/db/@data.dir@"))
+else (),
 
 (: ACL for data collection :)
 sm:chgrp(xs:anyURI("/db/@data.dir@"), "cfdbEditors"),
@@ -71,22 +81,33 @@ sm:add-group-ace(xs:anyURI("/db/@data.dir@"), "cfdbAnnotators", true(), "r-x"),
 
 (: ACL for tablets collection:)
 sm:chgrp(xs:anyURI("/db/@data.dir@/tablets"), "cfdbEditors"),
-sm:chmod(xs:anyURI("/db/@data.dir@"), "rwxrwxr-x"),
+sm:chmod(xs:anyURI("/db/@data.dir@/tablets"), "rwxrwxr-x"),
 sm:add-group-ace(xs:anyURI("/db/@data.dir@/tablets"), "cfdbAnnotators", true(), "rwx"),
 
 (: ACL for taxonomies et alt. :)
 sm:add-group-ace(xs:anyURI("/db/@data.dir@/etc"), "cfdbAnnotators", true(), "rwx"),
 for $resource in xmldb:get-child-resources("/db/@data.dir@/etc")
-return sm:add-group-ace(xs:anyURI("/db/@data.dir@/etc/"||$resource), "cfdbAnnotators", true(), "rwx"),
+return 
+    (sm:add-group-ace(xs:anyURI("/db/@data.dir@/etc/"||$resource), "cfdbAnnotators", true(), "rwx"),
+     sm:add-group-ace(xs:anyURI("/db/@data.dir@/etc/"||$resource), "cfdbEditors", true(), "rwx")
+),
 
 (: ACL for STANDARD SIGNS:)
 sm:add-group-ace(xs:anyURI("/db/@data.dir@/etc/stdSigns"), "cfdbAnnotators", true(), "rwx"),
 sm:add-group-ace(xs:anyURI("/db/@data.dir@/etc/stdSigns/imgs"), "cfdbAnnotators", true(), "rwx"),
 for $resource in xmldb:get-child-resources("/db/@data.dir@/etc/stdSigns")
-return sm:add-group-ace(xs:anyURI("/db/@data.dir@/etc/stdSigns/"||$resource), "cfdbAnnotators", true(), "rwx"),
+return (
+    sm:add-group-ace(xs:anyURI("/db/cfdb-data/etc/stdSigns/"||$resource), "cfdbAnnotators", true(), "rwx"),
+    sm:add-group-ace(xs:anyURI("/db/cfdb-data/etc/stdSigns/"||$resource), "cfdbEditors", true(), "rwx")
+),
 
 
-(: grant 'read' and 'execute' permissions on restxq endpoint module to annotators :)
+(: grant 'read' and 'execute' permissions on restxq endpoint module to editors and annotators :)
 sm:add-group-ace(xs:anyURI($target||"/modules/api.xqm"), "cfdbAnnotators", true(), "r-x"),
+sm:add-group-ace(xs:anyURI($target||"/modules/api.xqm"), "cfdbEditors", true(), "r-x"),
 (: revoke exec rights from guest on api.xqm :)
-sm:chmod(xs:anyURI($config:app-root||"/modules/api.xqm"), "rwxr-xr--") 
+sm:chmod(xs:anyURI($config:app-root||"/modules/api.xqm"), "rwxr-xr--"),
+
+(: make configuration file $app-root/conf.xml owned by editors group:)
+sm:chgrp(xs:anyURI($config:app-root||"/config.xml"), "cfdbEditors"),
+sm:chmod(xs:anyURI($config:app-root||"/config.xml"), "rwxrwxr-x")
