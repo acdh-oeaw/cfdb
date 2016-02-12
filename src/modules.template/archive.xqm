@@ -7,6 +7,9 @@ declare namespace http="http://expath.org/ns/http-client";
 declare namespace dc="http://purl.org/dc/elements/1.1/";
 declare namespace dcterms="http://purl.org/dc/terms/"; 
 
+(: Application independent namespace for the snapshot archive metadata format :)
+declare namespace cfdba = "@app.archive-format.ns@";
+
 import module namespace config = "@app.uri@/config" at "xmldb:exist:///db/apps/@app.name@/modules/config.xqm";
 import module namespace cfdb = "@app.uri@/db" at "xmldb:exist:///db/apps/@app.name@/modules/cfdb.xqm";
 import module namespace tablet = "@app.uri@/tablet" at "xmldb:exist:///db/apps/@app.name@/modules/tablet.xqm";
@@ -22,7 +25,7 @@ declare variable $archive:repo-path := $archive:repo-parent-collection||"/"||$ar
 declare variable $archive:entry-filter := function($path as xs:string, $data-type as xs:string, $param as item()*) as xs:boolean{ if (ends-with($path, "dc.xml")) then true() else false() };
 declare variable $archive:entry-data := function($path as xs:string, $data-type as xs:string, $data as item()?, $param as item()*) {$data};
 
-declare function archive:create($version as xs:string) as element(cfdb:archive)? {
+declare function archive:create($version as xs:string) as element(cfdba:archive)? {
     archive:create($version, ())
 };
 
@@ -31,7 +34,7 @@ declare function archive:create($version as xs:string) as element(cfdb:archive)?
  :)
 declare function archive:create($version as xs:string, $pid as xs:string?) as element() {
     if ($config:isPublicInstance eq true()) then <error>Cannot create an archive from public instance.</error>
-    else if (exists(collection($archive:repo-path)//cfdb:archive[@version = $version])) then <error>Version {$version} already exists.</error>
+    else if (exists(collection($archive:repo-path)//cfdba:archive[@version = $version])) then <error>Version {$version} already exists.</error>
     else if (not($version castable as xs:integer and xs:integer($version) gt 0)) then <error>Version must be an integer greater than 0.</error>
     else if (xs:integer($version) lt max(archive:list()/xs:integer(@version))) then <error>Version must be greater than the highest previous version number (i.e. {max(archive:list()/xs:integer(@version))}).</error>
     else
@@ -42,7 +45,7 @@ declare function archive:create($version as xs:string, $pid as xs:string?) as el
             $etc-data-paths := cfdb:ls($config:data-root||"/etc")//resource/xs:anyURI(@path) 
         let $filename := $config:app-name||"_"||$version||"SNAPSHOT_"||format-dateTime(current-dateTime(),'[Y0000][M00][D00]-[H00][m00][s00]')
         let $md := 
-            <cfdb:archive version="{$version}">
+            <cfdba:archive version="{$version}">
                 <dc:title>cfdb archive {$version}</dc:title>
                 <dc:identifier>{$filename}</dc:identifier>
                 <dcterms:URL>{($pid, config:get("public-url")||"/archive/"||$version)[1]}</dcterms:URL>                
@@ -54,7 +57,7 @@ declare function archive:create($version as xs:string, $pid as xs:string?) as el
                 <dcterms:source>{$config:UUID}</dcterms:source>
                 <dc:description>This archive contains a snapshot of the data in the "{$config:app-name}" corpus at the time of its creation.</dc:description>
                 <dc:tableOfContents>For each tablet (under "tablets") cropped images (png files) and metadata, including image annotations (as TEI files), are provided. Additional data in "etc": lists of places, persons, archives and terms as well as standard sign lists and standard sign images ("stdSigs/stdSigns.xml").</dc:tableOfContents>
-            </cfdb:archive>
+            </cfdba:archive>
         let $md-entry := <entry name="dc.xml">{$md}</entry>
         let $zip-data-content := ($md-entry, $tablets-data-paths, $etc-data-paths)
         
@@ -86,7 +89,7 @@ declare function archive:create($version as xs:string, $pid as xs:string?) as el
         return  
             if ($store instance of element(error)) then $store
             else if ($set-resource-permissions instance of element(error)) then $set-resource-permissions
-            else doc($store[ends-with(., ".xml")])/cfdb:archive 
+            else doc($store[ends-with(., ".xml")])/cfdba:archive 
 };
 
 (:~ The function archive:get-metadata returns full metadata about the snapshot specified by $id. 
@@ -95,14 +98,14 @@ declare function archive:create($version as xs:string, $pid as xs:string?) as el
  :)
 declare function archive:get-extra-metadata($id-or-element) as element() {
     let $arg-type := typeswitch ($id-or-element) 
-                        case element(cfdb:archive) return "stored-md"
+                        case element(cfdba:archive) return "stored-md"
                         case xs:string return "id"
                         default return ()
     return
         if (not($arg-type))
-        then <error>parameter 1 of archive:get-metadata has wrong type: must be a snapshot ID (xs:string) or an element(cfdb:archive)</error>
+        then <error>parameter 1 of archive:get-metadata has wrong type: must be a snapshot ID (xs:string) or an element(cfdba:archive)</error>
         else 
-            let $stored-md := if ($arg-type = "stored-md") then $id-or-element else collection($archive:repo-path)//cfdb:archive[dc:identifier = $id-or-element],
+            let $stored-md := if ($arg-type = "stored-md") then $id-or-element else collection($archive:repo-path)//cfdba:archive[dc:identifier = $id-or-element],
                 $id := if ($arg-type = "id") then $id-or-element else $id-or-element/dc:identifier/data(.)
             return 
                 if ($id = "") then <error>archive:get-metadata() $id is empty</error> else 
@@ -114,7 +117,7 @@ declare function archive:get-extra-metadata($id-or-element) as element() {
                     $size-formatted := if ($zip-available) then round-half-to-even($size div 1024 div 1024, 2)||" MB" else (),
                     $date-formatted := format-dateTime($stored-md//dcterms:issued, "[D00]/[M00]/[Y0000] [H00]:[m00]")
                 return 
-                <archive xmlns="@app.uri@/db">
+                <archive xmlns="@app.archive-format.ns@">
                     {($stored-md/@*, $stored-md/*)}
                     <extra>
                         <md-filename>{$md-filename}</md-filename>
@@ -133,7 +136,7 @@ declare function archive:get-extra-metadata($id-or-element) as element() {
 
 (:~ This function returns a list of archive snapshots
  :)
-declare function archive:list() as element(cfdb:archive)* {
+declare function archive:list() as element(cfdba:archive)* {
     archive:get(())
 };
 
@@ -141,14 +144,14 @@ declare function archive:list() as element(cfdb:archive)* {
 (:~ The function archive:get retrieves the snaphot indicated by $id or lists all 
  : snapshots if there is no $id given. 
  :)
-declare function archive:get($id as xs:string?) as element(cfdb:archive)* {
+declare function archive:get($id as xs:string?) as element(cfdba:archive)* {
     if (exists($id))
-    then collection($archive:repo-path)//cfdb:archive[dc:identifier = $id]
-    else collection($archive:repo-path)//cfdb:archive
+    then collection($archive:repo-path)//cfdba:archive[dc:identifier = $id]
+    else collection($archive:repo-path)//cfdba:archive
 };
 
-declare function archive:get-by-version($version) as element(cfdb:archive)* {
-    collection($archive:repo-path)//cfdb:archive[@version = $version]
+declare function archive:get-by-version($version) as element(cfdba:archive)* {
+    collection($archive:repo-path)//cfdba:archive[@version = $version]
 };
 
 (:~ Removes the archive of a snapshot as well as the unpacked files.  
@@ -251,7 +254,7 @@ declare function archive:deploy($id as xs:string, $removeDeployedSnaphot as xs:b
             let $folders := if (contains($path,"/")) then subsequence(tokenize($path, "/"), 1, count(tokenize($path, "/"))-1) else (),
                 $create-folders := archive:create-collection-recursively($snapshot-collection, $folders) 
             return 
-            if ($data instance of document-node() and $data/cfdb:archive) then () else 
+            if ($data instance of document-node() and $data/cfdba:archive) then () else 
             if ($data-type eq "resource") then if (exists($folders)) then xmldb:store($snapshot-collection||"/"||string-join($folders,"/"), substring-after($path, string-join($folders,"/")||"/"), $data) else xmldb:store($snapshot-collection, $path, $data) else 
             if ($data-type eq "folder") then xmldb:create-collection($snapshot-collection, $path) 
             else ()

@@ -130,6 +130,9 @@
                 token="@app.name@" 
                 property="app.name"/>
             <replacefilter 
+                token="@app.archive-format.ns@" 
+                property="app.archive-format.ns"/>
+            <replacefilter 
                 token="@app.uri@" 
                 property="app.uri"/>
             <replacefilter 

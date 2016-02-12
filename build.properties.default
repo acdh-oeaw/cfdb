@@ -2,6 +2,9 @@
 
 app.name=
 app.uri=http://www.oeaw.ac.at/acdh/cfdb2
+# namespace for the snapshot archive format 
+# It's important to keep that namespace independent from the application namespace to allow for snapshot sharing between application instances.   
+app.archive-format.ns=http://www.oeaw.ac.at/acdh/cfdb-archive-format/1.0
 
 # app.version= -> moved to .version
 

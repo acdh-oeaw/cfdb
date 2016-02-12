@@ -15,6 +15,8 @@ import module namespace search = "@app.uri@/search" at "search.xqm";
 import module namespace cfdb = "@app.uri@/db" at "cfdb.xqm";
 import module namespace archive="@app.uri@/archive" at "archive.xqm";
 
+declare namespace cfdba = "@app.archive-format.ns@";
+
 (:~
  : This is a sample templating function. It will be called by the templating module if
  : it encounters an HTML element with an attribute data-template="app:test" 
@@ -300,11 +302,11 @@ declare function app:archivelist($node, $model) {
                     let $md-extra := archive:get-extra-metadata($md),
                         $identifier := $md-extra/dc:identifier/xs:string(.), 
                         $isDeployed := config:get("deployed-snapshot") = $md-extra/dc:identifier
-                    let $zip-filename := $md-extra//cfdb:zip-filename,
-                        $zip-available := $md-extra//cfdb:zip-available eq "true",
-                        $md-filename := $md-extra//cfdb:md-filename,
-                        $date-formatted := $md-extra//cfdb:date-formatted,
-                        $size-formatted := $md-extra//cfdb:size-formatted,
+                    let $zip-filename := $md-extra//cfdba:zip-filename,
+                        $zip-available := $md-extra//cfdba:zip-available eq "true",
+                        $md-filename := $md-extra//cfdba:md-filename,
+                        $date-formatted := $md-extra//cfdba:date-formatted,
+                        $size-formatted := $md-extra//cfdba:size-formatted,
                         $version := $md-extra/xs:integer(@version)
                     order by $version
                     return
