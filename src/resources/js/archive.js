@@ -216,4 +216,11 @@ $(document).ready(function(){
         cfdb.archive.create(version);
     });
     uploader.init();
+    uploader.bind('UploadProgress', function(up, file) {
+        $('.progress-bar').attr('aria-valuenow', file.percent);
+        $('.progress-bar').style('width', file.percent + "%");
+        $('.progress-bar').style('width', file.percent + "%");
+        $('.progress-bar').style('min-width', file.percent + "%");
+        $('.progress-bar').html(file.percent + "%");
+    });
 }); 

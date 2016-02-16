@@ -422,6 +422,9 @@ declare function app:input-upload-snapshot($node, $model) {
                 <button type="submit" id="uploadarchive">Upload</button>
                 <span class="spinner">&#160;<i class="fa fa-spinner fa-spin"/></span>
             </form>
+            <div class="progress">
+                <div class="progress-bar" role="progressbar" aria-valuenow="2" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em; width: 2%;">NaN</div>
+            </div>
         </div>
         )
     else ()
