@@ -198,7 +198,7 @@ declare function archive:import($filename as xs:string, $archive as item()) {
     let $md := if (not($store-archive instance of element(error))) then try { compression:unzip( $archive, $entry-filter, (), $entry-data, ()) } catch * { <error>Could not uncompress archive. ({$err:code} , {$err:description}, {$err:value})</error> } else ()
     let $identifier := $md//dc:identifier[1]/xs:string(.)
     let $store-md:= if ($identifier != "" and not($store-archive instance of element(error))) then try { xmldb:store($archive:repo-path, $identifier||".xml", $md, "application/xml") } catch * { <error>Could not store metadata entry under {$archive:repo-path}/{$identifier}.xml. ({$err:code} , {$err:description}, {$err:value})</error> } else <error>Invalid snapshot metadata: No dc:identifier found.</error>
-    let $rename := if (not($store-md instance of element(error)) and $identifier != "") then try { xmldb:rename($archive:repo-path, $filename, $identifier||".zip") } catch * {<error>Could not rename {$filename} to {$identifier}.zip. ({$err:code} , {$err:description}, {$err:value})</error>}else ()
+    let $rename := if (not($store-md instance of element(error)) and $identifier != "" and $filename != $identifier||".zip") then try { xmldb:rename($archive:repo-path, $filename, $identifier||".zip") } catch * {<error>Could not rename {$filename} to {$identifier}.zip. ({$err:code} , {$err:description}, {$err:value})</error>}else ()
     return 
         if ($md instance of element(error)) then $md else 
         if ($store-archive instance of element(error)) then $store-archive else
