@@ -146,12 +146,14 @@ declare function cfdb:property($key as xs:string, $value) {
         '"',$key,'"',
         ':',
         switch(true())
-            case (starts-with($value, '[')) return () 
+            (: no quotation marks around arrays or numbers :)
+            case (matches($value, '^\[.+\]$')) return () 
             case ($value instance of xs:integer) return ()
             default return  '"',
         $value,
         switch(true())
-            case (starts-with($value, '[')) return () 
+            (: no quotation marks around arrays or numbers :)
+            case (matches($value, '^\[.+\]$')) return ()
             case ($value instance of xs:integer) return ()
             default return  '"'
     )
