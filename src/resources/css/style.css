@@ -21,6 +21,8 @@ body { background: none!important; }
 /* glyph.html */
 #glyphDetails img { max-width: 180px; max-height: 200px; }
 
+/* tablet.html */
+#tablet #tabletHTMLContainer .gThumbnail tbody { color: white; }
 
 /* editTablets.html */
 #tabletHTMLContainer .gThumbnail { float: left; height: auto; margin-bottom: 1em; margin-right: 1em; max-width: 10em; }

@@ -74,6 +74,12 @@ declare function app:listGlyphs($node as node(), $model as map(*)) {
 	<span>no glyph-id</span>
 };:)
 
+declare function app:renderTablet($node, $model, $id as xs:string) {
+    let $tablet := tablet:get($id),
+        $xsl := doc($config:tablet2html)
+    return <div xmlns="http://www.w3.org/1999/xhtml" id="tablet">{transform:transform($tablet, $xsl, <parameters><param name="taxonomies.path" value="{$config:tablets-root}/../etc/taxonomies.xml"/><param name="makeAnnotateLink" value="false"/></parameters>)}</div>
+};
+
 declare function app:showGlyph($node as node(), $model as map(*), $glyph-id as xs:string?, $filterExpr as xs:string?) {
 	if ($glyph-id and $glyph-id != '')
 	then

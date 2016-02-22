@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema" exclude-result-prefixes="#all" version="2.0">
     <xsl:param name="taxonomies.path"/>
+    <xsl:param name="makeAnnotateLink" select="'true'"/>
     <xsl:variable name="taxonomies" select="doc($taxonomies.path)"/>
     <xsl:template match="/tei:TEI">
         <div id="html_{@xml:id}">
@@ -10,16 +11,16 @@
             <table class="table">
                 <xsl:apply-templates select="tei:teiHeader/tei:fileDesc/tei:sourceDesc/tei:msDesc"/>
                 <xsl:apply-templates select="tei:teiHeader/tei:profileDesc"/>
-
             </table>
             <h4>Annotated Signs</h4>
-            <xsl:for-each select="//tei:g">
-                <xsl:sort select="@type"/>
-                <xsl:apply-templates select="."/>
-            </xsl:for-each>
+            <div id="tabletHTMLContainer">
+                <xsl:for-each select="//tei:g">
+                    <xsl:sort select="@type"/>
+                    <xsl:apply-templates select="."/>
+                </xsl:for-each>
+            </div>
         </div>
     </xsl:template>
-
     <xsl:template match="tei:msDesc">
         <tr>
             <td>
@@ -126,14 +127,12 @@
                 </td>
             </tr>
         </xsl:if>
-
         <xsl:if test="tei:particDesc/*[.!='']">
             <tr>
                 <td>Persons mentioned</td>
                 <xsl:value-of select="string-join(tei:particDesc/*,', ')"/>
             </tr>
         </xsl:if>
-
         <xsl:if test="tei:textClass/tei:keywords/tei:term[.!='']">
             <tr>
                 <td>Genre</td>
@@ -142,7 +141,6 @@
                 </td>
             </tr>
         </xsl:if>
-
         <xsl:if test="tei:abstract/tei:ab[.!='']">
             <tr>
                 <td>Paraphrase</td>
@@ -152,8 +150,6 @@
             </tr>
         </xsl:if>
     </xsl:template>
-
-
     <xsl:template match="tei:g">
         <xsl:variable name="annotation-id" select="substring-after(@xml:id, 'glyph_')"/>
         <xsl:variable name="tablet-id" select="root()/tei:TEI/@xml:id"/>
@@ -161,8 +157,16 @@
         <xsl:variable name="snippet-relpath" select="$g-graphic/@url"/>
         <xsl:variable name="surface-id" select="$g-graphic/ancestor::tei:surface/tei:graphic/@url"/>
         <span class="gThumbnail">
-            <a href="annotate.xql?t={$tablet-id}&amp;s={encode-for-uri($surface-id)}&amp;a={$annotation-id}">
-                <img src="$app-root/data/tablets/{$tablet-id}/{$snippet-relpath}"/>
+            <a>
+                <xsl:choose>
+                    <xsl:when test="$makeAnnotateLink = 'true'">
+                        <xsl:attribute name="href">annotate.xql?t={$tablet-id}&amp;s={encode-for-uri($surface-id)}&amp;a={$annotation-id}</xsl:attribute>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:attribute name="href">#</xsl:attribute>
+                    </xsl:otherwise>
+                </xsl:choose>
+                <img src="$tablets-root/{$tablet-id}/{$snippet-relpath}"/>
                 <span class="attributes">
                     <table>
                         <tbody>
@@ -181,7 +185,7 @@
                             <tr>
                                 <td>Reading</td>
                                 <td>
-                                    <xsl:value-of select="text()"/>
+                                    <xsl:value-of select="if (matches(text(),'^\p{Lu}+$')) then text() else lower-case(text())"/>
                                 </td>
                             </tr>
                             <tr>
