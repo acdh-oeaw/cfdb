@@ -104,9 +104,9 @@ declare function api:log($msg) as empty() {
  : @param $scribe: filter tablets by scribe (case insensitive substring match)
  : @param $city: filter tablets by city (case insensitive substring match)
  : @param $periodd: filter tablets by period (substring match)
- : @param $anteQuem: filter tablets by anteQuem date (exact match)
- : @param $postQuem: filter tablets by anteQuem date (exact match)
- : @param $date: filter tablets by date (exact match)
+ : @param $anteQuem: filter tablets by anteQuem date (substring match)
+ : @param $postQuem: filter tablets by anteQuem date (substring match)
+ : @param $date: filter tablets by date (substring match)
  : @param $dateBabylonian: filter tablets by babylonian date (exact match)
  : @param $ductus: filter tablets by ductus attribute(exact match)
  : NB: only GET is supported on this endpoint 
@@ -150,9 +150,9 @@ function api:list-tablets-as-json($text as xs:string*, $region as xs:string*, $a
  : @param $scribe: filter tablets by scribe (case insensitive substring match)
  : @param $city: filter tablets by city (case insensitive substring match)
  : @param $periodd: filter tablets by period (substring match)
- : @param $anteQuem: filter tablets by anteQuem date (exact match)
- : @param $postQuem: filter tablets by anteQuem date (exact match)
- : @param $date: filter tablets by date (exact match)
+ : @param $anteQuem: filter tablets by anteQuem date (substring match)
+ : @param $postQuem: filter tablets by anteQuem date (substring match)
+ : @param $date: filter tablets by date (substring match)
  : @param $dateBabylonian: filter tablets by babylonian date (exact match)
  : @param $ductus: filter tablets by ductus attribute(exact match)
  : NB: only GET is supported on this endpoint 
@@ -198,10 +198,10 @@ declare %private function api:do-filter-tablets($text as xs:string*, $region as 
         if ($scribe != '') then <filter key="scribe">{$scribe[1]}</filter> else (),
         if ($city != '') then <filter key="city">{$city[1]}</filter> else (),
         if ($period != '') then <filter key="period">{$period[1]}</filter> else (),
-        if ($anteQuem != '') then <filter key="anteQuem">{$anteQuem[1]}</filter> else (),
-        if ($postQuem != '') then <filter key="postQuem">{$postQuem[1]}</filter> else (),
-        if ($date != '') then <filter key="date">{$date[1]}</filter> else (),
-        if ($dateBabylonian != '') then <filter key="dateBabylonian">{$dateBabylonian[1]}</filter> else (),
+        if ($anteQuem != '') then <filter key="anteQuem">{util:unescape-uri($anteQuem[1],'UTF-8')}</filter> else (),
+        if ($postQuem != '') then <filter key="postQuem">{util:unescape-uri($postQuem[1],'UTF-8')}</filter> else (),
+        if ($date != '') then <filter key="date">{util:unescape-uri($date[1],'UTF-8')}</filter> else (),
+        if ($dateBabylonian != '') then <filter key="dateBabylonian">{util:unescape-uri($dateBabylonian[1],'UTF-8')}</filter> else (),
         if ($ductus != '') then <filter key="ductus">{$ductus[1]}</filter> else ()
     )
     return cfdb:tablets($filter)

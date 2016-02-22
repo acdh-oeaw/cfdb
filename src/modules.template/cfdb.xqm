@@ -110,7 +110,7 @@ declare %private function cfdb:filter-tablets($filters as element(filter)+, $res
  :)
 declare %private function cfdb:tablet-by-facet($key as xs:string, $filterValue as item()) as node()* {
     let $value := if ($filterValue = "[null]") then "" else $filterValue
-    let $facet :=  
+    let $facet := 
         switch ($key)
             case "text"             return collection($config:tablets-root)//tei:msIdentifier/tei:idno[. = $value]
             case "title"            return collection($config:tablets-root)//tei:teiHeader/tei:fileDesc/tei:titleStmt/tei:title[contains(., $value)]
@@ -120,9 +120,9 @@ declare %private function cfdb:tablet-by-facet($key as xs:string, $filterValue a
             case "scribe"           return collection($config:tablets-root)//tei:persName[@role = "scribe"][contains(., $value, "?strength=secondary")]
             case "city"             return collection($config:tablets-root)//tei:origPlace/tei:placeName[contains(., $value, "?strength=secondary")]
             case "period"           return collection($config:tablets-root)//tei:origDate/tei:date[@calendar = '#gregorian'][contains(@period, $value)]
-            case "anteQuem"         return collection($config:tablets-root)//tei:origDate/tei:date[@calendar = '#gregorian'][@notAfter = $value]
-            case "postQuem"         return collection($config:tablets-root)//tei:origDate/tei:date[@calendar = '#gregorian'][@notBefore = $value]
-            case "date"             return collection($config:tablets-root)//tei:origDate/tei:date[@calendar = '#gregorian'][. = $value]
+            case "anteQuem"         return collection($config:tablets-root)//tei:origDate/tei:date[@calendar = '#gregorian'][contains(@notAfter, $value)]
+            case "postQuem"         return collection($config:tablets-root)//tei:origDate/tei:date[@calendar = '#gregorian'][contains(@notAfter, $value)]
+            case "date"             return collection($config:tablets-root)//tei:origDate/tei:date[@calendar = '#gregorian'][contains(@notAfter, $value)]
             case "dateBabylonian"   return collection($config:tablets-root)//tei:origDate/tei:date[@calendar = '#babylonian'][. = $value]
             case "ductus"           return collection($config:tablets-root)//tei:f[@name = 'ductus'][tei:symbol/@value = $value]
             default return ()

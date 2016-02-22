@@ -43,7 +43,7 @@ $(document).ready(function(){
                 { name: "period", title: "Period", type: "text", autosearch: true },
                 { name: "anteQuem", title: "Ante Quem", type: "text", autosearch: true },
                 { name: "postQuem", title: "Post Quem", type: "text", autosearch: true },
-                { name: "date", title: "Date",  type: "number", autosearch: true },
+                { name: "date", title: "Date",  type: "text", autosearch: true },
                 { name: "dateBabylonian", title: "Date (Babylonian)", type: "text", autosearch: true },
                 { name: "ductus", title: "Ductus", type: "text", autosearch:true},
                 { type: "control", editButton: false, deleteButton: false }
