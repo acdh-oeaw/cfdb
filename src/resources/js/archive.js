@@ -159,6 +159,7 @@ var uploader = new plupload.Uploader({
  
             document.getElementById('uploadarchive').onclick = function() {
                 uploader.start();
+                $('.progress-bar').show();
                 $('#input-upload-snapshot .spinner').show();
                 return false;
             };
@@ -218,9 +219,9 @@ $(document).ready(function(){
     uploader.init();
     uploader.bind('UploadProgress', function(up, file) {
         $('.progress-bar').attr('aria-valuenow', file.percent);
-        $('.progress-bar').style('width', file.percent + "%");
-        $('.progress-bar').style('width', file.percent + "%");
-        $('.progress-bar').style('min-width', file.percent + "%");
-        $('.progress-bar').html(file.percent + "%");
+        $('.progress-bar').css({
+            'width' : file.percent + "%",
+            'min-width' : file.percent + "%"
+        }).html(file.percent + "%");
     });
 }); 
