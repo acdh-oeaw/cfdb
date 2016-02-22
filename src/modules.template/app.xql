@@ -111,14 +111,16 @@ declare function app:showGlyph($node as node(), $model as map(*), $glyph-id as x
 
 (:~ The function app:renderAttributes displays annotation data of the glyph $g:)
 declare function app:renderAttributes($g as element(tei:g)) as element(span) {
-    <span class="attributes" xmlns="http://www.w3.org/1999/xhtml">
-        <span class="attribute">Glyph: {a:sign($g)}</span>
-        <span class="attribute">Reading: {xs:string($g/text())}</span>
-        <span class="attribute">Context: {xs:string($g/parent::tei:seg)}</span>
-        <span class="attribute">
-            <a href="editTablets.html?t={$g/root(.)//tei:title}">edit tablet</a>
+    let $props := a:get-attributes($g, ())
+    return
+        <span class="attributes" xmlns="http://www.w3.org/1999/xhtml">
+            <span class="attribute">Glyph: {$props/sign}</span>
+            <span class="attribute">Reading: {$props/reading}</span>
+            <span class="attribute">Context: {$props/context}</span>
+            <span class="attribute">
+                <a href="editTablets.html?t={$g/root(.)//tei:title}">edit tablet</a>
+            </span>
         </span>
-    </span>
 };
 
 (:~ The function app:signlistNav displays the navigation and filter controls for the sign list (used in index.html) :)
@@ -247,11 +249,13 @@ function app:signlist($node as node(), $model as map(), $s as xs:string*, $order
                             let $creation := $g/root()//tei:creation,
                                 $date := $creation/tei:origDate/tei:date,
                                 $period := $date[@period]/@period, 
-                                $city := $creation/tei:origPlace/tei:placeName,
-                                $context := $g/parent::tei:seg
+                                $city := $creation/tei:origPlace/tei:placeName
                             let $dateBefore := ($date[@calendar = "#gregorian"], $date[@calendar = "#gregorian"]/@notAfter)[. != ""][1]/xs:integer(if(contains(.,'~')) then replace(.,'~','') else .),
                                 $dateAfter := ($date[@calendar = "#gregorian"], $date[@calendar = "#gregorian"]/@notBefore)[. != ""][1]/xs:integer(if(contains(.,'~')) then replace(.,'~','') else .)
                             let $dateFilter := count(($dateBefore,$dateAfter)) gt 0 and not(some $d in ($dateBefore gt $before, $dateAfter lt $after) satisfies exists($d) and $d = false())
+                            let $props := a:get-attributes($g, ()), 
+                                $reading := $props/*[local-name() = "reading"],
+                                $context := $props/*[local-name() = "context"]
                             let $orderexpr := switch ($order)
                                 case "date" return $date[@calendar = '#gregorian']/replace(.,'^~','') 
                                 case "period" return $date[@calendar = '#gregorian']/replace(.,'^~','')
@@ -260,12 +264,12 @@ function app:signlist($node as node(), $model as map(), $s as xs:string*, $order
                             order by $orderexpr  
                             return 
                             <li class="span2 gThumbnail">
-                                <a href="#" class="thumbnail">
+                                <a href="tablet.html?id={$tablet-id}" class="thumbnail">
                                     <img src="{$facsurl}"/>
                                     <span class="attributes" style="width:auto; min-width: 250px;">
                                         <span class="attribute"><span class="attribute-label">Text:</span><span class="attribute-value">{$museumNo}</span></span>
                                         <span class="attribute"><span class="attribute-label">Archive:</span><span class="attribute-value">{$archive}</span></span>
-                                        <span class="attribute"><span class="attribute-label">Reading:</span><span class="attribute-value">{$g}</span></span>
+                                        <span class="attribute"><span class="attribute-label">Reading:</span><span class="attribute-value">{$reading}</span></span>
                                         <span class="attribute"><span class="attribute-label">Context:</span><span class="attribute-value">{$context}</span></span>
                                         <span class="attribute"><span class="attribute-label">City:</span><span class="attribute-value">{$city}</span></span>
                                         <span class="attribute"><span class="attribute-label">Period:</span><span class="attribute-value">{$date[@period]/@period}</span></span>
