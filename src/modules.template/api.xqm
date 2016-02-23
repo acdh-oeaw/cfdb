@@ -10,6 +10,7 @@ import module namespace annotation = "@app.uri@/annotations" at "xmldb:exist:///
 import module namespace archive = "@app.uri@/archive" at "xmldb:exist:///db/apps/@app.name@/modules/archive.xqm";
 import module namespace xqjson = "http://xqilla.sourceforge.net/lib/xqjson";
 import module namespace app="@app.uri@/templates" at "xmldb:exist:///db/apps/@app.name@/modules/app.xql";
+import module namespace graph = "@app.uri@/graph" at "xmldb:exist:///db/apps/@app.name@/modules/graph.xqm";
 
 declare namespace rest = "http://exquery.org/ns/restxq";
 declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
@@ -688,4 +689,31 @@ function api:set-instance-settings($key as xs:string*, $value as item()*, $forma
                 if ($response instance of element(error))
                 then api:response("error", $response)
                 else api:response("ok", $response, $format, "api:set-instance-settings")
+};
+
+(: ************************************* :)
+(: ********* Graph endpoint *********** :)
+(: ************************************* :)
+
+
+declare 
+    %rest:GET
+    %rest:path("/cfdb/graphs")
+    %rest:header-param("format", "{$format}", "xml")
+function api:list-graphs($format as xs:string*) {
+    let $data := graph:list()
+    return 
+        if ($data instance of element(error)) then api:response("error", $data, $format, "api:graph")
+        else api:response("ok", $data, $format, "api:graph")
+};
+
+declare 
+    %rest:GET
+    %rest:path("/cfdb/graphs/{$name}")
+    %rest:header-param("format", "{$format}", "xml")
+function api:graph($name as xs:string, $format as xs:string*) {
+    let $data := graph:get-data($name)
+    return 
+        if ($data instance of element(error)) then api:response("error", $data, $format, "api:graph")
+        else api:response("ok", $data, $format, "api:graph")
 };
