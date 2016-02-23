@@ -66,7 +66,7 @@ body { background: none!important; }
 .archive-md {display:none;}
 .archive-md-link:hover {position:relative;}
 .archive-md-link:hover > .archive-md {background: white; border: 1px solid gray; display: block; left: 42pt; min-width: 600px; padding: 5px; position: absolute; top: -40px; z-index: 5; }
-#input-upload-snapshot .spinner, #input-create-snapshot .spinner, #input-upload-snapshot .progress-bar {display:none;}
+#input-upload-snapshot .spinner, #input-create-snapshot .spinner, .progress {display:none;}
 #snapshots tr:hover {background: lightgray; }
 #snapshots .fa {padding-left: 19px; font-size: large; }
 .fa.fa-check-square.deployed {color: #3db93d;}

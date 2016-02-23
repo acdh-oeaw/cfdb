@@ -159,7 +159,7 @@ var uploader = new plupload.Uploader({
  
             document.getElementById('uploadarchive').onclick = function() {
                 uploader.start();
-                $('.progress-bar').show();
+                $('.progress').show();
                 $('#input-upload-snapshot .spinner').show();
                 return false;
             };
@@ -176,6 +176,7 @@ var uploader = new plupload.Uploader({
             var entry = document.getElementById(file.id);
             entry.parentNode.removeChild(entry);
             cfdb.archive.list();
+            $('.progress').hide();
         },
         
  /*
