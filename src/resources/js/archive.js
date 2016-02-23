@@ -219,8 +219,8 @@ $(document).ready(function(){
     });
     uploader.init();
     uploader.bind('UploadProgress', function(up, file) {
-        $('.progress-bar').attr('aria-valuenow', file.percent);
-        $('.progress-bar').css({
+        $('.progress .bar').attr('aria-valuenow', file.percent);
+        $('.progress .bar').css({
             'width' : file.percent + "%",
             'min-width' : file.percent + "%"
         }).html(file.percent + "%");
