@@ -12,19 +12,34 @@ import module namespace xqjson = "http://xqilla.sourceforge.net/lib/xqjson";
 import module namespace app="@app.uri@/templates" at "xmldb:exist:///db/apps/@app.name@/modules/app.xql";
 import module namespace graph = "@app.uri@/graph" at "xmldb:exist:///db/apps/@app.name@/modules/graph.xqm";
 
+
 declare namespace rest = "http://exquery.org/ns/restxq";
 declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
 declare namespace json = "http://www.json.org";
 declare namespace tei = "http://www.tei-c.org/ns/1.0";
 
-declare function api:format-response-payload($items as item()*, $format as xs:string, $status, $caller as xs:string) as element(api:reponse) {
+declare function api:format-response-payload($items as item()*, $format as xs:string, $status, $caller as xs:string) (:as element(api:reponse):) {
+    if (count($items) eq 1 and $items instance of element(xqjson:payload))
+    then 
+        let $object := 
+            <json type="object">
+                <pair name="status">{$status}</pair>
+                <pair name="query">{$caller}</pair>
+                <pair name="timestamp">{current-dateTime()}</pair>
+                <pair name="user">{xmldb:get-current-user()}</pair>
+                <pair name="format">{$format}</pair>
+                <pair name="items">{$items/xs:integer(@items)}</pair>
+                <pair name="payload" type="{$items/@type}">{$items/*}</pair>
+            </json>
+        return xqjson:serialize-json($object)
+    else 
     <cfdb:response status="{$status}" query="{$caller}" timestamp="{current-dateTime()}" user="{xmldb:get-current-user()}" format="{$format}" items="{count($items)}">{
     for $i in $items
     return
         typeswitch ($i) 
             case element() return 
-                if ($format eq "xml") then $i
-                else if ($format eq "json") then <cfdb:payload>{$i}</cfdb:payload> 
+                if ($format eq "xml") then $i else 
+                if ($format eq "json") then <cfdb:payload>{$i}</cfdb:payload> 
                 else data($i) 
             case map() return
                 if ($format eq "xml") then <cfdb:item>{for $key in map:keys($i) return <cfdb:property name="{$key}">{map:get($i, $key)}</cfdb:property>}</cfdb:item> else
@@ -66,15 +81,22 @@ declare function api:response($status, $load, $format as xs:string?, $caller as 
             case "text" return "text/plain"
             default return "application/xml" 
     let $ser :=
-        <output:serialization-parameters>
-            <output:method value="{$format}"/>
-        </output:serialization-parameters>
+        (: if the payload is in JSON XML, the XML is serialized by api:format-response-payload() 
+        which calls the xqjson serializer, thus serialization is not needed any more; in all
+        other cases we rely on the existdb serializer :)
+        if ($format eq "json" and $load instance of element(xqjson:payload))
+        then ()
+        else 
+            <output:serialization-parameters>
+                <output:method value="{$format}"/>
+            </output:serialization-parameters>
     return (
         <rest:response>
             {$ser}
             <http:response status="{$statusCode}">
                 {if ($statusCode != 200) then attribute reason {$load} else ()}
-                <http:header name="Content-Type" value="{$content-type}"/>
+                <http:header name="Content-Type" value="{$content-type}; charset=utf-8"/>
+                
             </http:response>            
         </rest:response>,
         if ($statusCode = 200) 
@@ -699,21 +721,56 @@ function api:set-instance-settings($key as xs:string*, $value as item()*, $forma
 declare 
     %rest:GET
     %rest:path("/cfdb/graphs")
-    %rest:header-param("format", "{$format}", "xml")
+    %rest:header-param("format", "{$format}", "json")
 function api:list-graphs($format as xs:string*) {
     let $data := graph:list()
     return 
         if ($data instance of element(error)) then api:response("error", $data, $format, "api:graph")
-        else api:response("ok", $data, $format, "api:graph")
+        else api:response("ok", $data/*, $format, "api:graph")
 };
 
 declare 
     %rest:GET
     %rest:path("/cfdb/graphs/{$name}")
-    %rest:header-param("format", "{$format}", "xml")
+    %rest:header-param("format", "{$format}", "json")
 function api:graph($name as xs:string, $format as xs:string*) {
-    let $data := graph:get-data($name)
+    let $data := graph:get-data($name),
+        $data-formatted := 
+            if (not($data instance of element(graph:data))) then () (: no need to re-format error content :)
+            else if ($format = "json") then api:graph-data-to-json-array($data) else $data 
     return 
         if ($data instance of element(error)) then api:response("error", $data, $format, "api:graph")
-        else api:response("ok", $data, $format, "api:graph")
+        else api:response("ok", $data-formatted, $format, "api:graph")
+};
+
+
+(:~ This function formats the data returned by graph functions into the output format 
+ :  needed by the used graph library, currently this is the Google graph rendering API:
+ :  
+ :  [
+ :      [column 1 title, column 2 name, ...], 
+ :      [row 1 column 1, row 1 column 2, ...], 
+ :      [row 2 column 1, row 2 column 2, ...] 
+ :  ]
+ :)
+declare function api:graph-data-to-json-array($data as element(graph:data)) {
+    <xqjson:payload type="array" items="{$data/@rows}">{
+        let $columns:= distinct-values($data//graph:value/@name)
+        return (
+            (: column heads :)
+            <item type="array">{
+                for $c in $columns
+                return <item type="string">{$c}</item> 
+            }</item>,
+            
+            (: row data :)
+            for $r in $data//graph:row
+            return
+            <item type="array">{
+                for $c in $columns
+                let $v := $r/graph:value[@name = $c]
+                return <item type="{$v/@type}">{$v}</item> 
+            }</item>
+        )
+    }</xqjson:payload>
 };
