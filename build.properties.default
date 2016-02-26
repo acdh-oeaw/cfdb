@@ -8,6 +8,9 @@ app.archive-format.ns=http://www.oeaw.ac.at/acdh/cfdb-archive-format/1.0
 
 # app.version= -> moved to .version
 
+#operation mode of the instance 
+app.operationmode=public
+
 # the base collection (relative to /db/) where to store all data
 data.dir=cfdb-data
 

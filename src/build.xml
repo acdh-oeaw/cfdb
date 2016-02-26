@@ -148,6 +148,13 @@
                 token="@instance.uuid@"
                 value="${instance.uuid}"/>
         </replace>
+        <replace 
+            file="config.xml" 
+            propertyFile="../build.properties">
+            <replacefilter 
+                token="@app.operationmode@" 
+                property="app.operationmode"/>
+        </replace>
     </target>
     
     <!--<target name="install" depends="clean,xar">
