@@ -72,6 +72,7 @@
         <copy file="editStdSigns.template.html" tofile="editStdSigns.html" overwrite="true" />
         <copy file="editTablets.template.html" tofile="editTablets.html" overwrite="true" />
         <copy file="sync.template.xql" tofile="sync.xql" overwrite="true" />
+        <copy file="config.template.xml" tofile="config.xml" overwrite="true"/>
         
         <replace dir="." includes="*"
             excludes="build.xml *.template.*"
@@ -147,6 +148,13 @@
             <replacefilter
                 token="@instance.uuid@"
                 value="${instance.uuid}"/>
+        </replace>
+        <replace 
+            file="config.xml" 
+            propertyFile="../build.properties">
+            <replacefilter 
+                token="@app.operationmode@" 
+                property="app.operationmode"/>
         </replace>
     </target>
     

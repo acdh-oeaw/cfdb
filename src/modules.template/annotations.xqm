@@ -218,7 +218,7 @@ declare function annotation:read($tablet as element(tei:TEI), $surface-id as xs:
         else ()
 };
 
-declare function annotation:get-attributes($glyph as element(tei:g), $filter as xs:string*) as element(annotation)* {
+declare function annotation:get-attributes($glyph as element(tei:g), $filter as xs:string?) as element(annotation)* {
     let $annotation-id := substring-after($glyph/@xml:id, 'glyph_'),
         $tablet := root($glyph)/tei:TEI,
         $tablet-id := tablet:id($tablet),
@@ -229,21 +229,46 @@ declare function annotation:get-attributes($glyph as element(tei:g), $filter as 
         $context := $glyph/parent::tei:seg[@type = "context"],
         $char := annotation:char($tablet, $annotation-id),
         $note := annotation:note($tablet, $annotation-id)[1]
+    let $creation := $tablet//tei:creation
+    let $scribe := $tablet//tei:persName[@role = "scribe"],
+        $place := $creation//tei:origPlace/tei:placeName,
+        $archive := $tablet//tei:collection[@type = "archive"]/xs:string(.)
+    let $date-elt := $creation/tei:origDate/tei:date[@calendar = '#gregorian'],
+        $period := $date-elt/xs:string(@period),
+        $date-babylonian := $creation//tei:date[@calendar = '#babylonian'],
+        $date-after := replace($date-elt/@notBefore, '\P{N}', ''),
+        $date-before := replace($date-elt/@notAfter, '\P{N}', '')
+    let $date := replace($date-elt, '\P{N}', ''),
+        $date-integer := if ($date != '' and $date castable as xs:integer) then xs:integer($date) else (),
+        $after-integer :=  if ($date-after castable as xs:integer) then xs:integer($date-after) else (),
+        $before-integer := if ($date-before castable as xs:integer) then xs:integer($date-before) else ()
+    let $effectiveDates := ($date-integer,$after-integer,$before-integer)    
     let $data := 
         <annotation>
             <uuid>{$annotation-id}</uuid>
             <tablet>{$tablet-id}</tablet>
-            <img>/exist/apps/@app.name@/$app-root/data/tablets/{$tablet-id||"/"||$glyph-img}</img>
+            <!-- size and location on tablet -->
+            <img>@app.name@/$tablets-root/{$tablet-id||"/"||$glyph-img}</img>
             <surface>{$surface-id}</surface>
             <x>{$glyph-zone/number(@ulx)}</x>
             <y>{$glyph-zone/number(@uly)}</y>
             <width>{number($glyph-zone/@lrx) - number($glyph-zone/@ulx)}</width>
             <height>{number($glyph-zone/@lry) - number($glyph-zone/@uly)}</height>
+            <!-- annotation data -->
             <sign>{$glyph/xs:string(@type)}</sign>
             <reading>{if (matches($glyph/text(),"^\p{Lu}+$")) then $glyph/text() else lower-case($glyph/text())}</reading>
             <context>{annotation:renderContext($context)}</context>
             <sequence>{$char/tei:charProp[tei:localName='sequence']/tei:value/text()}</sequence>
             <note>{$note/text()}</note>
+            <!-- contextual data -->
+            <date-verbatim>{$date-elt/xs:string(.)}</date-verbatim>
+            <date-min>{min($effectiveDates)}</date-min>
+            <date-max>{max($effectiveDates)}</date-max>
+            <period>{$period}</period>
+            <date-babylonian>{$date-babylonian/xs:string(.)}</date-babylonian>
+            <scribe>{$scribe}</scribe>
+            <place>{$place}</place>
+            <archive>{$archive}</archive>
         </annotation>
     return  
         if ($filter = '') 

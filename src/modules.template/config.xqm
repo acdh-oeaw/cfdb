@@ -46,6 +46,9 @@ declare variable $config:config-valid-values := map {
     "operation-mode" := ("public", "curation")
 };
 
+(: allowed values for "groupby" parameter in browse.html / cfdb:list-annotations :)
+declare variable $config:valid-grouping-keys := ("scribe", "period", "region", "archive"); 
+
 
 (:~ $config:operation-mode contains the value of the operation-mode setting. 
  : each cfdb instance can work in two modes of operation: either "public mode" or 

@@ -9,9 +9,10 @@ return
 try{
     let $source  := request:get-parameter("source",$config:app-root)
     let $target-base := request:get-parameter("target-base",$target-base-default)
-    let $cfdb :=  file:sync($source, $target-base||"/cfdb/src", ()) 
-    let $cfdb-data :=  file:sync($source||"/data", $target-base||"/cfdb-data", ())
-    return ($cfdb,$cfdb-data)
+    let $cfdb :=  file:sync($source, $target-base||"/cfdb/sync", ()) 
+    (:let $cfdb-data :=  file:sync($source||"/data", $target-base||"/cfdb-data", ())
+    return ($cfdb,$cfdb-data):)
+    return $cfdb
     
     
 } catch * {

@@ -8,6 +8,9 @@
             <h3>
                 <xsl:value-of select="tei:teiHeader/tei:fileDesc/tei:titleStmt/tei:title"/>
             </h3>
+            <p>
+                <a href="$tablets-root/{@xml:id}/{@xml:id}.xml">show XML source</a>
+            </p>
             <table class="table">
                 <xsl:apply-templates select="tei:teiHeader/tei:fileDesc/tei:sourceDesc/tei:msDesc"/>
                 <xsl:apply-templates select="tei:teiHeader/tei:profileDesc"/>
