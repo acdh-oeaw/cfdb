@@ -42,21 +42,70 @@ declare function cfdb:listStdSigns() as element(tei:char)* {
 
 (: lists all annotations in the database :)
 declare function cfdb:list-annotations() {
-    cfdb:list-annotations((),())
+    cfdb:list-annotations((), (), (), (), ())
 };
 
-(: lists all annotations in the database, optionally filtering by a given $category and value:)
-declare function cfdb:list-annotations($category as xs:string?, $value as xs:string?) {
+declare function cfdb:list-annotations($category as xs:string?, $value as xs:string*) {
+    cfdb:list-annotations($category, $value, (), (), ())
+};
+
+declare function cfdb:list-annotations($category as xs:string?, $value as xs:string*, $after as xs:integer, $before as xs:integer) {
+    cfdb:list-annotations($category, $value, $after, $before, (), ())
+};
+
+(: lists all annotations in the database, optionally filtering by a given $category and value, grouped by one or more group clasuses and with a min/max date border applied :)
+declare function cfdb:list-annotations($category as xs:string?, $value as xs:string*, $after as xs:integer?, $before as xs:integer?, $groupby-input as xs:string*, $collapse-signs as xs:boolean?) {
+    let $groupby := $groupby-input[. = $config:valid-grouping-keys]
     let $glyphs := 
         if ($category = "sign-type") then collection($config:tablets-root)//tei:g[@type = $value] else
         if ($category = "sign-number") then collection($config:tablets-root)//tei:g[@n = $value] else
         if ($category = "id") then collection($config:tablets-root)//tei:g[@xml:id = $value] else
-        if ($category = "period") then collection($config:tablets-root)//tei:g[root(.)//tei:origPlace/tei:placeName = $value] else 
+        if ($category = "place") then collection($config:tablets-root)//tei:g[root(.)//tei:origPlace/tei:placeName = $value] else
+        if ($category = "period") then collection($config:tablets-root)//tei:g[root(.)//tei:creation/tei:date/@period = $value] else
         if (not(exists($category))) then collection($config:tablets-root)//tei:g
         else ()
-    return <annotations>{$glyphs!annotations:get-attributes(., ())}</annotations>
+    let $annotations := $glyphs!annotations:get-attributes(., ()) 
+    let $annotations-filtered := 
+        for $a in $annotations 
+        let $date-min := if ($a//date-min castable as xs:integer) then xs:integer($a//date-min) else (),
+            $date-max := if ($a//date-max castable as xs:integer) then xs:integer($a//date-max) else ()
+        let $include-before := if (exists($before)) then $before lt $date-min else true(),
+            $include-after := if (exists($after)) then $after gt $date-max else true()
+        order by ($date-min, $date-max)[1] descending
+        return 
+            if (not(exists($date-max) or exists($date-min))) then ()
+            else if (every $i in ($include-before, $include-after) satisfies $i eq true())
+            then $a
+            else ()
+    return
+    if (every $g in $groupby satisfies $g = '') 
+    then <annotations items="{count($annotations-filtered)}">{$annotations-filtered}</annotations>
+    else 
+        let $groups := 
+            for $group in $annotations-filtered
+                let $period := $group//period,
+                    $place := $group//place,
+                    $scribe := $group//scribe,
+                    $archive := $group//archive 
+                let $groupValue := string-join(
+                    for $gEx in $groupby
+                    let $prefix := if (count($groupby) gt 1) then $gEx||": " else ""
+                    return 
+                        switch ($gEx)
+                        case "archive" return $prefix||($archive, "[n/a]")[. != ""][1]
+                        case "period" return $prefix||($period, "[n/a]")[. != ""][1]
+                        case "region" return $prefix||($place, "[n/a]")[. != ""][1]
+                        case "scribe" return $prefix||($scribe, "[n/a]")[. != ""][1]
+                        default return "[unknown grouping clause '"||$gEx||"']"
+                    , ", ")
+            group by $groupValue
+            order by $groupValue ascending
+            return <group grouping-clause="{$groupby}" grouping-value="{$groupValue}" items="{count($group)}">{$group}</group> 
+        return 
+            <annotations items="{count($annotations-filtered)}" groups="{count($groups)}">{
+                for $gr in $groups order by $gr/@items descending return $gr
+            }</annotations>
 };
-
 
 (:~
  : This function lists all tablets in the database as TEI elements.
