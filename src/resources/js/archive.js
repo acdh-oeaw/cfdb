@@ -179,11 +179,21 @@ var uploader = new plupload.Uploader({
             $('.progress').hide();
         },
         
- /*
+ 
         UploadProgress: function(up, file) {
-            document.getElementById(file.id).getElementsByTagName('b')[0].innerHTML = '<span>' + file.percent + "%</span>";
+            $('.progress .bar').css({
+                'width' : file.percent + "%",
+                'min-width' : file.percent + "%"
+            }).html(file.percent + "%");
         },
- */
+        
+        StateChanged: function(up) {
+            if (up.state == 1) {
+                $('#input-upload-snapshot .spinner').hide();
+                $('.progress').hide();
+            }
+        },
+ 
         Error: function(up, err) {
             /*document.getElementById('console').innerHTML += "\nError #" + err.code + ": " + err.message;*/
             $('#input-upload-snapshot .spinner').hide();
@@ -218,11 +228,4 @@ $(document).ready(function(){
         cfdb.archive.create(version);
     });
     uploader.init();
-    uploader.bind('UploadProgress', function(up, file) {
-        $('.progress .bar').attr('aria-valuenow', file.percent);
-        $('.progress .bar').css({
-            'width' : file.percent + "%",
-            'min-width' : file.percent + "%"
-        }).html(file.percent + "%");
-    });
 }); 
