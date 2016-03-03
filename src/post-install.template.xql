@@ -111,3 +111,5 @@ sm:chmod(xs:anyURI($config:app-root||"/modules/api.xqm"), "rwxr-xr--"),
 (: make configuration file $app-root/conf.xml owned by editors group:)
 sm:chgrp(xs:anyURI($config:app-root||"/config.xml"), "cfdbEditors"),
 sm:chmod(xs:anyURI($config:app-root||"/config.xml"), "rwxrwxr-x")
+
+,(: FOR TESTING PURPOSES ONLY Create default editor user :)sm:create-account("edi", "pwd", "cfdbEditors")
