@@ -72,6 +72,7 @@
         <copy file="editStdSigns.template.html" tofile="editStdSigns.html" overwrite="true" />
         <copy file="editTablets.template.html" tofile="editTablets.html" overwrite="true" />
         <copy file="sync.template.xql" tofile="sync.xql" overwrite="true" />
+        <copy file="config.template.xml" tofile="repo.xml" overwrite="true"/>
         
         <replace dir="." includes="*"
             excludes="build.xml *.template.*"
