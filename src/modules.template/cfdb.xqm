@@ -42,11 +42,11 @@ declare function cfdb:listStdSigns() as element(tei:char)* {
 
 (: lists all annotations in the database :)
 declare function cfdb:list-annotations() {
-    cfdb:list-annotations((), (), (), (), ())
+    cfdb:list-annotations((), (), (), (), (), ())
 };
 
 declare function cfdb:list-annotations($category as xs:string?, $value as xs:string*) {
-    cfdb:list-annotations($category, $value, (), (), ())
+    cfdb:list-annotations($category, $value, (), (), (), () )
 };
 
 declare function cfdb:list-annotations($category as xs:string?, $value as xs:string*, $after as xs:integer, $before as xs:integer) {

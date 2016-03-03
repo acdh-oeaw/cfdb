@@ -202,10 +202,10 @@ function app:signlist($node as node(), $model as map(), $s as xs:string*, $order
                             "?",
                             string-join(for $si in $s return concat('s=',$si),'&amp;s=')
                         )
-    let $annotations := if ($collapse-signs = "true") then cfdb:list-annotations("sign-type", $s, $after, $before, $groupby) else ()
+    let $annotations := if ($collapse-signs = "true") then cfdb:list-annotations("sign-type", $s, $after, $before, $groupby, true()) else ()
     return
         for $ss at $spos in $s 
-            let $annotations := if ($collapse-signs = "true") then $annotations else cfdb:list-annotations("sign-type", $ss, $after, $before, $groupby)
+            let $annotations := if ($collapse-signs = "true") then $annotations else cfdb:list-annotations("sign-type", $ss, $after, $before, $groupby, false())
             let $stdSign := $stdSigns[tei:charName = $ss],
                 $signNumber := xs:integer(replace($stdSign/@n, '\P{N}', '')),
                 $annotations-of-sign-type := $annotations//annotation[sign = $ss],
