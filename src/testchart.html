@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<div xmlns="http://www.w3.org/1999/xhtml" data-template="templates:surround" data-template-with="templates/page.html" data-template-at="content">
+    <div style="text-align:right">
+        <select id="chartselector">
+            <option value="standardSignDistribution">Signs per Type</option>
+            <option value="periodDistribution">Tables per Period</option>
+            <option value="regionDistribution">Tables per Region</option>
+        </select>
+    </div>
+    <div>
+        <h1>Please - make a selection</h1>
+    </div>
+    <div id="container" style="min-width: 300px; height: 700px; margin: 0 auto"/>
+    <script src="https://code.highcharts.com/highcharts.js"/>
+    <script src="https://code.highcharts.com/modules/exporting.js"/>
+    <script type="text/javascript">
+        $("#chartselector").change(function(){
+        $('html, body').css("cursor", "wait");
+        var which_chart = $("#chartselector option:selected").val();
+        var header = $("#chartselector option:selected").text();
+        var url = "http://localhost:8080/exist/restxq/cfdb/graphs/"+which_chart
+        console.log(url)
+        $("h1").text(header);
+        $.getJSON( url, function( data ) {
+        $('html, body').css("cursor", "default");        
+        var items = (data.payload).slice(1, data.payload.items);
+        var measuredObject = data.measuredObject
+        console.log(items);
+        $(function () {
+        $('#container').highcharts({
+        chart: {
+        type: 'column'
+        },
+        title: {
+        text: 'Stacked column chart'
+        },
+        xAxis: {
+        categories: ['Apples', 'Oranges', 'Pears', 'Grapes', 'Bananas']
+        },
+        yAxis: {
+        min: 0,
+        title: {
+        text: 'Total fruit consumption'
+        },
+        stackLabels: {
+        enabled: true,
+        style: {
+        fontWeight: 'bold',
+        }
+        }
+        },
+        legend: {
+        align: 'right',
+        x: -30,
+        verticalAlign: 'top',
+        y: 25,
+        floating: true,
+        borderColor: '#CCC',
+        borderWidth: 1,
+        shadow: false
+        },
+        tooltip: {
+        headerFormat: '{point.x}',
+        pointFormat: '{series.name}: {point.y}Total: {point.stackTotal}'
+        },
+        plotOptions: {
+        column: {
+        stacking: 'normal',
+        dataLabels: {
+        enabled: true,
+        style: {
+        textShadow: '0 0 3px black'
+        }
+        }
+        }
+        },
+        series: [{
+        name: 'John',
+        data: [5, 3, 4, 7, 2]
+        }, {
+        name: 'Jane',
+        data: [2, 2, 3, 2, 1]
+        }, {
+        name: 'Joe',
+        data: [3, 4, 4, 2, 5]
+        }]
+        });
+        });
+        });
+        });
+
+    </script>
+</div>

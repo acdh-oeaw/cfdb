@@ -12,7 +12,6 @@ import module namespace xqjson = "http://xqilla.sourceforge.net/lib/xqjson";
 import module namespace app="@app.uri@/templates" at "xmldb:exist:///db/apps/@app.name@/modules/app.xql";
 import module namespace graph = "@app.uri@/graph" at "xmldb:exist:///db/apps/@app.name@/modules/graph.xqm";
 
-
 declare namespace rest = "http://exquery.org/ns/restxq";
 declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
 declare namespace json = "http://www.json.org";
@@ -28,7 +27,7 @@ declare function api:format-response-payload($items as item()*, $format as xs:st
                 <pair name="timestamp">{current-dateTime()}</pair>
                 <pair name="user">{xmldb:get-current-user()}</pair>
                 <pair name="format">{$format}</pair>
-                <pair name="items">{$items/xs:integer(@items)}</pair>
+                {for $a in $items/@* return <pair name="{local-name($a)}">{data($a)}</pair>}
                 <pair name="payload" type="{$items/@type}">{$items/*}</pair>
             </json>
         return xqjson:serialize-json($object)
@@ -754,9 +753,11 @@ function api:graph($name as xs:string, $format as xs:string*) {
  :  ]
  :)
 declare function api:graph-data-to-json-array($data as element(graph:data)) {
-    <xqjson:payload type="array" items="{$data/@rows}">{
+    <xqjson:payload type="array">{
+        let $attributes := $data/@*
         let $columns:= distinct-values($data//graph:value/@name)
         return (
+            $attributes,
             (: column heads :)
             <item type="array">{
                 for $c in $columns

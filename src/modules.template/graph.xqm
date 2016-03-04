@@ -29,7 +29,7 @@ declare namespace json = "http://www.json.org";
 declare function graph:get-data($name as xs:string) {
     let $f := 
         try {
-            fn:function-lookup(QName("http://www.oeaw.ac.at/acdh/@app.name@/graph", $name), 0)
+            fn:function-lookup(QName("@app.uri@/graph", $name), 0)
         } catch * {
             <error>An error occured looking up graph function graph:{$name} in graph.xqm. ({$err:code} , {$err:description}, {$err:value})</error>
         }
@@ -71,12 +71,18 @@ function graph:standardSignDistribution() {
                     <graph:value name="type" type="string">{$type}</graph:value>
                     <graph:value name="count" type="number">{count($g)}</graph:value>
                </graph:row>
-    return <graph:data rows="{count($results)}">{$results}</graph:data>
+    return <graph:data
+        items="{count($results)}"
+        title="Signs per Type"
+        subtitle="A bar chart showing the distribution of sign types (standard signs) over the corpus."
+        legendx="Signs"
+        legendy="Number of Signs"
+         measuredObject="Signs">{$results}</graph:data>
 };
 
 declare  
     %graph:provides-data-for("a graph showing the distribution of tablets over periods in the corpus.") 
-function graph:periodDistribution() {     
+ function graph:periodDistribution() {     
     let $tablets := cfdb:tablets()
     let $results :=
         for $t in $tablets 
@@ -87,6 +93,33 @@ function graph:periodDistribution() {
                     <graph:value name="period" type="string">{xs:string($period)}</graph:value>
                     <graph:value name="count" type="number">{count($t)}</graph:value>
                </graph:row>
-    return <graph:data rows="{count($results)}">{$results}</graph:data>
+    return <graph:data items="{count($results)}"
+        title="Tablets per Periode"
+        subtitle="A bar chart showing the distribution of tablets over periods in the current corpus."
+        legendx="Period"
+        legendy="Number of Tablets"
+        measuredObject="Tablets">{$results}</graph:data>
 };
+
+declare  
+    %graph:provides-data-for("a graph showing the distribution of tablets over regions in the corpus.") 
+ function graph:regionDistribution() {     
+    let $tablets := cfdb:tablets()
+    let $results :=
+        for $t in $tablets 
+        let $region := $t//tei:region
+        group by $region
+        order by count($t) descending
+        return <graph:row>  
+                    <graph:value name="region" type="string">{xs:string($region)}</graph:value>
+                    <graph:value name="count" type="number">{count($t)}</graph:value>
+               </graph:row>
+    return <graph:data items="{count($results)}"
+        title="Tablets per Regions"
+        subtitle="A bar chart showing the distribution of tablets over regions in the current corpus."
+        legendx="Region"
+        legendy="Number of Tablets"
+        measuredObject="Tablets">{$results}</graph:data>
+};
+
 

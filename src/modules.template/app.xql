@@ -380,6 +380,9 @@ declare function app:menu-administration($node, $model) {
                     <li>
                         <a href="administration.html"><i class="fa fa-wrench"/>&#160;General Configuration</a>
                     </li>
+                    <li>
+                        <a href="charts.html"><i class="fa fa-bar-chart"></i>&#160;Charts</a>
+                    </li>  
                 </ul>
         </li>
     else ()
