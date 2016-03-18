@@ -142,6 +142,7 @@
         <xf:instance xmlns="" id="currentPeriod">
             <data period="">
                 <note xmlns="http://www.tei-c.org/ns/1.0" type="returnMsg"/>
+                <newPeriodName/>
             </data>
         </xf:instance>
         <xf:instance xmlns="" id="currentPlaceOfIssue">
@@ -352,6 +353,10 @@
             
             <xf:message ev:event="xforms-submit-error" level="ephemeral">removing period has failed (error-type: <xf:output value="event('error-type')"/>, status-code: <xf:output value="event('response-status-code')"/>)</xf:message>
             <xf:message ev:event="xforms-submit-done" level="ephemeral" ref="//tei:note[@type='returnMsg']">removing period succeeded</xf:message>
+        </xf:submission>
+        <xf:submission id="renamePeriodGlobally" method="execute" ref="instance('currentPeriod')" replace="instance" includenamespaceprefixes="#default" resource="exist:/db/apps/cfdb/api/renamePeriodGlobally.xql">
+            <xf:message ev:event="xforms-submit-error" level="ephemeral">renaming period has failed (error-type: <xf:output value="event('error-type')"/>, status-code: <xf:output value="event('response-status-code')"/>)</xf:message>
+            <xf:message ev:event="xforms-submit-done" level="ephemeral" ref="//tei:note[@type='returnMsg']">renaming period succeeded</xf:message>
         </xf:submission>
         <xf:submission id="removePlaceGlobally" method="execute" ref="instance('envelope')" replace="instance" resource="exist:/db/apps/cfdb/api/removePlaceGlobally.xql" omit-xml-declaration="true" encoding="ISO-8859-1">
             <xf:action ev:event="xforms-submit">
@@ -752,6 +757,11 @@
                                                                 <xf:label>Remove Period</xf:label>
                                                                 <bfc:show dialog="removePeriodConfirmDialog" ev:event="DOMActivate"/>
                                                             </xf:trigger>
+                                                            <xf:trigger>
+                                                                <xf:label>Rename Period</xf:label>
+                                                                <xf:setvalue ref="instance('prototypes')//tei:taxonomy[@xml:id = 'periods']//tei:catDesc" value="instance('taxonomies')//tei:taxonomy[@xml:id = 'periods']/tei:category[@xml:id = instance('tablet')/tei:teiHeader/tei:profileDesc/tei:creation/tei:origDate/tei:date/@period]/tei:catDesc/text()"/>
+                                                                <xf:toggle case="renamePeriod"/>
+                                                            </xf:trigger>
                                                             <bfc:dialog id="removePeriodConfirmDialog">
                                                                 <xf:group appearance="minimal">
                                                                     <xf:label>This will remove the selected period from the list of periods and <b>delete any reference to it from all tablets.</b>
@@ -791,6 +801,25 @@
                                                                 <xf:setvalue ref="instance('prototypes')/tei:taxonomy[@xml:id = 'periods']/tei:category/@xml:id" value="concat('peri_',lower-case(replace(instance('prototypes')/tei:taxonomy[@xml:id = 'periods']/tei:category/tei:catDesc,'\C','')))"/>
                                                                 <xf:setvalue bind="period" value="instance('prototypes')/tei:taxonomy[@xml:id = 'periods']/tei:category/@xml:id"/>
                                                                 <xf:insert context="instance('taxonomies')//tei:taxonomy[@xml:id = 'periods']" origin="instance('prototypes')/tei:taxonomy[@xml:id = 'periods']/tei:category"/>
+                                                                <xf:send submission="storeTaxonomies"/>
+                                                                <xf:toggle case="newPeriodInputHidden"/>
+                                                            </xf:action>
+                                                        </xf:trigger>
+                                                        <xf:trigger>
+                                                            <xf:label>abort</xf:label>
+                                                            <xf:toggle case="newPeriodInputHidden"/>
+                                                        </xf:trigger>
+                                                    </xf:group>
+                                                </xf:case>
+                                                <xf:case id="renamePeriod">
+                                                    <xf:group appearance="bf:horizontalTable">
+                                                        <xf:input bind="periodPrototype" incremental="true">
+                                                            <xf:alert>Period already exists</xf:alert>
+                                                        </xf:input>
+                                                        <xf:trigger>
+                                                            <xf:label>OK</xf:label>
+                                                            <xf:action ev:event="DOMActivate">
+                                                                <xf:setvalue ref="instance('taxonomies')//tei:category[@xml:id = instance('tablet')/tei:teiHeader/tei:profileDesc/tei:creation/tei:origDate/tei:date/@period]/tei:catDesc" value="instance('prototypes')/tei:taxonomy[@xml:id = 'periods']/tei:category/tei:catDesc"/>
                                                                 <xf:send submission="storeTaxonomies"/>
                                                                 <xf:toggle case="newPeriodInputHidden"/>
                                                             </xf:action>
