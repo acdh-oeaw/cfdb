@@ -28,14 +28,12 @@
         <xf:instance xmlns="" id="computedContexts">
             <computedContexts/>
         </xf:instance>
-        
         <xf:instance xmlns="" id="tmpContext">
             <tmpContext>
                 <substring-before-glyph/>
                 <substring-after-glyph/>
             </tmpContext>
         </xf:instance>
-        
         <xf:instance xmlns="" id="currentContext">
             <context xml:id="id">context</context>
         </xf:instance>
@@ -66,8 +64,6 @@
                 <message/>
             </newTablet>
         </xf:instance>
-        
-        
         <xf:instance xmlns="" id="selectedTablet">
             <selectedTablet>
                 <path/>
@@ -76,23 +72,19 @@
                 <html/>
             </selectedTablet>
         </xf:instance>
-        
         <xf:instance xmlns="" id="selectedSurface">
             <selectedSurface>
                 <id/>
             </selectedSurface>
         </xf:instance>
-        
         <xf:instance xmlns="" id="tabletListFilter">
             <filterExpression/>
         </xf:instance>
-        
         <xf:instance xmlns="" id="glyphListFilter">
             <data>
                 <filterExpression/>
             </data>
         </xf:instance>
-
         <xf:instance xmlns="" id="prototypes">
             <TEI xmlns="http://www.tei-c.org/ns/1.0">
                 <bibl type="transliteration">[new bibligraphic reference]</bibl>
@@ -118,8 +110,6 @@
                 <seg type="context" reading="reading" context="context"/>
             </TEI>
         </xf:instance>
-
-
         <xf:instance xmlns="" id="certainity">
             <certainity>
                 <cert>high</cert>
@@ -127,6 +117,12 @@
                 <cert>low</cert>
                 <cert>unknown</cert>
             </certainity>
+        </xf:instance>
+        <xf:instance xmlns="" id="evidence">
+            <evidence>
+                <evid label="derived from archive">external</evid>
+                <evid label="mentioned on tablet">internal</evid>
+            </evidence>
         </xf:instance>
 
         <!-- counter (used in computing the string value of the context) -->
@@ -143,19 +139,16 @@
                 <tei:note type="returnMsg"/>
             </data>
         </xf:instance>
-        
         <xf:instance xmlns="" id="currentPeriod">
             <data period="">
                 <note xmlns="http://www.tei-c.org/ns/1.0" type="returnMsg"/>
             </data>
         </xf:instance>
-        
         <xf:instance xmlns="" id="currentPlaceOfIssue">
             <place xmlns="http://www.tei-c.org/ns/1.0" xml:id="currentPlace">
                 <placeName/>
             </place>
         </xf:instance>
-        
         <xf:instance xmlns="" id="currentGenre">
             <category xmlns="http://www.tei-c.org/ns/1.0" xml:id="currentGenre">
                 <catDesc/>
@@ -210,8 +203,6 @@
 
         <!-- Taxonomy for 'ductus' values -->
         <xf:bind id="ductusFDecl" ref="instance('taxonomies')/tei:teiHeader/tei:encodingDesc/tei:fsdDecl/tei:fsDecl[1]/tei:fDecl[1]/tei:vRange/tei:vAlt/tei:symbol"/>
-        
-        
         <xf:bind id="dossier" ref="instance('archives')//tei:list[@xml:id = 'regions']/tei:item[tei:placeName = instance('tablet')//tei:msIdentifier/tei:region]/tei:list[@n = 'Archives']/tei:item[tei:name = instance('tablet')//tei:msIdentifier/tei:collection[@type='archive']]/tei:list[@n = 'Dossiers']/tei:item"/>
         
         
@@ -225,13 +216,7 @@
         
         <!-- title must have been changed -->
         <xf:bind constraint=". != instance('template')/tei:teiHeader/tei:fileDesc/tei:titleStmt/tei:title" ref="instance('newTablet')/data/tei:TEI/tei:teiHeader/tei:fileDesc/tei:titleStmt/tei:title"/>
-        
         <xf:bind calculate="concat('tablet_',replace(translate(../tei:teiHeader/tei:fileDesc/tei:titleStmt/tei:title,'üäöß','uaos'),'[^A-Za-z0-9_\.-]',''))" constraint="not(. = instance('tablets')/tablet/id)" ref="instance('newTablet')/data/tei:TEI/@xml:id" type="xsi:ID"/>
-        
-        
-        
-        
-        
         <xf:bind id="selectedContext" ref="instance('tablet')//tei:seg[@type='context'][index('lsGlyphs')]" releveant="count(.) gt 0"/>
 
 
@@ -267,7 +252,6 @@
                 <xf:action while="instance('counters')/segCounter &gt; 0">
                     <xf:insert context="instance('computedContexts')/tei:seg[position()=instance('counters')/segCounter]" origin="instance('prototypes')/tei:seg[@type='context']/@reading"/>
                     <xf:insert context="instance('computedContexts')/tei:seg[position()=instance('counters')/segCounter]" origin="instance('prototypes')/tei:seg[@type='context']/@context"/>
-
                     <xf:setvalue ref="instance('computedContexts')/tei:seg[position()=instance('counters')/segCounter]/@reading" value="instance('tablet')//tei:seg[@xml:id = current()/parent::tei:seg/@xml:id]/tei:g/text()"/>
                     <!-- we compute the context as a string and store it in the @context attribute -->
                     <xf:setvalue ref="instance('computedContexts')/tei:seg[position()=instance('counters')/segCounter]/@context" value="string-join(                         (for $n in ../node() return                          if ($n/self::text())                          then                          if (not(matches(.,'^\s+$')))                          then replace($n,'(^\s+|\s+$)',' ')                          else                          if (position() gt 1)                          then                          if ($n/following-sibling::node())                          then normalize-space($n)                          else ()                          else ()                         else                         if ($n/self::tei:g)                          then                          if (some $t in $n/ancestor::tei:seg/text() satisfies contains($t,$n/text()))                          then concat($n,'*')                          else $n                          else ()                         )                         , '' )"/>
@@ -292,7 +276,6 @@
                     $('#signImg img').attr("src", imgSrc+"?timestamp="+time);
                 </script>
             </xf:action>
-
         </xf:submission>
         
         <!-- places a HTML view of the tablet into the interface -->
@@ -304,6 +287,7 @@
         <!-- stores the currently edited tablet in the instance 'tablet' to its corresponding resource in the database -->
         <xf:submission id="saveTablet" method="put" ref="instance('tablet')" replace="instance">
             <xf:resource value="concat('exist:',instance('selectedTablet')/path,'/',instance('selectedTablet')/id,'.xml')"/>
+            <xf:send ev:event="xforms-submit-done" submission="ls"/>
             <xf:message ev:event="xforms-submit-error" level="ephemeral">storing tablet <xf:output value="concat('exist:',instance('selectedTablet')/path,'/',instance('selectedTablet')/id,'.xml')"/> has failed</xf:message>
             <xf:message ev:event="xforms-submit-done" level="ephemeral">tablet saved successfully</xf:message>
         </xf:submission>
@@ -335,8 +319,8 @@
         <xf:submission id="removeGlyph" method="execute" ref="instance('envelope')" replace="instance" resource="exist:/db/apps/@app.name@/api/removeGlyph.xql">
             <!--<xf:message ev:event="xforms-submit-error" level="ephemeral">glyph could not be removed</xf:message>
             <xf:message ev:event="xforms-submit-done" level="ephemeral">glyph removed successfully</xf:message>-->
-        	<xf:message ev:event="xforms-submit-error" level="ephemeral">glyph could not be removed</xf:message>
-        	<xf:message ev:event="xforms-submit-done" level="ephemeral" ref="instance('envelope')/msg"/>
+            <xf:message ev:event="xforms-submit-error" level="ephemeral">glyph could not be removed</xf:message>
+            <xf:message ev:event="xforms-submit-done" level="ephemeral" ref="instance('envelope')/msg"/>
             <xf:send ev:event="xforms-submit-done" submission="ls"/>
         </xf:submission>
 
@@ -369,15 +353,12 @@
             <xf:message ev:event="xforms-submit-error" level="ephemeral">removing period has failed (error-type: <xf:output value="event('error-type')"/>, status-code: <xf:output value="event('response-status-code')"/>)</xf:message>
             <xf:message ev:event="xforms-submit-done" level="ephemeral" ref="//tei:note[@type='returnMsg']">removing period succeeded</xf:message>
         </xf:submission>
-        
-        <xf:submission id="removePlaceGlobally" method="execute" ref="instance('envelope')" replace="instance" resource="exist:/db/apps/@app.name@/api/removePlaceGlobally.xql" omit-xml-declaration="true" encoding="ISO-8859-1">
+        <xf:submission id="removePlaceGlobally" method="execute" ref="instance('envelope')" replace="instance" resource="exist:/db/apps/cfdb/api/removePlaceGlobally.xql" omit-xml-declaration="true" encoding="ISO-8859-1">
             <xf:action ev:event="xforms-submit">
                 <!-- put the currentPlace into the envelope -->
                 <xf:delete ref="instance('envelope')/*[*]/*"/>
                 <xf:insert context="instance('envelope')/data" origin="instance('currentPlaceOfIssue')"/>
             </xf:action>
-            
-            
             <xf:action ev:event="xforms-submit-done" if="@status='success'">
                 <!-- remove its corresponding tei:place element from  data/etc/places.xml  ... -->
                 <xf:delete ref="instance('places')//tei:listPlace/tei:place[tei:placeName = instance('currentPlaceOfIssue')/tei:placeName]"/>
@@ -388,16 +369,10 @@
                 <xf:setvalue ref="instance('currentPlaceOfIssue')" value="instance('prototypes')/tei:place/@xml:id"/>
                 <xf:insert context="instance('currentPlaceOfIssue')" origin="instance('prototypes')/tei:place/tei:placeName"/>
             </xf:action>
-            
-            
-            
             <xf:message ev:event="xforms-submit-error" level="ephemeral">removing place of issue has failed (error-type: <xf:output value="event('error-type')"/>, status-code: <xf:output value="event('response-status-code')"/>)</xf:message>
-            
             <xf:message ev:event="xforms-submit-done" level="ephemeral" ref="msg">removing place of issue succeeded</xf:message>
         </xf:submission>
-        
-        <xf:submission id="removeGenreGlobally" method="execute" ref="instance('envelope')" replace="instance" omit-xml-declaration="true" includenamespaceprefixes="#default" resource="exist:/db/apps/@app.name@/api/removeGenreGlobally.xql">
-            
+        <xf:submission id="removeGenreGlobally" method="execute" ref="instance('envelope')" replace="instance" omit-xml-declaration="true" includenamespaceprefixes="#default" resource="exist:/db/apps/cfdb/api/removeGenreGlobally.xql">
             <xf:action ev:event="xforms-submit">
                 <!-- put the currentGenre into the envelope -->
                 <xf:delete ref="instance('envelope')/*[*]/*"/>
@@ -424,9 +399,6 @@
             <xf:message ev:event="xforms-submit-error" level="ephemeral">removing scribe has failed</xf:message>
             <xf:message ev:event="xforms-submit-done" level="ephemeral" ref="//tei:note[@type='returnMsg']">XXX tablets have been altered</xf:message>
         </xf:submission>
-
-
-
         <xf:action ev:event="xforms-ready">
             <!-- fetch tablets list on load -->
             <xf:send submission="ls"/>
@@ -457,29 +429,24 @@
             </script>
         </xf:action>
     </xf:model>
-    
-
     <div class="page-header">
         <h1>Tablets</h1>
     </div>
-
     <div class="row-fluid">
         <div class="span4">
-
             <xf:input incremental="true" ref="instance('tabletListFilter')">
                 <xf:label>Filter list</xf:label>
             </xf:input>
-
             <table class="table">
                 <thead>
                     <tr>
                         <th>Text Reference</th>
                     </tr>
                 </thead>
-                <tbody id="lsTablets" xf:repeat-nodeset="instance('tablets')/tablet[contains(title,instance('tabletListFilter'))]">
+                <tbody id="lsTablets" xf:repeat-nodeset="instance('tablets')/tablet[contains(idno,instance('tabletListFilter'))]">
                     <tr>
                         <td>
-                            <xf:output ref="title"/>
+                            <xf:output ref="idno"/>
                         </td>
                     </tr>
                 </tbody>
@@ -491,12 +458,11 @@
                         <xf:insert context="instance('newTablet')/data" origin="instance('template')"/>
                         <xf:toggle case="newTabletMenu"/>
                         <xf:action>
-                             <script type="text/javascript">
+                            <script type="text/javascript">
                                 $("#overlay").attr("class","visible")
                             </script>
                         </xf:action>
                     </xf:trigger>
-                    
                     <xf:group appearance="minimal">
                         <xf:trigger id="viewTabletTrigger">
                             <xf:label>show</xf:label>
@@ -505,7 +471,6 @@
                             <xf:send submission="viewTablet"/>
                             <xf:toggle case="viewTabletCase"/>
                         </xf:trigger>
-                        
                         <xf:trigger id="editTrigger" ref="instance('tablets')/tablet[contains(title,instance('tabletListFilter'))][index('lsTablets')][@editable='1']">
                             <xf:label>edit</xf:label>
                             <xf:action>
@@ -516,7 +481,6 @@
                                 <xf:toggle case="editTabletCase"/>
                             </xf:action>
                         </xf:trigger>
-                        
                         <xf:trigger ref="instance('tablets')/tablet[contains(title,instance('tabletListFilter'))][index('lsTablets')][@editable='1']">
                             <xf:label>remove</xf:label>
                             <xf:setvalue ref="instance('selectedTablet')/path" value="instance('tablets')/tablet[contains(title,instance('tabletListFilter'))][index('lsTablets')]/path"/>
@@ -524,10 +488,11 @@
                             <xf:setvalue ref="instance('selectedTablet')/title" value="instance('tablets')/tablet[contains(title,instance('tabletListFilter'))][index('lsTablets')]/title"/>
                             <bfc:show dialog="removeTabletConfirmDialog" ev:event="DOMActivate"/>
                         </xf:trigger>
-                        
                         <bfc:dialog id="removeTabletConfirmDialog">
                             <xf:group appearance="minimal">
-                                <xf:label>You are about to delete the tablet <b><xf:output value="instance('selectedTablet')/title"/></b>.<br/>Are you sure?</xf:label>
+                                <xf:label>You are about to delete the tablet <b>
+                                        <xf:output value="instance('selectedTablet')/title"/>
+                                    </b>.<br/>Are you sure?</xf:label>
                                 <xf:trigger>
                                     <xf:label>Yes</xf:label>
                                     <bfc:hide dialog="removeTabletConfirmDialog" ev:event="DOMActivate"/>
@@ -541,10 +506,8 @@
                                 </xf:trigger>
                             </xf:group>
                         </bfc:dialog>
-                        
                     </xf:group>
                 </xf:case>
-
                 <xf:case id="newTabletMenuResult">
                     <h3>Result</h3>
                     <xf:output ref="instance('newTablet')/message"/>
@@ -562,7 +525,6 @@
                         <xf:toggle case="newTabletMenuDefault"/>
                     </xf:trigger>
                 </xf:case>
-
                 <xf:case id="newTabletMenu">
                     <h3>New Tablet</h3>
                     <xf:group appearance="bf:verticalTable">
@@ -571,7 +533,6 @@
                             <xf:alert>Text Reference has to be set</xf:alert>
                             <xf:setvalue ev:event="xforms-value-changed" ref="instance('newTablet')/data/tei:TEI/tei:teiHeader/tei:fileDesc/tei:sourceDesc/tei:msDesc/tei:msIdentifier/tei:idno" value="instance('newTablet')/data/tei:TEI/tei:teiHeader/tei:fileDesc/tei:titleStmt/tei:title"/>
                         </xf:input>
-
                         <xf:output incremental="true" ref="instance('newTablet')[@status='toBeSent']/data/tei:TEI/@xml:id">
                             <xf:label>ID</xf:label>
                             <xf:alert>Tablet exists already</xf:alert>
@@ -583,7 +544,6 @@
                             <xf:mediatype ref="@mediatype"/>
                             <xf:size ref="@size"/>
                         </xf:upload>-->
-
                         <xf:group>
                             <xf:trigger>
                                 <xf:label>Create</xf:label>
@@ -607,7 +567,6 @@
                 </xf:case>
             </xf:switch>
         </div>
-
         <div class="span8">
             <xf:switch>
                 <xf:case id="viewTabletCase">
@@ -615,234 +574,234 @@
                 </xf:case>
                 <xf:case id="editTabletCase">
                     <xf:group ref="instance('tablet')/tei:teiHeader">
-                <h3>
-                    <i>
-                        <xf:output ref="tei:fileDesc/tei:titleStmt/tei:title"/>
-                    </i>
-                </h3>
-                <div class="tabbable" id="edit-tabs">
-                    <ul class="nav nav-tabs">
-                        <li class="active">
-                            <a data-toggle="tab" href="#tab1">Archive Information</a>
-                        </li>
-                        <li>
-                            <a data-toggle="tab" href="#tab-creation">Creation</a>
-                        </li>
-                        <li>
-                            <a data-toggle="tab" href="#tab3">Script</a>
-                        </li>
-                        <li>
-                            <a data-toggle="tab" href="#tab4">Content</a>
-                        </li>
-                        <li>
-                            <a data-toggle="tab" href="#tab-transliterations">Bibliography</a>
-                        </li>
-                        <li>
-                            <a data-toggle="tab" href="#tab-signs">Signs</a>
-                        </li>
-                        <li>
-                            <a data-toggle="tab" href="#tab-imgs">Images</a>
-                        </li>
-                    </ul>
-                    <div class="tab-content">
-                        <div class="tab-pane active" id="tab1">
-                            <h4>Archive Information</h4>
-                            <xf:group appearance="bf:verticalTable" ref="tei:fileDesc/tei:sourceDesc/tei:msDesc">
+                        <h3>
+                            <i>
+                                <xf:output ref="tei:fileDesc/tei:titleStmt/tei:title"/>
+                            </i>
+                        </h3>
+                        <div class="tabbable" id="edit-tabs">
+                            <ul class="nav nav-tabs">
+                                <li class="active">
+                                    <a data-toggle="tab" href="#tab1">Archive Information</a>
+                                </li>
+                                <li>
+                                    <a data-toggle="tab" href="#tab-creation">Creation</a>
+                                </li>
+                                <li>
+                                    <a data-toggle="tab" href="#tab3">Script</a>
+                                </li>
+                                <li>
+                                    <a data-toggle="tab" href="#tab4">Content</a>
+                                </li>
+                                <li>
+                                    <a data-toggle="tab" href="#tab-transliterations">Bibliography</a>
+                                </li>
+                                <li>
+                                    <a data-toggle="tab" href="#tab-signs">Signs</a>
+                                </li>
+                                <li>
+                                    <a data-toggle="tab" href="#tab-imgs">Images</a>
+                                </li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="tab1">
+                                    <h4>Archive Information</h4>
+                                    <xf:group appearance="bf:verticalTable" ref="tei:fileDesc/tei:sourceDesc/tei:msDesc">
                                 <!--<xf:input ref="tei:msIdentifier/tei:region">
                                     <xf:label>Region</xf:label>
                                 </xf:input>-->
-                                <xf:select1 ref="tei:msIdentifier/tei:region">
-                                    <xf:label>Region</xf:label>
+                                        <xf:select1 ref="tei:msIdentifier/tei:region">
+                                            <xf:label>Region</xf:label>
                                     <!--<xf:itemset ref="instance('archives')//tei:list[@xml:id = 'regions']/tei:item">
                                         <xf:label ref="tei:placeName"/>
                                         <xf:value ref="tei:placeName"/>
                                     </xf:itemset>-->
-                                    <xf:itemset ref="                                   if (../tei:collection[@type='archive'] != '')                                   then instance('archives')//tei:list[@xml:id = 'regions']/tei:item[tei:list/tei:item[tei:name = current()/../tei:collection[@type='archive']]]                                   else instance('archives')//tei:list[@xml:id = 'regions']/tei:item">
-                                        <xf:label ref="tei:placeName"/>
-                                        <xf:value ref="tei:placeName"/>
-                                    </xf:itemset>
-                                </xf:select1>
-
-                                <xf:select1 ref="tei:msIdentifier/tei:collection[@type='archive']">
-                                    <xf:label>Archive</xf:label>
-                                    <xf:itemset ref="                                      if (../tei:msIdentifier/tei:region != '')                                      then instance('archives')//tei:list[@xml:id = 'regions']/tei:item[tei:placeName = instance('tablet')//tei:msIdentifier/tei:region]/tei:list[@n = 'Archives']/tei:item                                      else instance('archives')//tei:list[@n = 'Archives']/tei:item">
-                                        <xf:label ref="tei:name"/>
-                                        <xf:value ref="tei:name"/>
-                                    </xf:itemset>
-                                </xf:select1>
-
-                                <xf:select1 ref="tei:msIdentifier/tei:collection[@type='dossier']">
-                                    <xf:itemset bind="dossier">
-                                        <xf:label ref="tei:name"/>
-                                        <xf:value ref="tei:name"/>
-                                    </xf:itemset>
-                                    <xf:label>Dossier</xf:label>
-                                </xf:select1>
-                                <xf:input ref="tei:msIdentifier/tei:idno">
-                                    <xf:label>Text Reference</xf:label>
-                                </xf:input>
-                            </xf:group>
-                            <xf:group ref="tei:fileDesc/tei:sourceDesc/tei:msDesc">
-                                <xf:label>References</xf:label>
-                                <xf:input ref="tei:msIdentifier/tei:altIdentifier[@type='museumNumber']/tei:idno">
-                                    <xf:label>Museum no.</xf:label>
-                                </xf:input>
-                                <xf:input ref="tei:msIdentifier/tei:altIdentifier[@type='CDLI']/tei:idno">
-                                    <xf:label>CDLI no.</xf:label>
-                                </xf:input>
-                                <xf:input ref="tei:msIdentifier/tei:altIdentifier[@type='NABUCCO']/tei:idno">
-                                    <xf:label>NABUCCO no.</xf:label>
-                                </xf:input>
-                            </xf:group>
-                        </div>
-                        <div class="tab-pane" id="tab-creation">
-                            <h4>Creation</h4>
-                            <xf:group>
-                                <xf:group>
-                                    <xf:label>Scribe</xf:label>
-                                    <xf:select1 appearance="minimal" bind="scribe" id="select1" incremental="true">
-                                        <xf:label>Name</xf:label>
-                                        <xf:itemset bind="scribes">
-                                            <xf:label ref="tei:persName"/>
-                                            <xf:value ref="tei:persName"/>
-                                        </xf:itemset>
-                                    </xf:select1>
-                                    <xf:switch style="position:relative; display:inline-block; top:4px;">
-                                        <xf:case id="newScribeInputHidden" style="position:relative; display:inline-block; top:4px;">
-                                            <xf:group appearance="bf:horizontalTable">
-                                                <xf:trigger>
-                                                    <xf:label>New Scribe</xf:label>
-                                                    <xf:toggle case="newScribeInputShown"/>
-                                                </xf:trigger>
-                                                <xf:group ref="tei:fileDesc/tei:sourceDesc/tei:msDesc/tei:physDesc/tei:handDesc/tei:handNote/tei:persName[@role='scribe'][.!='']">
-                                                    <xf:trigger>
-                                                        <xf:label>Remove Scribe</xf:label>
-                                                        <bfc:show dialog="removeScribeConfirmDialog" ev:event="DOMActivate"/>
-                                                    </xf:trigger>
-                                                    <bfc:dialog id="removeScribeConfirmDialog">
-                                                        <xf:group appearance="minimal">
-                                                            <xf:label>This will remove <i>
-                                                                    <xf:output bind="scribe"/>
-                                                                </i> from the list of scribes and <b>delete any reference to him from all tablets.</b>
-                                                                <br/>Are you sure to proceed?</xf:label>
+                                            <xf:itemset ref="                                   if (../tei:collection[@type='archive'] != '')                                   then instance('archives')//tei:list[@xml:id = 'regions']/tei:item[tei:list/tei:item[tei:name = current()/../tei:collection[@type='archive']]]                                   else instance('archives')//tei:list[@xml:id = 'regions']/tei:item">
+                                                <xf:label ref="tei:placeName"/>
+                                                <xf:value ref="tei:placeName"/>
+                                            </xf:itemset>
+                                        </xf:select1>
+                                        <xf:select1 ref="tei:msIdentifier/tei:collection[@type='archive']">
+                                            <xf:label>Archive</xf:label>
+                                            <xf:itemset ref="                                      if (../tei:msIdentifier/tei:region != '')                                      then instance('archives')//tei:list[@xml:id = 'regions']/tei:item[tei:placeName = instance('tablet')//tei:msIdentifier/tei:region]/tei:list[@n = 'Archives']/tei:item                                      else instance('archives')//tei:list[@n = 'Archives']/tei:item">
+                                                <xf:label ref="tei:name"/>
+                                                <xf:value ref="tei:name"/>
+                                            </xf:itemset>
+                                        </xf:select1>
+                                        <xf:select1 ref="tei:msIdentifier/tei:collection[@type='dossier']">
+                                            <xf:itemset bind="dossier">
+                                                <xf:label ref="tei:name"/>
+                                                <xf:value ref="tei:name"/>
+                                            </xf:itemset>
+                                            <xf:label>Dossier</xf:label>
+                                        </xf:select1>
+                                        <xf:input ref="tei:msIdentifier/tei:idno">
+                                            <xf:label>Text Reference</xf:label>
+                                            <xf:action ev:event="xforms-value-changed">
+                                                <xf:setvalue ref="root()//tei:fileDesc/tei:titleStmt/tei:title" value="instance('tablet')//tei:msIdentifier/tei:idno"/>
+                                            </xf:action>
+                                        </xf:input>
+                                    </xf:group>
+                                    <xf:group ref="tei:fileDesc/tei:sourceDesc/tei:msDesc">
+                                        <xf:label>References</xf:label>
+                                        <xf:input ref="tei:msIdentifier/tei:altIdentifier[@type='museumNumber']/tei:idno">
+                                            <xf:label>Museum no.</xf:label>
+                                        </xf:input>
+                                        <xf:input ref="tei:msIdentifier/tei:altIdentifier[@type='CDLI']/tei:idno">
+                                            <xf:label>CDLI no.</xf:label>
+                                        </xf:input>
+                                        <xf:input ref="tei:msIdentifier/tei:altIdentifier[@type='NABUCCO']/tei:idno">
+                                            <xf:label>NABUCCO no.</xf:label>
+                                        </xf:input>
+                                    </xf:group>
+                                </div>
+                                <div class="tab-pane" id="tab-creation">
+                                    <h4>Creation</h4>
+                                    <xf:group>
+                                        <xf:group>
+                                            <xf:label>Scribe</xf:label>
+                                            <xf:select1 appearance="minimal" bind="scribe" id="select1" incremental="true">
+                                                <xf:label>Name</xf:label>
+                                                <xf:itemset bind="scribes">
+                                                    <xf:label ref="tei:persName"/>
+                                                    <xf:value ref="tei:persName"/>
+                                                </xf:itemset>
+                                            </xf:select1>
+                                            <xf:switch style="position:relative; display:inline-block; top:4px;">
+                                                <xf:case id="newScribeInputHidden" style="position:relative; display:inline-block; top:4px;">
+                                                    <xf:group appearance="bf:horizontalTable">
+                                                        <xf:trigger>
+                                                            <xf:label>New Scribe</xf:label>
+                                                            <xf:toggle case="newScribeInputShown"/>
+                                                        </xf:trigger>
+                                                        <xf:group ref="tei:fileDesc/tei:sourceDesc/tei:msDesc/tei:physDesc/tei:handDesc/tei:handNote/tei:persName[@role='scribe'][.!='']">
                                                             <xf:trigger>
-                                                                <xf:label>Yes</xf:label>
-                                                                <xf:action>
+                                                                <xf:label>Remove Scribe</xf:label>
+                                                                <bfc:show dialog="removeScribeConfirmDialog" ev:event="DOMActivate"/>
+                                                            </xf:trigger>
+                                                            <bfc:dialog id="removeScribeConfirmDialog">
+                                                                <xf:group appearance="minimal">
+                                                                    <xf:label>This will remove <i>
+                                                                            <xf:output bind="scribe"/>
+                                                                        </i> from the list of scribes and <b>delete any reference to him from all tablets.</b>
+                                                                        <br/>Are you sure to proceed?</xf:label>
+                                                                    <xf:trigger>
+                                                                        <xf:label>Yes</xf:label>
+                                                                        <xf:action>
                                                                     <!-- remove the scribe's name from all tablets in the database -->
-                                                                    <xf:send submission="removeScribeGlobally"/>
+                                                                            <xf:send submission="removeScribeGlobally"/>
                                                                     <!-- remove the tei:person element from the list of scribes -->
-                                                                    <xf:delete ref="instance('persons')//tei:person[tei:persName = context()]"/>
-                                                                    <xf:send submission="storePersons"/>
+                                                                            <xf:delete ref="instance('persons')//tei:person[tei:persName = context()]"/>
+                                                                            <xf:send submission="storePersons"/>
                                                                     <!-- remove the scribe's name from the 'tablet' instance (we could also reload the tablet as it has been altered by remvoeScribeGlobally, but this is faster)-->
-                                                                    <xf:setvalue ref="context()" value="''"/>
-                                                                </xf:action>
-                                                                <bfc:hide dialog="removeScribeConfirmDialog" ev:event="DOMActivate"/>
-                                                            </xf:trigger>
-                                                            <xf:trigger>
-                                                                <xf:label>No</xf:label>
-                                                                <bfc:hide dialog="removeScribeConfirmDialog" ev:event="DOMActivate"/>
-                                                            </xf:trigger>
+                                                                            <xf:setvalue ref="context()" value="''"/>
+                                                                        </xf:action>
+                                                                        <bfc:hide dialog="removeScribeConfirmDialog" ev:event="DOMActivate"/>
+                                                                    </xf:trigger>
+                                                                    <xf:trigger>
+                                                                        <xf:label>No</xf:label>
+                                                                        <bfc:hide dialog="removeScribeConfirmDialog" ev:event="DOMActivate"/>
+                                                                    </xf:trigger>
+                                                                </xf:group>
+                                                            </bfc:dialog>
                                                         </xf:group>
-                                                    </bfc:dialog>
-                                                </xf:group>
-                                            </xf:group>
-                                        </xf:case>
+                                                    </xf:group>
+                                                </xf:case>
                                         <!-- Input for new scribe -->
-                                        <xf:case id="newScribeInputShown">
-                                            <xf:group appearance="bf:horizontalTable">
+                                                <xf:case id="newScribeInputShown">
+                                                    <xf:group appearance="bf:horizontalTable">
                                                 <!-- TODO: This should _not_ alter the prototypes instance! -->
-                                                <xf:input ref="instance('prototypes')/tei:person[@role='scribe']/tei:persName"/>
-                                                <xf:trigger>
-                                                    <xf:label>OK</xf:label>
-                                                    <xf:action ev:event="DOMActivate">
+                                                        <xf:input ref="instance('prototypes')/tei:person[@role='scribe']/tei:persName"/>
+                                                        <xf:trigger>
+                                                            <xf:label>OK</xf:label>
+                                                            <xf:action ev:event="DOMActivate">
                                                         <!-- updates the scribe's name in the tablet's instance data -->
-                                                        <xf:setvalue ref="tei:fileDesc/tei:sourceDesc/tei:msDesc/tei:physDesc/tei:handDesc/tei:handNote/tei:persName[@role='scribe']" value="instance('prototypes')/tei:person[@role='scribe']/tei:persName"/>
+                                                                <xf:setvalue ref="tei:fileDesc/tei:sourceDesc/tei:msDesc/tei:physDesc/tei:handDesc/tei:handNote/tei:persName[@role='scribe']" value="instance('prototypes')/tei:person[@role='scribe']/tei:persName"/>
                                                         <!-- adds a new tei:person element to the list of scribes -->
-                                                        <xf:insert context="instance('persons')/tei:text/tei:body/tei:listPerson[@xml:id='scribes']" nodeset="tei:head" origin="instance('prototypes')/tei:person[@role='scribe']" position="after"/>
-                                                        <xf:send submission="storePersons"/>
-                                                        <xf:toggle case="newScribeInputHidden"/>
-                                                    </xf:action>
-                                                </xf:trigger>
-                                                <xf:trigger>
-                                                    <xf:label>abort</xf:label>
-                                                    <xf:toggle case="newScribeInputHidden"/>
-                                                </xf:trigger>
-                                            </xf:group>
-                                        </xf:case>
-                                    </xf:switch>
-                                </xf:group>
-
-
-                                <xf:group>
-                                    <xf:label>Period</xf:label>
-                                    <xf:select1 bind="period">
-                                        <xf:label>Period</xf:label>
-                                        <xf:itemset bind="periods">
-                                            <xf:label ref="tei:catDesc"/>
-                                            <xf:value ref="@xml:id"/>
-                                        </xf:itemset>
-                                    </xf:select1>
-                                    <xf:switch style="position:relative; display:inline-block; top:4px;">
-                                        <xf:case id="newPeriodInputHidden" style="position:relative; display:inline-block; top:4px;">
-                                            <xf:group appearance="bf:horizontalTable">
-                                                <xf:trigger>
-                                                    <xf:label>New Period</xf:label>
-                                                    <xf:toggle case="newPeriodInputShown"/>
-                                                </xf:trigger>
-                                                <xf:group ref="tei:profileDesc/tei:creation/tei:origDate/tei:date[@calendar='#gregorian']/@period[.!='']">
-                                                    <xf:trigger>
-                                                        <xf:label>Remove Period</xf:label>
-                                                        <bfc:show dialog="removePeriodConfirmDialog" ev:event="DOMActivate"/>
-                                                    </xf:trigger>
-                                                    
-                                                    <bfc:dialog id="removePeriodConfirmDialog">
-                                                        <xf:group appearance="minimal">
-                                                            <xf:label>This will remove the selected period from the list of periods and <b>delete any reference to it from all tablets.</b>
-                                                                <br/>Are you sure to proceed?</xf:label>
+                                                                <xf:insert context="instance('persons')/tei:text/tei:body/tei:listPerson[@xml:id='scribes']" nodeset="tei:head" origin="instance('prototypes')/tei:person[@role='scribe']" position="after"/>
+                                                                <xf:send submission="storePersons"/>
+                                                                <xf:toggle case="newScribeInputHidden"/>
+                                                            </xf:action>
+                                                        </xf:trigger>
+                                                        <xf:trigger>
+                                                            <xf:label>abort</xf:label>
+                                                            <xf:toggle case="newScribeInputHidden"/>
+                                                        </xf:trigger>
+                                                    </xf:group>
+                                                </xf:case>
+                                            </xf:switch>
+                                        </xf:group>
+                                        <xf:group>
+                                            <xf:label>Period</xf:label>
+                                            <xf:select1 bind="period">
+                                                <xf:label>Period</xf:label>
+                                                <xf:itemset bind="periods">
+                                                    <xf:label ref="tei:catDesc"/>
+                                                    <xf:value ref="@xml:id"/>
+                                                </xf:itemset>
+                                            </xf:select1>
+                                            <xf:switch style="position:relative; display:inline-block; top:4px;">
+                                                <xf:case id="newPeriodInputHidden" style="position:relative; display:inline-block; top:4px;">
+                                                    <xf:group appearance="bf:horizontalTable">
+                                                        <xf:trigger>
+                                                            <xf:label>New Period</xf:label>
+                                                            <xf:toggle case="newPeriodInputShown"/>
+                                                        </xf:trigger>
+                                                        <xf:group ref="tei:profileDesc/tei:creation/tei:origDate/tei:date[@calendar='#gregorian']/@period[.!='']">
                                                             <xf:trigger>
-                                                                <xf:label>Yes</xf:label>
-                                                                <bfc:hide dialog="removePeriodConfirmDialog" ev:event="DOMActivate"/>
-                                                                <xf:action>
-                                                                    <!-- diese Periode aus allen Tablets löschen -->                 <xf:setvalue ref="instance('currentPeriod')/@period" value="instance('tablet')/tei:teiHeader/tei:profileDesc/tei:creation/tei:origDate/tei:date/@period"/>                     <xf:send submission="removePeriodGlobally"/>                                   
+                                                                <xf:label>Remove Period</xf:label>
+                                                                <bfc:show dialog="removePeriodConfirmDialog" ev:event="DOMActivate"/>
+                                                            </xf:trigger>
+                                                            <bfc:dialog id="removePeriodConfirmDialog">
+                                                                <xf:group appearance="minimal">
+                                                                    <xf:label>This will remove the selected period from the list of periods and <b>delete any reference to it from all tablets.</b>
+                                                                        <br/>Are you sure to proceed?</xf:label>
+                                                                    <xf:trigger>
+                                                                        <xf:label>Yes</xf:label>
+                                                                        <bfc:hide dialog="removePeriodConfirmDialog" ev:event="DOMActivate"/>
+                                                                        <xf:action>
+                                                                    <!-- diese Periode aus allen Tablets löschen -->
+                                                                            <xf:setvalue ref="instance('currentPeriod')/@period" value="instance('tablet')/tei:teiHeader/tei:profileDesc/tei:creation/tei:origDate/tei:date/@period"/>
+                                                                            <xf:send submission="removePeriodGlobally"/>                                   
                                                                     <!-- das category-Element aus der Taxonomie in data/etc/taxonomies.xml löschen ... -->
-   <xf:delete ref="instance('taxonomies')//tei:taxonomy[@xml:id='periods']/tei:category[@xml:id = context()]"/>
+                                                                            <xf:delete ref="instance('taxonomies')//tei:taxonomy[@xml:id='periods']/tei:category[@xml:id = context()]"/>
                                                                     <!-- ... und speichern -->
-   <xf:send submission="storeTaxonomies"/>
-                                                                    <xf:setvalue ref="context()" value="''"/>
-                                                                </xf:action>
-                                                            </xf:trigger>
-                                                            <xf:trigger>
-                                                                <xf:label>No</xf:label>
-                                                                <bfc:hide dialog="removePeriodConfirmDialog" ev:event="DOMActivate"/>
-                                                            </xf:trigger>
+                                                                            <xf:send submission="storeTaxonomies"/>
+                                                                            <xf:setvalue ref="context()" value="''"/>
+                                                                        </xf:action>
+                                                                    </xf:trigger>
+                                                                    <xf:trigger>
+                                                                        <xf:label>No</xf:label>
+                                                                        <bfc:hide dialog="removePeriodConfirmDialog" ev:event="DOMActivate"/>
+                                                                    </xf:trigger>
+                                                                </xf:group>
+                                                            </bfc:dialog>
                                                         </xf:group>
-                                                    </bfc:dialog>
-                                                </xf:group>
-                                            </xf:group>
-                                        </xf:case>
+                                                    </xf:group>
+                                                </xf:case>
                                         <!-- Input für neue Periode -->
-                                        <xf:case id="newPeriodInputShown">
-                                            <xf:group appearance="bf:horizontalTable">
-                                                <xf:input bind="periodPrototype" incremental="true">
-                                                    <xf:alert>Period already exists</xf:alert>
-                                                </xf:input>
-                                                <xf:trigger>
-                                                    <xf:label>OK</xf:label>
-                                                    <xf:action ev:event="DOMActivate">
-                                                        <xf:setvalue ref="instance('prototypes')/tei:taxonomy[@xml:id = 'periods']/tei:category/@xml:id" value="concat('peri_',lower-case(replace(instance('prototypes')/tei:taxonomy[@xml:id = 'periods']/tei:category/tei:catDesc,'\C','')))"/>
-                                                        <xf:setvalue bind="period" value="instance('prototypes')/tei:taxonomy[@xml:id = 'periods']/tei:category/@xml:id"/>
-                                                        <xf:insert context="instance('taxonomies')//tei:taxonomy[@xml:id = 'periods']" origin="instance('prototypes')/tei:taxonomy[@xml:id = 'periods']/tei:category"/>
-                                                        <xf:send submission="storeTaxonomies"/>
-                                                        <xf:toggle case="newPeriodInputHidden"/>
-                                                    </xf:action>
-                                                </xf:trigger>
-                                                <xf:trigger>
-                                                    <xf:label>abort</xf:label>
-                                                    <xf:toggle case="newPeriodInputHidden"/>
-                                                </xf:trigger>
-                                            </xf:group>
-                                        </xf:case>
-                                    </xf:switch>
+                                                <xf:case id="newPeriodInputShown">
+                                                    <xf:group appearance="bf:horizontalTable">
+                                                        <xf:input bind="periodPrototype" incremental="true">
+                                                            <xf:alert>Period already exists</xf:alert>
+                                                        </xf:input>
+                                                        <xf:trigger>
+                                                            <xf:label>OK</xf:label>
+                                                            <xf:action ev:event="DOMActivate">
+                                                                <xf:setvalue ref="instance('prototypes')/tei:taxonomy[@xml:id = 'periods']/tei:category/@xml:id" value="concat('peri_',lower-case(replace(instance('prototypes')/tei:taxonomy[@xml:id = 'periods']/tei:category/tei:catDesc,'\C','')))"/>
+                                                                <xf:setvalue bind="period" value="instance('prototypes')/tei:taxonomy[@xml:id = 'periods']/tei:category/@xml:id"/>
+                                                                <xf:insert context="instance('taxonomies')//tei:taxonomy[@xml:id = 'periods']" origin="instance('prototypes')/tei:taxonomy[@xml:id = 'periods']/tei:category"/>
+                                                                <xf:send submission="storeTaxonomies"/>
+                                                                <xf:toggle case="newPeriodInputHidden"/>
+                                                            </xf:action>
+                                                        </xf:trigger>
+                                                        <xf:trigger>
+                                                            <xf:label>abort</xf:label>
+                                                            <xf:toggle case="newPeriodInputHidden"/>
+                                                        </xf:trigger>
+                                                    </xf:group>
+                                                </xf:case>
+                                            </xf:switch>
 
 
                                     <!--<xf:select1 ref="tei:profileDesc/tei:creation/tei:origDate/tei:date[@type='period']/@cert">
@@ -852,24 +811,27 @@
                                             <xf:value ref="."/>
                                         </xf:itemset>
                                     </xf:select1>-->
-                                </xf:group>
-                                <xf:group appearance="bf:horizontalTable">
-                                    <xf:label>Date (Gregorian calendar)</xf:label>
-                                    <xf:input ref="tei:profileDesc/tei:creation/tei:origDate/tei:date[@calendar='#gregorian'][not(@type)]">
-                                        <xf:label>Year</xf:label>
-                                        <xf:hint>yyy</xf:hint>
-                                    </xf:input>
-                                    <xf:input ref="tei:profileDesc/tei:creation/tei:origDate/tei:date[@calendar='#gregorian'][not(@type)]/@notAfter">
-                                        <xf:label>ante quem</xf:label>
-                                    </xf:input>
-                                    <xf:input ref="tei:profileDesc/tei:creation/tei:origDate/tei:date[@calendar='#gregorian'][not(@type)]/@notBefore">
-                                        <xf:label>post quem</xf:label>
-                                    </xf:input>
-                                </xf:group>
-                                <xf:group appearance="bf:horizontalTable">
-                                    <xf:input ref="tei:profileDesc/tei:creation/tei:origDate/tei:date[@calendar='#babylonian']">
-                                        <xf:label>Date (Babylonian calendar)</xf:label>
-                                    </xf:input>
+                                        </xf:group>
+                                        <xf:group appearance="bf:horizontalTable">
+                                            <xf:label>Date (Gregorian calendar)</xf:label>
+                                            <xf:input ref="tei:profileDesc/tei:creation/tei:origDate/tei:date[@calendar='#gregorian'][not(@type)]">
+                                                <xf:label>Year</xf:label>
+                                                <xf:hint>yyy</xf:hint>
+                                            </xf:input>
+                                            <xf:input ref="tei:profileDesc/tei:creation/tei:origDate/tei:date[@calendar='#gregorian'][not(@type)]/@notAfter">
+                                                <xf:label>ante quem</xf:label>
+                                            </xf:input>
+                                            <xf:input ref="tei:profileDesc/tei:creation/tei:origDate/tei:date[@calendar='#gregorian'][not(@type)]/@notBefore">
+                                                <xf:label>post quem</xf:label>
+                                            </xf:input>
+                                            <xf:textarea ref="tei:profileDesc/tei:creation/tei:origDate/tei:note">
+                                                <xf:label>Comment</xf:label>
+                                            </xf:textarea>
+                                        </xf:group>
+                                        <xf:group appearance="bf:horizontalTable">
+                                            <xf:input ref="tei:profileDesc/tei:creation/tei:origDate/tei:date[@calendar='#babylonian']">
+                                                <xf:label>Date (Babylonian calendar)</xf:label>
+                                            </xf:input>
                                     <!--<xf:select1 ref="tei:profileDesc/tei:creation/tei:origDate/tei:date[not(@type)]/@cert">
                                         <xf:label>Certainity</xf:label>
                                         <xf:item>
@@ -888,181 +850,179 @@
                                             <xf:label>unknown</xf:label>
                                             <xf:value>unknown</xf:value>
                                         </xf:item>
-                                    </xf:select1>--></xf:group><xf:group>
-                                    <xf:label>Place of issue</xf:label>
-                                    <xf:select1 ref="tei:profileDesc/tei:creation/tei:origPlace/tei:placeName" incremental="true">
-                                        <xf:label>Place</xf:label>
-                                        <xf:itemset bind="placesOfIssue">
-                                            <xf:label ref="tei:placeName"/>
-                                            <xf:value ref="tei:placeName"/>
-                                        </xf:itemset>
-                                    </xf:select1>
-                                    <!--<xf:select1 ref="tei:profileDesc/tei:creation/tei:origPlace/@cert">
-                                    
-                                        <xf:label>Certainity</xf:label>
-                                        <xf:itemset nodeset="instance('certainity')/cert">
-                                            <xf:label ref="."/>
-                                            <xf:value ref="."/>
-                                        </xf:itemset>
                                     </xf:select1>-->
-                                    <xf:switch style="position:relative; display:inline-block; top:4px;">
-                                        <xf:case id="newPlaceInputHidden" style="position:relative; display:inline-block; top:4px;">
-                                            <xf:group appearance="bf:horizontalTable">
-                                                <xf:trigger>
-                                                    <xf:label>New Place</xf:label>
-                                                    <xf:action>
-                                                        <xf:toggle case="newPlaceInputShown"/>
-                                                    </xf:action>
-                                                </xf:trigger>
-                                                <!-- show "Remove Place" button when placeName is not empty -->
-                                                <xf:group ref="tei:profileDesc/tei:creation/tei:origPlace/tei:placeName[. != '']">
-                                                    <xf:trigger>
-                                                        <xf:label>Remove Place</xf:label>
-                                                        <bfc:show dialog="removePlaceConfirmDialog" ev:event="DOMActivate"/>
-                                                    </xf:trigger>
-                                                    
-                                                    <bfc:dialog id="removePlaceConfirmDialog">
-                                                        <xf:group appearance="minimal">
-                                                            <xf:label>This will remove the selected place from the list of places and <b>delete any reference to it from all tablets.</b>
-                                                                <br/>Are you sure to proceed?</xf:label>
-                                                            <xf:trigger>
-                                                                <xf:label>Yes</xf:label>
-                                                                <bfc:hide dialog="removePlaceConfirmDialog" ev:event="DOMActivate"/>
-                                                                <xf:action>
-                                                                    <!-- update instance 'currentPlaceOfIssue' with the current placeName -->                 
-                                                                    <xf:setvalue ref="instance('currentPlaceOfIssue')/tei:placeName" value="instance('tablet')/tei:teiHeader/tei:profileDesc/tei:creation/tei:origPlace/tei:placeName"/>
-                                                                    <!--  remove this place from all tablets -->
-                                                                    <xf:send submission="removePlaceGlobally"/>                                   
-                                                                </xf:action>
-                                                            </xf:trigger>
-                                                            <xf:trigger>
-                                                                <xf:label>No</xf:label>
-                                                                <bfc:hide dialog="removePlaceConfirmDialog" ev:event="DOMActivate"/>
-                                                            </xf:trigger>
-                                                        </xf:group>
-                                                    </bfc:dialog>
-                                                </xf:group>
-                                            </xf:group>
-                                        </xf:case>
-                                        <!-- Input for new place of issue -->
-                                        <xf:case id="newPlaceInputShown">
-                                            <xf:group appearance="bf:horizontalTable">
-                                                <xf:input bind="currentPlaceOfIssue" incremental="true">
-                                                    <xf:alert>Place already defined</xf:alert>
-                                                </xf:input>
-                                                <xf:trigger>
-                                                    <xf:label>OK</xf:label>
-                                                    <xf:action ev:event="DOMActivate">
-                                                        <xf:setvalue ref="instance('currentPlaceOfIssue')/@xml:id" value="concat('place_',lower-case(replace(../tei:placeName,'\C','')))"/>                                                        
-                                                        <xf:insert context="instance('places')//tei:listPlace" origin="instance('currentPlaceOfIssue')" nodeset="tei:head" position="after"/>
-                                                        <xf:send submission="storePlaces"/>
-                                                        <!-- set value of drop down list -->
-                                                        <xf:setvalue bind="placeOfIssue" value="instance('currentPlaceOfIssue')/tei:placeName"/>
-                                                        <!-- reset "currentPlaceOfIssue" -->
-                                                        <xf:delete ref="instance('currentPlaceOfIssue')/tei:placeName"/>
-                                                        <xf:setvalue ref="instance('currentPlaceOfIssue')/@xml:id" value="instance('prototypes')/tei:place/@xml:id"/>
-                                                        <xf:insert context="instance('currentPlaceOfIssue')" origin="instance('prototypes')/tei:place/tei:placeName"/>
-                                                        <xf:toggle case="newPlaceInputHidden"/>
-                                                    </xf:action>
-                                                </xf:trigger>
-                                                <xf:trigger>
-                                                    <xf:label>abort</xf:label>
-                                                    <!-- reset "currentPlaceOfIssue" -->
-                                                    <xf:delete ref="instance('currentPlaceOfIssue')/tei:placeName"/>
-                                                    <xf:insert context="instance('currentPlaceOfIssue')" origin="instance('prototypes')/tei:place/tei:placeName"/>
-                                                    <xf:setvalue ref="instance('currentPlaceOfIssue')/@xml:id" value="instance('prototypes')/tei:place/@xml:id"/>
-                                                    <xf:toggle case="newPlaceInputHidden"/>
-                                                </xf:trigger>
-                                            </xf:group>
-                                        </xf:case>
-                                    </xf:switch>
-                                </xf:group>
-
-
-                            </xf:group>
-                        </div>
-                        <div class="tab-pane" id="tab3">
-                            <h4>Script</h4>
-                            <xf:select1 ref="tei:fileDesc[1]/tei:sourceDesc[1]/tei:msDesc[1]/tei:physDesc[1]/tei:handDesc[1]/tei:handNote[1]/tei:fs[1]/tei:f[@name='ductus']/tei:symbol[1]/@value">
-                                <xf:label>Script Ductus</xf:label>
-                                <xf:itemset bind="ductusFDecl">
-                                    <xf:label ref="@value"/>
-                                    <xf:value ref="@value"/>
-                                </xf:itemset>
-                            </xf:select1>
-                        </div>
-                        <div class="tab-pane" id="tab4">
-                            <h4>Content</h4>
-                            <xf:group>
-                                <xf:select1 bind="genre" incremental="true">
-                                    <xf:label>Text type</xf:label>
-                                    <xf:itemset bind="genres">
-                                        <xf:label ref="tei:catDesc"/>
-                                        <xf:value ref="tei:catDesc"/>
-                                    </xf:itemset>
-                                </xf:select1>
-                                <xf:switch style="position:relative; display:inline-block; top:4px;">
-                                    <xf:case id="newGenreInputHidden" style="position:relative; display:inline-block; top:4px;">
-                                        <xf:group appearance="bf:horizontalTable">
-                                            <xf:trigger>
-                                                <xf:label>New Genre</xf:label>
-                                                <xf:toggle case="newGenreInputShown"/>
-                                            </xf:trigger>
-                                            <xf:group ref="tei:profileDesc/tei:textClass/tei:keywords[@scheme = 'local']/tei:term[.!='']">
-                                                <xf:trigger>
-                                                    <xf:label>Remove Genre</xf:label>
-                                                    <bfc:show dialog="removeGenreConfirmDialog" ev:event="DOMActivate"/>
-                                                </xf:trigger>
-                                                
-                                                <bfc:dialog id="removeGenreConfirmDialog">
-                                                    <xf:group appearance="minimal">
-                                                        <xf:label>This will remove the selected genre from the list of genres and <b>delete any reference to it from all tablets.</b>
-                                                            <br/>Are you sure to proceed?</xf:label>
+                                        </xf:group>
+                                        <xf:group>
+                                            <xf:label>Place of issue</xf:label>
+                                            <xf:select1 ref="tei:profileDesc/tei:creation/tei:origPlace/tei:placeName" incremental="true">
+                                                <xf:label>Place</xf:label>
+                                                <xf:itemset bind="placesOfIssue">
+                                                    <xf:label ref="tei:placeName"/>
+                                                    <xf:value ref="tei:placeName"/>
+                                                </xf:itemset>
+                                            </xf:select1>
+                                            <xf:select1 ref="tei:profileDesc/tei:creation/tei:origPlace/tei:placeName/@evidence">
+                                                <xf:label>Evidence</xf:label>
+                                                <xf:itemset nodeset="instance('evidence')/evid">
+                                                    <xf:label ref="@label"/>
+                                                    <xf:value ref="."/>
+                                                </xf:itemset>
+                                                <xf:hint>Indicates the nature of the evidence. Values: 1] mentioned on tablet; 2] derived from archive;</xf:hint>
+                                            </xf:select1>
+                                            <xf:switch style="position:relative; display:inline-block; top:4px;">
+                                                <xf:case id="newPlaceInputHidden" style="position:relative; display:inline-block; top:4px;">
+                                                    <xf:group appearance="bf:horizontalTable">
                                                         <xf:trigger>
-                                                            <xf:label>Yes</xf:label>
-                                                            <bfc:hide dialog="removeGenreConfirmDialog" ev:event="DOMActivate"/>
+                                                            <xf:label>New Place</xf:label>
                                                             <xf:action>
-                                                                <xf:setvalue bind="currentGenre" value="context()"/>
-                                                                <xf:send submission="removeGenreGlobally"/>
+                                                                <xf:toggle case="newPlaceInputShown"/>
+                                                            </xf:action>
+                                                        </xf:trigger>
+                                                <!-- show "Remove Place" button when placeName is not empty -->
+                                                        <xf:group ref="tei:profileDesc/tei:creation/tei:origPlace/tei:placeName[. != '']">
+                                                            <xf:trigger>
+                                                                <xf:label>Remove Place</xf:label>
+                                                                <bfc:show dialog="removePlaceConfirmDialog" ev:event="DOMActivate"/>
+                                                            </xf:trigger>
+                                                            <bfc:dialog id="removePlaceConfirmDialog">
+                                                                <xf:group appearance="minimal">
+                                                                    <xf:label>This will remove the selected place from the list of places and <b>delete any reference to it from all tablets.</b>
+                                                                        <br/>Are you sure to proceed?</xf:label>
+                                                                    <xf:trigger>
+                                                                        <xf:label>Yes</xf:label>
+                                                                        <bfc:hide dialog="removePlaceConfirmDialog" ev:event="DOMActivate"/>
+                                                                        <xf:action>
+                                                                    <!-- update instance 'currentPlaceOfIssue' with the current placeName -->
+                                                                            <xf:setvalue ref="instance('currentPlaceOfIssue')/tei:placeName" value="instance('tablet')/tei:teiHeader/tei:profileDesc/tei:creation/tei:origPlace/tei:placeName"/>
+                                                                    <!--  remove this place from all tablets -->
+                                                                            <xf:send submission="removePlaceGlobally"/>
+                                                                        </xf:action>
+                                                                    </xf:trigger>
+                                                                    <xf:trigger>
+                                                                        <xf:label>No</xf:label>
+                                                                        <bfc:hide dialog="removePlaceConfirmDialog" ev:event="DOMActivate"/>
+                                                                    </xf:trigger>
+                                                                </xf:group>
+                                                            </bfc:dialog>
+                                                        </xf:group>
+                                                    </xf:group>
+                                                </xf:case>
+                                        <!-- Input for new place of issue -->
+                                                <xf:case id="newPlaceInputShown">
+                                                    <xf:group appearance="bf:horizontalTable">
+                                                        <xf:input bind="currentPlaceOfIssue" incremental="true">
+                                                            <xf:alert>Place already defined</xf:alert>
+                                                        </xf:input>
+                                                        <xf:trigger>
+                                                            <xf:label>OK</xf:label>
+                                                            <xf:action ev:event="DOMActivate">
+                                                                <xf:setvalue ref="instance('currentPlaceOfIssue')/@xml:id" value="concat('place_',lower-case(replace(../tei:placeName,'\C','')))"/>
+                                                                <xf:insert context="instance('places')//tei:listPlace" origin="instance('currentPlaceOfIssue')" nodeset="tei:head" position="after"/>
+                                                                <xf:send submission="storePlaces"/>
+                                                        <!-- set value of drop down list -->
+                                                                <xf:setvalue bind="placeOfIssue" value="instance('currentPlaceOfIssue')/tei:placeName"/>
+                                                        <!-- reset "currentPlaceOfIssue" -->
+                                                                <xf:delete ref="instance('currentPlaceOfIssue')/tei:placeName"/>
+                                                                <xf:setvalue ref="instance('currentPlaceOfIssue')/@xml:id" value="instance('prototypes')/tei:place/@xml:id"/>
+                                                                <xf:insert context="instance('currentPlaceOfIssue')" origin="instance('prototypes')/tei:place/tei:placeName"/>
+                                                                <xf:toggle case="newPlaceInputHidden"/>
                                                             </xf:action>
                                                         </xf:trigger>
                                                         <xf:trigger>
-                                                            <xf:label>No</xf:label>
-                                                            <bfc:hide dialog="removeGenreConfirmDialog" ev:event="DOMActivate"/>
+                                                            <xf:label>abort</xf:label>
+                                                    <!-- reset "currentPlaceOfIssue" -->
+                                                            <xf:delete ref="instance('currentPlaceOfIssue')/tei:placeName"/>
+                                                            <xf:insert context="instance('currentPlaceOfIssue')" origin="instance('prototypes')/tei:place/tei:placeName"/>
+                                                            <xf:setvalue ref="instance('currentPlaceOfIssue')/@xml:id" value="instance('prototypes')/tei:place/@xml:id"/>
+                                                            <xf:toggle case="newPlaceInputHidden"/>
                                                         </xf:trigger>
                                                     </xf:group>
-                                                </bfc:dialog>
-                                            </xf:group>
+                                                </xf:case>
+                                            </xf:switch>
                                         </xf:group>
-                                    </xf:case>
+                                    </xf:group>
+                                </div>
+                                <div class="tab-pane" id="tab3">
+                                    <h4>Script</h4>
+                                    <xf:select1 ref="tei:fileDesc[1]/tei:sourceDesc[1]/tei:msDesc[1]/tei:physDesc[1]/tei:handDesc[1]/tei:handNote[1]/tei:fs[1]/tei:f[@name='ductus']/tei:symbol[1]/@value">
+                                        <xf:label>Script Ductus</xf:label>
+                                        <xf:itemset bind="ductusFDecl">
+                                            <xf:label ref="@value"/>
+                                            <xf:value ref="@value"/>
+                                        </xf:itemset>
+                                    </xf:select1>
+                                </div>
+                                <div class="tab-pane" id="tab4">
+                                    <h4>Content</h4>
+                                    <xf:group>
+                                        <xf:select1 bind="genre" incremental="true">
+                                            <xf:label>Text type</xf:label>
+                                            <xf:itemset bind="genres">
+                                                <xf:label ref="tei:catDesc"/>
+                                                <xf:value ref="tei:catDesc"/>
+                                            </xf:itemset>
+                                        </xf:select1>
+                                        <xf:switch style="position:relative; display:inline-block; top:4px;">
+                                            <xf:case id="newGenreInputHidden" style="position:relative; display:inline-block; top:4px;">
+                                                <xf:group appearance="bf:horizontalTable">
+                                                    <xf:trigger>
+                                                        <xf:label>New Genre</xf:label>
+                                                        <xf:toggle case="newGenreInputShown"/>
+                                                    </xf:trigger>
+                                                    <xf:group ref="tei:profileDesc/tei:textClass/tei:keywords[@scheme = 'local']/tei:term[.!='']">
+                                                        <xf:trigger>
+                                                            <xf:label>Remove Genre</xf:label>
+                                                            <bfc:show dialog="removeGenreConfirmDialog" ev:event="DOMActivate"/>
+                                                        </xf:trigger>
+                                                        <bfc:dialog id="removeGenreConfirmDialog">
+                                                            <xf:group appearance="minimal">
+                                                                <xf:label>This will remove the selected genre from the list of genres and <b>delete any reference to it from all tablets.</b>
+                                                                    <br/>Are you sure to proceed?</xf:label>
+                                                                <xf:trigger>
+                                                                    <xf:label>Yes</xf:label>
+                                                                    <bfc:hide dialog="removeGenreConfirmDialog" ev:event="DOMActivate"/>
+                                                                    <xf:action>
+                                                                        <xf:setvalue bind="currentGenre" value="context()"/>
+                                                                        <xf:send submission="removeGenreGlobally"/>
+                                                                    </xf:action>
+                                                                </xf:trigger>
+                                                                <xf:trigger>
+                                                                    <xf:label>No</xf:label>
+                                                                    <bfc:hide dialog="removeGenreConfirmDialog" ev:event="DOMActivate"/>
+                                                                </xf:trigger>
+                                                            </xf:group>
+                                                        </bfc:dialog>
+                                                    </xf:group>
+                                                </xf:group>
+                                            </xf:case>
                                     <!-- Input für neue Textklasse -->
-                                    <xf:case id="newGenreInputShown">
-                                        <xf:group appearance="bf:horizontalTable">
-                                            <xf:input bind="currentGenre" incremental="true">
-                                                <xf:alert>Genre already defined</xf:alert>
-                                            </xf:input>
-                                            <xf:trigger>
-                                                <xf:label>OK</xf:label>
-                                                <xf:action ev:event="DOMActivate">
-                                                    <xf:setvalue ref="instance('currentGenre')/@xml:id" value="concat('genre_',lower-case(replace(../tei:catDesc,'\C','')))"/>
-                                                    <xf:insert context="instance('taxonomies')//tei:taxonomy[@xml:id = 'genres']" origin="instance('currentGenre')"/>
-                                                    <xf:send submission="storeTaxonomies"/>
+                                            <xf:case id="newGenreInputShown">
+                                                <xf:group appearance="bf:horizontalTable">
+                                                    <xf:input bind="currentGenre" incremental="true">
+                                                        <xf:alert>Genre already defined</xf:alert>
+                                                    </xf:input>
+                                                    <xf:trigger>
+                                                        <xf:label>OK</xf:label>
+                                                        <xf:action ev:event="DOMActivate">
+                                                            <xf:setvalue ref="instance('currentGenre')/@xml:id" value="concat('genre_',lower-case(replace(../tei:catDesc,'\C','')))"/>
+                                                            <xf:insert context="instance('taxonomies')//tei:taxonomy[@xml:id = 'genres']" origin="instance('currentGenre')"/>
+                                                            <xf:send submission="storeTaxonomies"/>
                                                     <!-- update the tablet with the newly created term -->
-                                                    <xf:setvalue bind="genre" value="instance('currentGenre')/tei:catDesc"/>
-                                                    <xf:toggle case="newGenreInputHidden"/>
-                                                </xf:action>
-                                            </xf:trigger>
-                                            <xf:trigger>
-                                                <xf:label>abort</xf:label>
-                                                <xf:toggle case="newGenreInputHidden"/>
-                                            </xf:trigger>
-                                        </xf:group>
-                                    </xf:case>
-                                </xf:switch>
-                                <xf:group appearance="bf:horizontalTable">
-                                    <xf:textarea ref="tei:profileDesc/tei:abstract/tei:ab">
-                                        <xf:label>Paraphrase</xf:label>
-                                    </xf:textarea>
+                                                            <xf:setvalue bind="genre" value="instance('currentGenre')/tei:catDesc"/>
+                                                            <xf:toggle case="newGenreInputHidden"/>
+                                                        </xf:action>
+                                                    </xf:trigger>
+                                                    <xf:trigger>
+                                                        <xf:label>abort</xf:label>
+                                                        <xf:toggle case="newGenreInputHidden"/>
+                                                    </xf:trigger>
+                                                </xf:group>
+                                            </xf:case>
+                                        </xf:switch>
+                                        <xf:group appearance="bf:horizontalTable">
+                                            <xf:textarea ref="tei:profileDesc/tei:abstract/tei:ab">
+                                                <xf:label>Paraphrase</xf:label>
+                                            </xf:textarea>
                                     <!--<xf:select1 ref="tei:profileDesc/tei:abstract/@xml:lang">
                                                 <xf:label>Paraphrase Language</xf:label>
                                                 <xf:item>
@@ -1074,236 +1034,222 @@
                                                     <xf:label>German</xf:label>
                                                 </xf:item>
                                             </xf:select1>-->
-                                </xf:group>
-                            </xf:group>
-
-
-                            <h4 id="list-persons-mentioned-head">Distinctive Protagonists</h4>
-
-                            <xf:repeat id="list-persons-mentioned" nodeset="tei:profileDesc/tei:particDesc/tei:person[@role='mentioned']">
-                                <xf:output ref="tei:persName"/>
-                            </xf:repeat>
-                            <xf:input ref="tei:persName">
-                                <xf:label>Name: </xf:label>
-                            </xf:input>
-
-                            <div id="edit-current-person-mentioned">
-                                <xf:trigger>
-                                    <xf:label>Delete</xf:label>
-                                    <xf:delete nodeset="tei:profileDesc/tei:particDesc/tei:person[@role='mentioned'][index('list-persons-mentioned')]"/>
-                                </xf:trigger>
-
-                                <xf:trigger>
-                                    <xf:label>New</xf:label>
-                                    <xf:insert context="tei:profileDesc/tei:particDesc" origin="instance('prototypes')/tei:person[@role='mentioned']"> </xf:insert>
-                                </xf:trigger>
-
-                                <br/>
-
-                                <xf:input id="edit-current-person-mentioned-input" incremental="true" ref="tei:profileDesc/tei:particDesc/tei:person[@role='mentioned'][index('list-persons-mentioned')]/tei:persName">
-                                    <xf:label>Edit selected person:</xf:label>
-                                </xf:input>
-                            </div>
-
-                        </div>
-                        <div class="tab-pane" id="tab-transliterations">
-                            <h4>Bibliography</h4>
-
-                            <xf:repeat id="list-translit" nodeset="tei:fileDesc[1]/tei:sourceDesc[1]/tei:msDesc[1]/tei:additional[1]/tei:surrogates[1]/tei:listBibl/tei:bibl">
-                                <i>
-                                    <xf:output incremental="true" ref="."/>
-                                </i>
-                            </xf:repeat>
-
-                            <div>
-                                <xf:trigger>
-                                    <xf:label>Delete</xf:label><xf:delete nodeset="tei:fileDesc[1]/tei:sourceDesc[1]/tei:msDesc[1]/tei:additional[1]/tei:surrogates[1]/tei:listBibl/tei:bibl[index('list-translit')]"/></xf:trigger>
-
-                                <xf:trigger>
-                                    <xf:label>New</xf:label><xf:insert context="tei:fileDesc[1]/tei:sourceDesc[1]/tei:msDesc[1]/tei:additional[1]/tei:surrogates[1]/tei:listBibl" origin="instance('prototypes')/tei:bibl[@type='transliteration']"/></xf:trigger>
-
-                                <br/>
-
-                                <xf:input id="edit-current-translit" incremental="true" ref="tei:fileDesc[1]/tei:sourceDesc[1]/tei:msDesc[1]/tei:additional[1]/tei:surrogates[1]/tei:listBibl/tei:bibl[index('list-translit')]">
-                                    <xf:label>Edit selected entry:</xf:label>
-                                </xf:input>
-                            </div>
-                        </div>
-                        <div class="tab-pane" id="tab-signs">
-                            <h3>Signs</h3>
-                            
-                            <xf:group appearance="bf:horizontalTable">
-                                <xf:input ref="instance('glyphListFilter')/filterExpression" incremental="true">
-                                    <xf:label>Sign Name, reading or context contains ...</xf:label>
-                                </xf:input>
-                            </xf:group>
-                            <xf:group relevant="exists(instance('tablet')//tei:seg[@type='context'])">
-                                <table class="table">
-                                    <thead>
-                                        <tr>
-                                            <th>Sign Name</th>
-                                            <th>Reading</th>
-                                            <th>Image file</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="lsGlyphs" xf:repeat-nodeset="instance('tablet')//tei:seg[@type='context'][some $x in (xs:string(.),tei:g/@type) satisfies contains($x,instance('glyphListFilter')/filterExpression)]">
-                                        <tr>
-                                            <td>
-                                                <xf:output ref="tei:g/@type"/>
-                                            </td>
-                                            <td>
-                                                <xf:output ref="tei:g"/>
-                                            </td>
-                                            <td>
-                                                <xf:output value="root(tei:g)//tei:graphic[@xml:id = substring-after(current()/tei:g/@facs,'#')]/ancestor::tei:surface/tei:graphic/replace(@url,'%20',' ')"/>
-                                            </td>
-                                            <td>
-                                                <xf:trigger appearance="minimal">
-                                                    <xf:label>show on image</xf:label>
-                                                    <xf:load show="replace">
-                                                        <xf:resource value="concat('annotate.xql?t=', instance('tablet')/@xml:id, '&amp;s=', encode-for-uri(root(tei:g)//tei:graphic[@xml:id = substring-after(current()/tei:g/@facs,'#')]/ancestor::tei:surface/tei:graphic/@url), '&amp;a=', tei:g/replace(@xml:id,'glyph_',''), '&amp;filter=', tei:g/replace(@xml:id,'glyph_',''))"/>
-                                                    </xf:load>
-                                                </xf:trigger>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </xf:group>
-
-                            <xf:switch>
-                                <xf:case id="editGlyphMenuHidden">
-                                    <xf:trigger bind="selectedContext">
-                                        <xf:label>Edit selected Sign</xf:label>
-                                        <xf:toggle case="editGlyphMenuShown"/>
-                                    </xf:trigger>
-                                    <xf:trigger bind="selectedContext">
-                                        <xf:label>Delete selected Sign</xf:label>
-                                        <xf:setvalue ref="instance('envelope')//data" value="instance('tablet')//tei:seg[@type='context'][some $x in (xs:string(.),tei:g/@type) satisfies contains($x,instance('glyphListFilter')/filterExpression)][index('lsGlyphs')]/@xml:id"/>
-                                        <xf:send submission="removeGlyph"/>
-                                        <xf:setvalue ref="instance('envelope')//data" value="''"/>
-                                        <xf:send submission="loadTablet"/>
-                                    </xf:trigger>
-                                </xf:case>
-                                <xf:case id="editGlyphMenuShown">
-                                    <xf:group ref="instance('tablet')//tei:seg[@type='context'][some $x in (xs:string(.),tei:g/@type) satisfies contains($x,instance('glyphListFilter')/filterExpression)][index('lsGlyphs')]">
-                                        <h4>Edit Sign</h4>
-                                        <div class="pull-right" id="signImg">
-                                            <xf:output mediatype="image/jpeg" value="concat('$app-root/data/tablets/',root(tei:g)/tei:TEI/@xml:id,'/',root(tei:g)//tei:graphic[@xml:id = substring-after(context()/tei:g/@facs,'#')]/@url)"/>
-                                        </div>
-                                        <xf:group appearance="bf:verticalTable">
-                                            <xf:select1 ref="tei:g/@type">
-                                                <xf:label>Sign Name</xf:label>
-                                                <xf:alert>must be a sign in the sign list</xf:alert>
-                                                <xf:itemset ref="instance('standardSigns')//tei:char">
-                                                    <xf:label ref="tei:charName"/>
-                                                    <xf:value ref="tei:charName"/>
-                                                </xf:itemset>
-                                            </xf:select1>
-                                            <xf:input ref="tei:g">
-                                                <xf:label>Reading</xf:label>
-                                                <xf:action ev:event="xforms-value-changed">
-                                                    <xf:setvalue ref="instance('computedContexts')/tei:seg[@xml:id = current()/parent::tei:seg/@xml:id]/@reading" value="context()/text()"/>
-                                                </xf:action>
-                                            </xf:input>
-
-                                            <xf:input ref="instance('computedContexts')/tei:seg[@xml:id = current()/@xml:id]/@context">
-                                                <xf:label>Context</xf:label>
-                                                <xf:alert>Context must contain reading</xf:alert>
-                                                <xf:action ev:event="xforms-value-changed">
+                                        </xf:group>
+                                    </xf:group>
+                                    <h4 id="list-persons-mentioned-head">Distinctive Protagonists</h4>
+                                    <xf:repeat id="list-persons-mentioned" nodeset="tei:profileDesc/tei:particDesc/tei:person[@role='mentioned']">
+                                        <xf:output ref="tei:persName"/>
+                                    </xf:repeat>
+                                    <xf:input ref="tei:persName">
+                                        <xf:label>Name: </xf:label>
+                                    </xf:input>
+                                    <div id="edit-current-person-mentioned">
+                                        <xf:trigger>
+                                            <xf:label>Delete</xf:label>
+                                            <xf:delete nodeset="tei:profileDesc/tei:particDesc/tei:person[@role='mentioned'][index('list-persons-mentioned')]"/>
+                                        </xf:trigger>
+                                        <xf:trigger>
+                                            <xf:label>New</xf:label>
+                                            <xf:insert context="tei:profileDesc/tei:particDesc" origin="instance('prototypes')/tei:person[@role='mentioned']"/>
+                                        </xf:trigger>
+                                        <br/>
+                                        <xf:input id="edit-current-person-mentioned-input" incremental="true" ref="tei:profileDesc/tei:particDesc/tei:person[@role='mentioned'][index('list-persons-mentioned')]/tei:persName">
+                                            <xf:label>Edit selected person:</xf:label>
+                                        </xf:input>
+                                    </div>
+                                </div>
+                                <div class="tab-pane" id="tab-transliterations">
+                                    <h4>Bibliography</h4>
+                                    <xf:repeat id="list-translit" nodeset="tei:fileDesc[1]/tei:sourceDesc[1]/tei:msDesc[1]/tei:additional[1]/tei:surrogates[1]/tei:listBibl/tei:bibl">
+                                        <i>
+                                            <xf:output incremental="true" ref="."/>
+                                        </i>
+                                    </xf:repeat>
+                                    <div>
+                                        <xf:trigger>
+                                            <xf:label>Delete</xf:label>
+                                            <xf:delete nodeset="tei:fileDesc[1]/tei:sourceDesc[1]/tei:msDesc[1]/tei:additional[1]/tei:surrogates[1]/tei:listBibl/tei:bibl[index('list-translit')]"/>
+                                        </xf:trigger>
+                                        <xf:trigger>
+                                            <xf:label>New</xf:label>
+                                            <xf:insert context="tei:fileDesc[1]/tei:sourceDesc[1]/tei:msDesc[1]/tei:additional[1]/tei:surrogates[1]/tei:listBibl" origin="instance('prototypes')/tei:bibl[@type='transliteration']"/>
+                                        </xf:trigger>
+                                        <br/>
+                                        <xf:input id="edit-current-translit" incremental="true" ref="tei:fileDesc[1]/tei:sourceDesc[1]/tei:msDesc[1]/tei:additional[1]/tei:surrogates[1]/tei:listBibl/tei:bibl[index('list-translit')]">
+                                            <xf:label>Edit selected entry:</xf:label>
+                                        </xf:input>
+                                    </div>
+                                </div>
+                                <div class="tab-pane" id="tab-signs">
+                                    <h3>Signs</h3>
+                                    <xf:group appearance="bf:horizontalTable">
+                                        <xf:input ref="instance('glyphListFilter')/filterExpression" incremental="true">
+                                            <xf:label>Sign Name, reading or context contains ...</xf:label>
+                                        </xf:input>
+                                    </xf:group>
+                                    <xf:group relevant="exists(instance('tablet')//tei:seg[@type='context'])">
+                                        <table class="table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Sign Name</th>
+                                                    <th>Reading</th>
+                                                    <th>Image file</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="lsGlyphs" xf:repeat-nodeset="instance('tablet')//tei:seg[@type='context'][some $x in (xs:string(.),tei:g/@type) satisfies contains($x,instance('glyphListFilter')/filterExpression)]">
+                                                <tr>
+                                                    <td>
+                                                        <xf:output ref="tei:g/@type"/>
+                                                    </td>
+                                                    <td>
+                                                        <xf:output ref="tei:g"/>
+                                                    </td>
+                                                    <td>
+                                                        <xf:output value="root(tei:g)//tei:graphic[@xml:id = substring-after(current()/tei:g/@facs,'#')]/ancestor::tei:surface/tei:graphic/replace(@url,'%20',' ')"/>
+                                                    </td>
+                                                    <td>
+                                                        <xf:trigger appearance="minimal">
+                                                            <xf:label>show on image</xf:label>
+                                                            <xf:load show="replace">
+                                                                <xf:resource value="concat('annotate.xql?t=', instance('tablet')/@xml:id, '&amp;s=', encode-for-uri(root(tei:g)//tei:graphic[@xml:id = substring-after(current()/tei:g/@facs,'#')]/ancestor::tei:surface/tei:graphic/@url), '&amp;a=', tei:g/replace(@xml:id,'glyph_',''), '&amp;filter=', tei:g/replace(@xml:id,'glyph_',''))"/>
+                                                            </xf:load>
+                                                        </xf:trigger>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </xf:group>
+                                    <xf:switch>
+                                        <xf:case id="editGlyphMenuHidden">
+                                            <xf:trigger bind="selectedContext">
+                                                <xf:label>Edit selected Sign</xf:label>
+                                                <xf:toggle case="editGlyphMenuShown"/>
+                                            </xf:trigger>
+                                            <xf:trigger bind="selectedContext">
+                                                <xf:label>Delete selected Sign</xf:label>
+                                                <xf:setvalue ref="instance('envelope')//data" value="instance('tablet')//tei:seg[@type='context'][some $x in (xs:string(.),tei:g/@type) satisfies contains($x,instance('glyphListFilter')/filterExpression)][index('lsGlyphs')]/@xml:id"/>
+                                                <xf:send submission="removeGlyph"/>
+                                                <xf:setvalue ref="instance('envelope')//data" value="''"/>
+                                                <xf:send submission="loadTablet"/>
+                                            </xf:trigger>
+                                        </xf:case>
+                                        <xf:case id="editGlyphMenuShown">
+                                            <xf:group ref="instance('tablet')//tei:seg[@type='context'][some $x in (xs:string(.),tei:g/@type) satisfies contains($x,instance('glyphListFilter')/filterExpression)][index('lsGlyphs')]">
+                                                <h4>Edit Sign</h4>
+                                                <div class="pull-right" id="signImg">
+                                                    <xf:output mediatype="image/jpeg" value="concat('$app-root/data/tablets/',root(tei:g)/tei:TEI/@xml:id,'/',root(tei:g)//tei:graphic[@xml:id = substring-after(context()/tei:g/@facs,'#')]/@url)"/>
+                                                </div>
+                                                <xf:group appearance="bf:verticalTable">
+                                                    <xf:select1 ref="tei:g/@type">
+                                                        <xf:label>Sign Name</xf:label>
+                                                        <xf:alert>must be a sign in the sign list</xf:alert>
+                                                        <xf:itemset ref="instance('standardSigns')//tei:char">
+                                                            <xf:label ref="tei:charName"/>
+                                                            <xf:value ref="tei:charName"/>
+                                                        </xf:itemset>
+                                                    </xf:select1>
+                                                    <xf:input ref="tei:g">
+                                                        <xf:label>Reading</xf:label>
+                                                        <xf:action ev:event="xforms-value-changed">
+                                                            <xf:setvalue ref="instance('computedContexts')/tei:seg[@xml:id = current()/parent::tei:seg/@xml:id]/@reading" value="context()/text()"/>
+                                                        </xf:action>
+                                                    </xf:input>
+                                                    <xf:input ref="instance('computedContexts')/tei:seg[@xml:id = current()/@xml:id]/@context">
+                                                        <xf:label>Context</xf:label>
+                                                        <xf:alert>Context must contain reading</xf:alert>
+                                                        <xf:action ev:event="xforms-value-changed">
                                                     <!-- for convenience we store the string-representation of the context and its id to a temporary "currentContext" instance -->
-                                                    <xf:setvalue ref="instance('currentContext')/@xml:id" value="context()/../@xml:id"/>
-                                                    <xf:setvalue ref="instance('currentContext')" value="context()"/>
+                                                            <xf:setvalue ref="instance('currentContext')/@xml:id" value="context()/../@xml:id"/>
+                                                            <xf:setvalue ref="instance('currentContext')" value="context()"/>
                                                     
                                                     <!-- remove all text below the original tei:seg context -->
-                                                    <xf:delete ref="instance('tablet')//tei:seg[@type='context'][@xml:id = instance('currentContext')/@xml:id]/text()"/>
+                                                            <xf:delete ref="instance('tablet')//tei:seg[@type='context'][@xml:id = instance('currentContext')/@xml:id]/text()"/>
                                                     
                                                     <!-- store the substrings before and after the tei:g element into the tmpContext instance -->
-                                                    <xf:setvalue ref="instance('tmpContext')/substring-after-glyph" value="                                                         if (contains(instance('currentContext'),'*'))                                                          then substring-after(instance('currentContext'),concat(instance('tablet')//tei:seg[@type='context'][@xml:id = instance('currentContext')/@xml:id]/tei:g/text(),'*'))                                                          else substring-after(instance('currentContext'),instance('tablet')//tei:seg[@type='context'][@xml:id = instance('currentContext')/@xml:id]/tei:g/text())"/>
-                                                    <xf:setvalue ref="instance('tmpContext')/substring-before-glyph" value="                                                         if (contains(instance('currentContext'),'*'))                                                          then substring-before(instance('currentContext'),concat(instance('tablet')//tei:seg[@type='context'][@xml:id = instance('currentContext')/@xml:id]/tei:g/text(),'*'))                                                          else substring-before(instance('currentContext'),instance('tablet')//tei:seg[@type='context'][@xml:id = instance('currentContext')/@xml:id]/tei:g/text())"/>
+                                                            <xf:setvalue ref="instance('tmpContext')/substring-after-glyph" value="                                                         if (contains(instance('currentContext'),'*'))                                                          then substring-after(instance('currentContext'),concat(instance('tablet')//tei:seg[@type='context'][@xml:id = instance('currentContext')/@xml:id]/tei:g/text(),'*'))                                                          else substring-after(instance('currentContext'),instance('tablet')//tei:seg[@type='context'][@xml:id = instance('currentContext')/@xml:id]/tei:g/text())"/>
+                                                            <xf:setvalue ref="instance('tmpContext')/substring-before-glyph" value="                                                         if (contains(instance('currentContext'),'*'))                                                          then substring-before(instance('currentContext'),concat(instance('tablet')//tei:seg[@type='context'][@xml:id = instance('currentContext')/@xml:id]/tei:g/text(),'*'))                                                          else substring-before(instance('currentContext'),instance('tablet')//tei:seg[@type='context'][@xml:id = instance('currentContext')/@xml:id]/tei:g/text())"/>
                                                     
-                                                    <!-- remove any tei:g elements except the first one and any text from the original tei:seg context, leaving only one tei:g element -->  
-                                                    <xf:delete ref="instance('tablet')//tei:seg[@type='context'][@xml:id = instance('currentContext')/@xml:id]/(text(),tei:g[position() gt 1])"/>
+                                                    <!-- remove any tei:g elements except the first one and any text from the original tei:seg context, leaving only one tei:g element -->
+                                                            <xf:delete ref="instance('tablet')//tei:seg[@type='context'][@xml:id = instance('currentContext')/@xml:id]/(text(),tei:g[position() gt 1])"/>
                                                     
                                                     <!-- insert substring-before and substring-after from the tmpContext instance before and after the tei:g element in the tei:seg element  -->
-                                                    <xf:insert nodeset="instance('tablet')//tei:seg[@type='context'][@xml:id = instance('currentContext')/@xml:id]/tei:g[1]" origin="instance('tmpContext')/substring-before-glyph/text()" position="before"/>
-                                                    <xf:insert nodeset="instance('tablet')//tei:seg[@type='context'][@xml:id = instance('currentContext')/@xml:id]/tei:g[1]" origin="instance('tmpContext')/substring-after-glyph/text()" position="after"/>
-                                                </xf:action>
-                                            </xf:input>
-                                            <xf:input ref="instance('tablet')//tei:glyph[@xml:id = substring-after(current()/tei:g/@ana,'#')]/tei:charProp[tei:localName='sequence']/tei:value">
-                                                <xf:label>Sequence</xf:label>
-                                            </xf:input>
-                                            <xf:input ref="instance('tablet')//tei:glyph[@xml:id = substring-after(current()/tei:g/@ana,'#')]/tei:charProp[tei:localName='arrangement']/tei:value">
-                                                <xf:label>Arrangement</xf:label>
-                                            </xf:input>
-                                            <xf:textarea ref="instance('tablet')//tei:note[@target = concat('#',current()/tei:g/@xml:id)]">
-                                                <xf:label>Note</xf:label>
-                                            </xf:textarea>
-
-                                            <xf:trigger>
-                                                <xf:label>finish</xf:label>
-                                                <xf:toggle case="editGlyphMenuHidden"/>
-                                            </xf:trigger>
-                                        </xf:group>
-
+                                                            <xf:insert nodeset="instance('tablet')//tei:seg[@type='context'][@xml:id = instance('currentContext')/@xml:id]/tei:g[1]" origin="instance('tmpContext')/substring-before-glyph/text()" position="before"/>
+                                                            <xf:insert nodeset="instance('tablet')//tei:seg[@type='context'][@xml:id = instance('currentContext')/@xml:id]/tei:g[1]" origin="instance('tmpContext')/substring-after-glyph/text()" position="after"/>
+                                                        </xf:action>
+                                                    </xf:input>
+                                                    <xf:input ref="instance('tablet')//tei:glyph[@xml:id = substring-after(current()/tei:g/@ana,'#')]/tei:charProp[tei:localName='sequence']/tei:value">
+                                                        <xf:label>Sequence</xf:label>
+                                                    </xf:input>
+                                                    <xf:input ref="instance('tablet')//tei:glyph[@xml:id = substring-after(current()/tei:g/@ana,'#')]/tei:charProp[tei:localName='arrangement']/tei:value">
+                                                        <xf:label>Arrangement</xf:label>
+                                                    </xf:input>
+                                                    <xf:textarea ref="instance('tablet')//tei:note[@target = concat('#',current()/tei:g/@xml:id)]">
+                                                        <xf:label>Note</xf:label>
+                                                    </xf:textarea>
+                                                    <xf:trigger>
+                                                        <xf:label>finish</xf:label>
+                                                        <xf:toggle case="editGlyphMenuHidden"/>
+                                                    </xf:trigger>
+                                                </xf:group>
+                                            </xf:group>
+                                        </xf:case>
+                                    </xf:switch>
+                                </div>
+                                <div class="tab-pane" id="tab-imgs">
+                                    <h3>Images</h3>
+                                    <xf:output value="instance('selectedSurface')/id"/>
+                                    <xf:repeat ref="instance('tablet')/tei:sourceDoc/tei:surface" id="repeat-surfaces">
+                                        <xf:output value="if (contains(tei:graphic/@url,'%20')) then replace(tei:graphic/@url,'%20',' ') else tei:graphic/@url"/>
+                                        <xf:trigger>
+                                            <xf:label>annotate signs</xf:label>
+                                            <xf:load show="replace">
+                                                <xf:resource value="concat('annotate.xql?t=', instance('tablet')/@xml:id, '&amp;s=', encode-for-uri(tei:graphic/@url))"/>
+                                            </xf:load>
+                                        </xf:trigger>
+                                        <xf:trigger>
+                                            <xf:label>delete image</xf:label>
+                                            <xf:action>
+                                                <xf:setvalue ref="instance('selectedSurface')/id" value="instance('tablet')/tei:sourceDoc/tei:surface[index('repeat-surfaces')]/tei:graphic/encode-for-uri(@url)"/>
+                                                <xf:send submission="removeSurface"/>
+                                            </xf:action>
+                                        </xf:trigger>
+                                    </xf:repeat>
+                                    <xf:group ref="instance('tablet')/tei:sourceDoc[exists(tei:surface)]">
+                                        <xf:trigger appearance="minimal">
+                                            <xf:label>New images can be uploaded via the <i>tablet annotator</i>
+                                            </xf:label>
+                                            <xf:load show="replace">
+                                                <xf:resource value="concat('annotate.xql?t=', instance('tablet')/@xml:id)"/>
+                                            </xf:load>
+                                        </xf:trigger>
                                     </xf:group>
-                                </xf:case>
-                            </xf:switch>
-                        </div>
-                        <div class="tab-pane" id="tab-imgs">
-                            <h3>Images</h3>                 
-                            <xf:output value="instance('selectedSurface')/id"/>
-                            <xf:repeat ref="instance('tablet')/tei:sourceDoc/tei:surface" id="repeat-surfaces">
-                                <xf:output value="if (contains(tei:graphic/@url,'%20')) then replace(tei:graphic/@url,'%20',' ') else tei:graphic/@url"/>
-                                <xf:trigger>
-                                    <xf:label>annotate signs</xf:label>
-                                    <xf:load show="replace">
-                                        <xf:resource value="concat('annotate.xql?t=', instance('tablet')/@xml:id, '&amp;s=', encode-for-uri(tei:graphic/@url))"/>
-                                    </xf:load>
-                                </xf:trigger>
-                                <xf:trigger>
-                                    <xf:label>delete image</xf:label>
-                                    <xf:action>
-                                        <xf:setvalue ref="instance('selectedSurface')/id" value="instance('tablet')/tei:sourceDoc/tei:surface[index('repeat-surfaces')]/tei:graphic/encode-for-uri(@url)"/>
-                                        <xf:send submission="removeSurface"/>
-                                    </xf:action>
-                                </xf:trigger>
-                            </xf:repeat>
-                            <xf:group ref="instance('tablet')/tei:sourceDoc[exists(tei:surface)]">
-                                <xf:trigger appearance="minimal">
-                                    <xf:label>New images can be uploaded via the <i>tablet annotator</i></xf:label>
-                                    <xf:load show="replace">
-                                        <xf:resource value="concat('annotate.xql?t=', instance('tablet')/@xml:id)"/>
-                                    </xf:load>
-                                </xf:trigger>
-                            </xf:group>
-                            <xf:group ref="instance('tablet')/tei:sourceDoc[not(exists(tei:surface))]">
-                                <p>There is no image for this tablet yet. 
+                                    <xf:group ref="instance('tablet')/tei:sourceDoc[not(exists(tei:surface))]">
+                                        <p>There is no image for this tablet yet. 
                                     <xf:trigger appearance="minimal">
-                                        <xf:label>You may want to upload one via the <i>tablet annotator</i></xf:label>
-                                        <xf:load show="replace">
-                                            <xf:resource value="concat('annotate.xql?t=', instance('tablet')/@xml:id)"/>
-                                        </xf:load>
-                                    </xf:trigger>.
+                                                <xf:label>You may want to upload one via the <i>tablet annotator</i>
+                                                </xf:label>
+                                                <xf:load show="replace">
+                                                    <xf:resource value="concat('annotate.xql?t=', instance('tablet')/@xml:id)"/>
+                                                </xf:load>
+                                            </xf:trigger>.
                                 </p>
-                            </xf:group>
+                                    </xf:group>
+                                </div>
+                            </div>
                         </div>
-
-                    </div>
-                </div>
-
-                <xf:group appearance="minimal" id="tabletEditButtons">
-                    <xf:trigger>
-                        <xf:label>store</xf:label>
-                        <xf:send submission="saveTablet"/>
-                        <xf:send submission="loadTablet"/>
-                    </xf:trigger>
-                    <xf:trigger>
-                        <xf:label>revert</xf:label>
-                        <xf:reset/>
-                        <xf:send submission="ls"/>
-                    </xf:trigger>
-                </xf:group>
-            </xf:group>
+                        <xf:group appearance="minimal" id="tabletEditButtons">
+                            <xf:trigger>
+                                <xf:label>store</xf:label>
+                                <xf:send submission="saveTablet"/>
+                                <xf:send submission="loadTablet"/>
+                            </xf:trigger>
+                            <xf:trigger>
+                                <xf:label>revert</xf:label>
+                                <xf:reset/>
+                                <xf:send submission="ls"/>
+                            </xf:trigger>
+                        </xf:group>
+                    </xf:group>
                 </xf:case>
             </xf:switch>
         </div>

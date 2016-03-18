@@ -12,7 +12,7 @@ let $tablets :=
     return 
         map{
             "id" 		:= $t/xs:string(@xml:id),
-            "title" 	:= $t/tei:teiHeader/tei:fileDesc/tei:titleStmt/data(tei:title),
+            "idno" 	:= $t/tei:teiHeader/tei:fileDesc/tei:sourceDesc/tei:msDesc/tei:msIdentifier/data(tei:idno),
             "filename"	:= util:document-name($t),
            	"path"		:= util:collection-name($t)
         }
@@ -21,11 +21,11 @@ return
 	for $t in $tablets
 	let $permissions := sm:get-permissions($t("path"))
 	let $editable := if ($permissions/*/@owner = $user or $user = sm:get-group-members("cfdbEditors")) then true() else false()
-	order by $t("title") 
+	order by $t("idno") 
 	return
 	<tablet editable="{if ($editable) then 1 else 0}">
 		<id>{$t("id")}</id>
 		<path>{$t("path")}</path>
-		<title>{$t("title")}</title>
+		<idno>{$t("idno")}</idno>
 	</tablet>
 }</tablets>

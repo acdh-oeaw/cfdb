@@ -14,3 +14,5 @@ sync
 /src/post-install.xql
 /build
 /build.properties
+/src/config.xml
+/src/sync.xql
