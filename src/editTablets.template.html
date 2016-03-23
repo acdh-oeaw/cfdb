@@ -135,7 +135,10 @@
         <!-- *** controlled vocabularies lifecycle management *** -->
         <!-- holds the tei:persName data for a new scribe to be inserted into the list of scribes -->
         <xf:instance xmlns="" id="currentScribe">
-            <data>
+            <data newName="">
+                <tei:person role="scribe">
+                    <tei:persName/>
+                </tei:person>
                 <tei:note type="returnMsg"/>
             </data>
         </xf:instance>
@@ -183,6 +186,8 @@
         <!-- Scribe: instance data and list of values  -->
         <xf:bind id="scribe" ref="instance('tablet')/tei:teiHeader/tei:fileDesc/tei:sourceDesc/tei:msDesc/tei:physDesc/tei:handDesc/tei:handNote/tei:persName[@role='scribe']"/>
         <xf:bind id="scribes" ref="instance('persons')/tei:text/tei:body/tei:listPerson[@xml:id='scribes']/tei:person"/>
+        <xf:bind id="currentScribeNewName" ref="instance('currentScribe')/@newName"/>
+        
 
         <!-- Period: instance data and  list of values-->
         <xf:bind id="period" nodeset="tei:profileDesc/tei:creation/tei:origDate/tei:date[@calendar='#gregorian']/@period"/>
@@ -344,9 +349,16 @@
             <xf:message ev:event="xforms-submit-error" level="ephemeral">storing person list has failed</xf:message>
             <xf:message ev:event="xforms-submit-done" level="ephemeral">person list saved successfully</xf:message>
         </xf:submission>
-        
-       
-        
+        <xf:submission id="renameScribes" method="execute" ref="instance('currentScribe')" replace="instance" resource="exist:/db/apps/cfdb/api/renameScribesGlobally.xql" includenamespaceprefixes="#default" mediatype="application/xml" indent="false">
+            <xf:action ev:event="xforms-submit-done">
+                <xf:setvalue ref="instance('persons')//tei:person[@role='scribe']/tei:persName[. = instance('tablet')//tei:handDesc/tei:handNote/tei:persName[@role='scribe']]" value="instance('currentScribe')/@newName"/>
+                <xf:delete nodeset="instance('persons')//tei:person[@role='scribe'][tei:persName = instance('currentScribe')/@newName][position() gt 1]"/>
+                <xf:send submission="storePersons"/>
+                <xf:send submission="loadTablet"/>
+            </xf:action>
+            <xf:message ev:event="xforms-submit-error" level="ephemeral">renaming person has failed </xf:message>
+            <xf:message ev:event="xforms-submit-done" level="ephemeral" ref="instance('currentScribe')//tei:note"/>
+        </xf:submission>
         
         <!-- ** Global resets for controlled vocabularies ** -->
         <xf:submission id="removePeriodGlobally" method="execute" ref="instance('currentPeriod')" replace="instance" includenamespaceprefixes="#default" resource="exist:/db/apps/@app.name@/api/removePeriodGlobally.xql">
@@ -684,6 +696,13 @@
                                                                 <xf:label>Remove Scribe</xf:label>
                                                                 <bfc:show dialog="removeScribeConfirmDialog" ev:event="DOMActivate"/>
                                                             </xf:trigger>
+                                                            <xf:trigger>
+                                                                <xf:label>Rename Scribe</xf:label>
+ <!-- instance('tablet')/tei:teiHeader/tei:fileDesc/tei:sourceDesc/tei:msDesc/tei:physDesc/tei:handDesc/tei:handNote/tei:persName[@role='scribe']  -->
+                                                                <xf:setvalue ref="instance('currentScribe')/@newName" value="instance('tablet')//tei:handDesc/tei:handNote/tei:persName[@role='scribe']"/>
+                                                                <xf:setvalue ref="instance('currentScribe')//tei:persName" value="instance('tablet')//tei:handDesc/tei:handNote/tei:persName[@role='scribe']"/>
+                                                                <xf:toggle case="renameScribe"/>
+                                                            </xf:trigger>
                                                             <bfc:dialog id="removeScribeConfirmDialog">
                                                                 <xf:group appearance="minimal">
                                                                     <xf:label>This will remove <i>
@@ -725,6 +744,26 @@
                                                         <!-- adds a new tei:person element to the list of scribes -->
                                                                 <xf:insert context="instance('persons')/tei:text/tei:body/tei:listPerson[@xml:id='scribes']" nodeset="tei:head" origin="instance('prototypes')/tei:person[@role='scribe']" position="after"/>
                                                                 <xf:send submission="storePersons"/>
+                                                                <xf:toggle case="newScribeInputHidden"/>
+                                                            </xf:action>
+                                                        </xf:trigger>
+                                                        <xf:trigger>
+                                                            <xf:label>abort</xf:label>
+                                                            <xf:toggle case="newScribeInputHidden"/>
+                                                        </xf:trigger>
+                                                    </xf:group>
+                                                </xf:case>
+                                        <!-- Input for renaming scribe -->
+                                                <xf:case id="renameScribe">
+                                                    <xf:group appearance="bf:horizontalTable">
+                                                        <xf:input bind="currentScribeNewName" incremental="true">
+                                                            <xf:alert>Scribe already exists</xf:alert>
+                                                        </xf:input>
+                                                        <xf:trigger>
+                                                            <xf:label>OK</xf:label>
+                                                            <xf:action ev:event="DOMActivate">
+                                                                <!-- renames all scribes in the database and, if successfull, replaces the name in the person list.  -->
+                                                                <xf:send submission="renameScribes"/>
                                                                 <xf:toggle case="newScribeInputHidden"/>
                                                             </xf:action>
                                                         </xf:trigger>
@@ -798,7 +837,7 @@
                                                         <xf:trigger>
                                                             <xf:label>OK</xf:label>
                                                             <xf:action ev:event="DOMActivate">
-                                                                <xf:setvalue ref="instance('prototypes')/tei:taxonomy[@xml:id = 'periods']/tei:category/@xml:id" value="concat('peri_',lower-case(replace(instance('prototypes')/tei:taxonomy[@xml:id = 'periods']/tei:category/tei:catDesc,'\C','')))"/>
+                                                                <xf:setvalue ref="instance('prototypes')/tei:taxonomy[@xml:id = 'periods']/tei:category/@xml:id" value="lower-case(replace(instance('prototypes')/tei:taxonomy[@xml:id = 'periods']/tei:category/tei:catDesc,'\C',''))"/>
                                                                 <xf:setvalue bind="period" value="instance('prototypes')/tei:taxonomy[@xml:id = 'periods']/tei:category/@xml:id"/>
                                                                 <xf:insert context="instance('taxonomies')//tei:taxonomy[@xml:id = 'periods']" origin="instance('prototypes')/tei:taxonomy[@xml:id = 'periods']/tei:category"/>
                                                                 <xf:send submission="storeTaxonomies"/>
