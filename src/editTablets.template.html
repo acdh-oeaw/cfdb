@@ -155,7 +155,7 @@
         </xf:instance>
         <xf:instance xmlns="" id="currentGenre">
             <category xmlns="http://www.tei-c.org/ns/1.0" xml:id="currentGenre">
-                <catDesc/>
+                <catDesc newName="" nameToChange=""/>
             </category>
         </xf:instance>
         
@@ -188,7 +188,6 @@
         <xf:bind id="scribes" ref="instance('persons')/tei:text/tei:body/tei:listPerson[@xml:id='scribes']/tei:person"/>
         <xf:bind id="currentScribeNewName" ref="instance('currentScribe')/@newName"/>
         
-
         <!-- Period: instance data and  list of values-->
         <xf:bind id="period" nodeset="tei:profileDesc/tei:creation/tei:origDate/tei:date[@calendar='#gregorian']/@period"/>
         <xf:bind id="periods" ref="instance('taxonomies')/tei:teiHeader/tei:encodingDesc/tei:classDecl/tei:taxonomy[@xml:id='periods']/tei:category"/>
@@ -198,6 +197,8 @@
         <xf:bind id="genres" ref="instance('taxonomies')/tei:teiHeader/tei:encodingDesc/tei:classDecl/tei:taxonomy[@xml:id='genres']/tei:category"/>
         <xf:bind id="genre" ref="instance('tablet')/tei:teiHeader/tei:profileDesc/tei:textClass/tei:keywords/tei:term"/>
         <xf:bind id="currentGenre" ref="instance('currentGenre')/tei:catDesc" constraint="not(normalize-space(.) = instance('taxonomies')//tei:taxonomy[@*[local-name() = 'id'] = 'genres']/tei:category/normalize-space(tei:catDesc)) and not(@*[local-name() = 'id'] = instance('taxonomies')//tei:taxonomy[@*[local-name() = 'id'] = 'genres']/tei:category/tei:catDesc/@*[local-name() = 'id'])"/>
+        <xf:bind id="currentGenreNewName" ref="instance('currentGenre')/tei:catDesc/@newName"/>
+        
         
         <!-- Date of Issue -->
         <xf:bind constraint="matches(.,'(^\d{1,2}/\d{1,2}/\-?\d{1,4}$)?')" id="dateOfIssue" ref="instance('tablet')/tei:teiHeader/tei:profileDesc/tei:creation/tei:origDate/tei:date[@calendar='#gregorian']"/>
@@ -236,7 +237,6 @@
             <xf:message ev:event="xforms-submit-error" level="ephemeral">tablets listing has failed (error-type: <xf:output value="event('error-type')"/>, status-code: <xf:output value="event('response-status-code')"/>)</xf:message>
             <!--<xf:message ev:event="xforms-submit-done" level="ephemeral">tablets listed successfully</xf:message>-->
         </xf:submission>
-        
         
         
         <!-- Loads a single tablet -->
@@ -329,9 +329,7 @@
             <xf:message ev:event="xforms-submit-done" level="ephemeral" ref="instance('envelope')/msg"/>
             <xf:send ev:event="xforms-submit-done" submission="ls"/>
         </xf:submission>
-
-
-
+        
         <!-- stores instance 'places' to the resource data/etc/places.xml -->
         <xf:submission id="storePlaces" method="put" ref="instance('places')" replace="instance" resource="exist:/db/@data.dir@/etc/places.xml" includenamespaceprefixes="#default" mediatype="application/xml" indent="false">
             <xf:message ev:event="xforms-submit-error" level="ephemeral">storing place list has failed</xf:message>
@@ -344,10 +342,16 @@
             <xf:message ev:event="xforms-submit-done" level="ephemeral">taxonomies updated successfully</xf:message>
         </xf:submission>
         
+               
         <!-- stores instance 'persons' to the resource data/etc/persons.xml -->
         <xf:submission id="storePersons" method="put" ref="instance('persons')" replace="instance" resource="exist:/db/@data.dir@/etc/persons.xml">
             <xf:message ev:event="xforms-submit-error" level="ephemeral">storing person list has failed</xf:message>
             <xf:message ev:event="xforms-submit-done" level="ephemeral">person list saved successfully</xf:message>
+        </xf:submission>
+        <xf:submission id="renameGenres" method="execute" ref="instance('currentGenre')" replace="instance" resource="exist:/db/apps/cfdb/api/renameGenresGlobally.xql" includenamespaceprefixes="#default" mediatype="application/xml" indent="false">
+            <xf:send submission="loadTablet"/>
+            <xf:message ev:event="xforms-submit-error" level="ephemeral">renaming genres has failed</xf:message>
+            <xf:message ev:event="xforms-submit-done" level="ephemeral">reanming genres succeeded</xf:message>
         </xf:submission>
         <xf:submission id="renameScribes" method="execute" ref="instance('currentScribe')" replace="instance" resource="exist:/db/apps/cfdb/api/renameScribesGlobally.xql" includenamespaceprefixes="#default" mediatype="application/xml" indent="false">
             <xf:action ev:event="xforms-submit-done">
@@ -698,7 +702,6 @@
                                                             </xf:trigger>
                                                             <xf:trigger>
                                                                 <xf:label>Rename Scribe</xf:label>
- <!-- instance('tablet')/tei:teiHeader/tei:fileDesc/tei:sourceDesc/tei:msDesc/tei:physDesc/tei:handDesc/tei:handNote/tei:persName[@role='scribe']  -->
                                                                 <xf:setvalue ref="instance('currentScribe')/@newName" value="instance('tablet')//tei:handDesc/tei:handNote/tei:persName[@role='scribe']"/>
                                                                 <xf:setvalue ref="instance('currentScribe')//tei:persName" value="instance('tablet')//tei:handDesc/tei:handNote/tei:persName[@role='scribe']"/>
                                                                 <xf:toggle case="renameScribe"/>
@@ -1064,6 +1067,13 @@
                                                                 </xf:trigger>
                                                             </xf:group>
                                                         </bfc:dialog>
+                                                        <xf:trigger>
+                                                            <xf:label>Rename Genre</xf:label>
+                                                            <xf:setvalue ref="instance('currentGenre')//tei:catDesc/@newName" value="instance('tablet')//tei:keywords/tei:term"/>
+                                                            <xf:setvalue ref="instance('currentGenre')//tei:catDesc" value="concat('genre_',lower-case(replace(instance('tablet')//tei:keywords/tei:term,'\C','')))"/>
+                                                            <xf:setvalue ref="instance('currentGenre')//tei:catDesc/@nameToChange" value="instance('tablet')//tei:keywords/tei:term"/>
+                                                            <xf:toggle case="renameGenre"/>
+                                                        </xf:trigger>
                                                     </xf:group>
                                                 </xf:group>
                                             </xf:case>
@@ -1087,6 +1097,25 @@
                                                     <xf:trigger>
                                                         <xf:label>abort</xf:label>
                                                         <xf:toggle case="newGenreInputHidden"/>
+                                                    </xf:trigger>
+                                                </xf:group>
+                                            </xf:case>
+                                            <xf:case id="renameGenre">
+                                                <xf:group appearance="bf:horizontalTable">
+                                                    <xf:input bind="currentGenreNewName" incremental="true">
+                                                        <xf:alert>Genre already exists</xf:alert>
+                                                    </xf:input>
+                                                    <xf:trigger>
+                                                        <xf:label>OK</xf:label>
+                                                        <xf:action ev:event="DOMActivate">
+                                                            <xf:setvalue ref="instance('taxonomies')//tei:category[@xml:id = instance('currentGenre')//tei:catDesc]/tei:catDesc" value="instance('currentGenre')//tei:catDesc/@newName"/>
+                                                            <xf:send submission="renameGenres"/>
+                                                            <xf:toggle case="renameGenre"/>
+                                                        </xf:action>
+                                                    </xf:trigger>
+                                                    <xf:trigger>
+                                                        <xf:label>abort</xf:label>
+                                                        <xf:toggle case="renameGenre"/>
                                                     </xf:trigger>
                                                 </xf:group>
                                             </xf:case>
