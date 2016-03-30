@@ -4,7 +4,7 @@ xquery version "3.0";
  : A set of helper functions to access the application context from
  : within a module.
  :)
-module namespace config="@app.uri@/config";
+module namespace config="http://www.oeaw.ac.at/acdh/cfdb2/config";
 
 declare namespace templates="http://exist-db.org/xquery/templates";
 
@@ -77,6 +77,8 @@ declare variable $config:app-name := "@app.name@";
 declare variable $config:domain := "@app.name@.acdh.oeaw.ac.at";
 
 declare variable $config:data-root := "/db/@data.dir@";
+
+declare variable $config:etc-root := concat($config:data-root,"/","etc");
 
 declare variable $config:tablets-root := 
     if ($config:isPublicInstance) 

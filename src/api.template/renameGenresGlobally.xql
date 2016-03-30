@@ -36,16 +36,17 @@ return
         let $log := util:log("INFO", concat("oldName: ",$oldName))
         let $log := util:log("INFO", concat("oldID: ",$oldID))
         let $log := util:log("INFO", concat("newID: ",$newID))
-        (:let $taxOcc := collection($config:data-root)//tei:encodingDesc/tei:classDecl/tei:taxonomy[@xml:id = 'genres']/tei:category[@xml:id = $oldID],
-            $log := util:log("INFO", concat("taxOcc: ",$taxOcc/@xml:id)),
-            $changeID := update value $taxOcc/@xml:id with $newID,
-            $changeValue := update value $taxOcc/tei:catDesc/text() with $newName:)
+        let $taxOcc := collection($config:etc-root)//tei:encodingDesc/tei:classDecl/tei:taxonomy[@xml:id = 'genres']/tei:category[@xml:id = $oldID],
+            $log := util:log("INFO", concat("taxOcc: ",count($taxOcc/@xml:id))),
+            (:$changeID := update value $taxOcc/@xml:id with $newID,:)
+            $changeValue := try {update value $taxOcc/tei:catDesc with data($newName)} 
+                            catch*{concat($err:code, $err:description, $err:value)}
         let $occurences := collection($config:tablets-root)//tei:textClass/tei:keywords[@scheme = 'local']/tei:term[. eq $oldName],
             $noOcc := count($occurences),
             $remove := update value $occurences with $newName
         return 
          <category xmlns="http://www.tei-c.org/ns/1.0">
-            <catDesc newName="{$newName}" nameToChange="{$oldName}">{$newName}</catDesc>
+            <catDesc newName="{$newName}" nameToChange="{$oldName}">{if (exists($changeValue)) then $changeValue else concat($noOcc, " of ", $oldName, "has been replaced with ", $newName)}</catDesc>
          </category> 
     (:else <category xmlns="http://www.tei-c.org/ns/1.0">
             <catDesc newName="" nameToChange="">Ups, something went wrong</catDesc>

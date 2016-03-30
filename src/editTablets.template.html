@@ -341,6 +341,10 @@
             <xf:message ev:event="xforms-submit-error" level="ephemeral">storing taxonomies has failed</xf:message>
             <xf:message ev:event="xforms-submit-done" level="ephemeral">taxonomies updated successfully</xf:message>
         </xf:submission>
+        <xf:submission id="loadTaxonomies" method="get" ref="instance('taxonomies')" replace="instance" resource="exist:/db/cfdb-data/etc/taxonomies.xml" includenamespaceprefixes="#default" mediatype="application/xml" indent="false">
+            <xf:message ev:event="xforms-submit-error" level="ephemeral">loading taxonomies has failed</xf:message>
+            <xf:message ev:event="xforms-submit-done" level="ephemeral">taxonomies loaded successfully</xf:message>
+        </xf:submission>
         
                
         <!-- stores instance 'persons' to the resource data/etc/persons.xml -->
@@ -352,8 +356,8 @@
             <xf:action ev:event="xforms-submit-done">
                 <xf:send submission="loadTablet"/>
             </xf:action>
-            <xf:message ev:event="xforms-submit-error" level="ephemeral">renaming genre has failed</xf:message>
-            <xf:message ev:event="xforms-submit-done" level="ephemeral">reanming genres succeeded</xf:message>
+            <xf:message ev:event="xforms-submit-error" level="ephemeral" ref="instance('currentGenre')//tei:catDesc/text()"/>
+            <xf:message ev:event="xforms-submit-done" level="ephemeral" ref="instance('currentGenre')//tei:catDesc/text()"/>
         </xf:submission>
         <xf:submission id="renameScribes" method="execute" ref="instance('currentScribe')" replace="instance" resource="exist:/db/apps/cfdb/api/renameScribesGlobally.xql" includenamespaceprefixes="#default" mediatype="application/xml" indent="false">
             <xf:action ev:event="xforms-submit-done">
@@ -1110,14 +1114,14 @@
                                                     <xf:trigger>
                                                         <xf:label>OK</xf:label>
                                                         <xf:action ev:event="DOMActivate">
-                                                            <xf:setvalue ref="instance('taxonomies')//tei:category[@xml:id = instance('currentGenre')//tei:catDesc]/tei:catDesc" value="instance('currentGenre')//tei:catDesc/@newName"/>
                                                             <xf:send submission="renameGenres"/>
-                                                            <xf:toggle case="renameGenre"/>
+                                                            <xf:send submission="loadTaxonomies"/>
+                                                            <xf:toggle case="newGenreInputHidden"/>
                                                         </xf:action>
                                                     </xf:trigger>
                                                     <xf:trigger>
                                                         <xf:label>abort</xf:label>
-                                                        <xf:toggle case="renameGenre"/>
+                                                        <xf:toggle case="newGenreInputHidden"/>
                                                     </xf:trigger>
                                                 </xf:group>
                                             </xf:case>
