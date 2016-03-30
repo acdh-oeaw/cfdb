@@ -349,8 +349,10 @@
             <xf:message ev:event="xforms-submit-done" level="ephemeral">person list saved successfully</xf:message>
         </xf:submission>
         <xf:submission id="renameGenres" method="execute" ref="instance('currentGenre')" replace="instance" resource="exist:/db/apps/cfdb/api/renameGenresGlobally.xql" includenamespaceprefixes="#default" mediatype="application/xml" indent="false">
-            <xf:send submission="loadTablet"/>
-            <xf:message ev:event="xforms-submit-error" level="ephemeral">renaming genres has failed</xf:message>
+            <xf:action ev:event="xforms-submit-done">
+                <xf:send submission="loadTablet"/>
+            </xf:action>
+            <xf:message ev:event="xforms-submit-error" level="ephemeral">renaming genre has failed</xf:message>
             <xf:message ev:event="xforms-submit-done" level="ephemeral">reanming genres succeeded</xf:message>
         </xf:submission>
         <xf:submission id="renameScribes" method="execute" ref="instance('currentScribe')" replace="instance" resource="exist:/db/apps/cfdb/api/renameScribesGlobally.xql" includenamespaceprefixes="#default" mediatype="application/xml" indent="false">
