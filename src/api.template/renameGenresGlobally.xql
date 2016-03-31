@@ -36,7 +36,7 @@ return
         let $log := util:log("INFO", concat("oldName: ",$oldName))
         let $log := util:log("INFO", concat("oldID: ",$oldID))
         let $log := util:log("INFO", concat("newID: ",$newID))
-        let $taxOcc := collection($config:etc-root)//tei:encodingDesc/tei:classDecl/tei:taxonomy[@xml:id = 'genres']/tei:category[@xml:id = $oldID],
+        let $taxOcc := collection($config:etc-root)//tei:encodingDesc/tei:classDecl/tei:taxonomy[@xml:id = 'genres']/tei:category[. = $oldName],
             $log := util:log("INFO", concat("taxOcc: ",count($taxOcc/@xml:id))),
             (:$changeID := update value $taxOcc/@xml:id with $newID,:)
             $changeValue := try {update value $taxOcc/tei:catDesc with data($newName)} 
