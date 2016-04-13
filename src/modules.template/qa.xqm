@@ -2,7 +2,7 @@ xquery version "3.0";
 
 module namespace qa = "@app.uri@/qa";
 import module namespace config="@app.uri@/config" at "config.xqm";
-
+import module namespace cfdb="@app.uri@/cfdb" at "cfdb.xqm";
 declare namespace tei = "http://www.tei-c.org/ns/1.0";
 
 declare variable $qa:namespace := "@app.uri@/qa";
@@ -11,7 +11,7 @@ declare variable $qa:namespace := "@app.uri@/qa";
  : This module contains quality assurance functions, i.e. tests on the data integrity and validity. 
  :)
  
- declare %private function qa:result($test as xs:string, $desc, $assumptions as xs:string*, $status as xs:integer, $warn as xs:string?, $reason as xs:string?, $results as map*) {
+ declare %private function qa:result($test as xs:string, $desc, $assumptions as xs:string*, $status as xs:integer, $warn as xs:string?, $reason as xs:string?, $results as map(*)*) {
     <qa:test-results xml:id="{$test}">
         <qa:description>{$desc}</qa:description>
         {if ($assumptions)

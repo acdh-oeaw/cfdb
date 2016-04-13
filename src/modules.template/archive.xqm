@@ -255,7 +255,7 @@ declare function archive:deploy($id as xs:string, $removeDeployedSnaphot as xs:b
                 $create-folders := archive:create-collection-recursively($snapshot-collection, $folders) 
             return 
             if ($data instance of document-node() and $data/cfdba:archive) then () else 
-            if ($data-type eq "resource") then if (exists($folders)) then xmldb:store($snapshot-collection||"/"||string-join($folders,"/"), substring-after($path, string-join($folders,"/")||"/"), $data) else xmldb:store($snapshot-collection, $path, $data) else 
+            if ($data-type eq "resource") then if (exists($folders)) then xmldb:store($snapshot-collection||"/"||string-join($folders,"/"), substring-after(replace($path,'\*',''), string-join($folders,"/")||"/"), $data) else xmldb:store($snapshot-collection, $path, $data) else 
             if ($data-type eq "folder") then xmldb:create-collection($snapshot-collection, $path) 
             else ()
         }
