@@ -148,9 +148,15 @@
                 <newPeriodName/>
             </data>
         </xf:instance>
-        <xf:instance xmlns="" id="currentPlaceOfIssue">
+        <xf:instance xmlns="" id="newPlaceOfIssue">
             <place xmlns="http://www.tei-c.org/ns/1.0" xml:id="currentPlace">
                 <placeName/>
+            </place>
+        </xf:instance>
+        <xf:instance xmlns="" id="renamePlaceOfIssue">
+            <place xmlns="http://www.tei-c.org/ns/1.0" xml:id="renamedPlace" oldName="oldName">
+                <placeName/>
+                <note/>
             </place>
         </xf:instance>
         <xf:instance xmlns="" id="currentGenre">
@@ -167,7 +173,6 @@
             </envelope>
         </xf:instance>
         
-        
         <!-- instances of lookup lists -->
         <xf:instance xmlns="" id="archives" resource="exist:/db/@data.dir@/etc/places.xml"/>
         <xf:instance xmlns="" id="places" resource="exist:/db/@data.dir@/etc/places.xml"/>
@@ -181,8 +186,7 @@
        <!-- ******************************************** -->
        <!-- ************* DATA BINDINGS **************** -->
        <!-- ******************************************** -->
-        
-
+ 
         <!-- Scribe: instance data and list of values  -->
         <xf:bind id="scribe" ref="instance('tablet')/tei:teiHeader/tei:fileDesc/tei:sourceDesc/tei:msDesc/tei:physDesc/tei:handDesc/tei:handNote/tei:persName[@role='scribe']"/>
         <xf:bind id="scribes" ref="instance('persons')/tei:text/tei:body/tei:listPerson[@xml:id='scribes']/tei:person"/>
@@ -196,17 +200,18 @@
         <!-- Genre / text class: instance and controlled vocabulary -->
         <xf:bind id="genres" ref="instance('taxonomies')/tei:teiHeader/tei:encodingDesc/tei:classDecl/tei:taxonomy[@xml:id='genres']/tei:category"/>
         <xf:bind id="genre" ref="instance('tablet')/tei:teiHeader/tei:profileDesc/tei:textClass/tei:keywords/tei:term"/>
-        <xf:bind id="currentGenre" ref="instance('currentGenre')/tei:catDesc" constraint="not(normalize-space(.) = instance('taxonomies')//tei:taxonomy[@*[local-name() = 'id'] = 'genres']/tei:category/normalize-space(tei:catDesc)) and not(@*[local-name() = 'id'] = instance('taxonomies')//tei:taxonomy[@*[local-name() = 'id'] = 'genres']/tei:category/tei:catDesc/@*[local-name() = 'id'])"/>
+        <xf:bind id="currentGenre-bind" ref="instance('currentGenre')/tei:catDesc" constraint="not(normalize-space(.) = instance('taxonomies')//tei:taxonomy[@*[local-name() = 'id'] = 'genres']/tei:category/normalize-space(tei:catDesc)) and not(@*[local-name() = 'id'] = instance('taxonomies')//tei:taxonomy[@*[local-name() = 'id'] = 'genres']/tei:category/tei:catDesc/@*[local-name() = 'id'])"/>
         <xf:bind id="currentGenreNewName" ref="instance('currentGenre')/tei:catDesc/@newName"/>
-        
         
         <!-- Date of Issue -->
         <xf:bind constraint="matches(.,'(^\d{1,2}/\d{1,2}/\-?\d{1,4}$)?')" id="dateOfIssue" ref="instance('tablet')/tei:teiHeader/tei:profileDesc/tei:creation/tei:origDate/tei:date[@calendar='#gregorian']"/>
         
         <!-- Place of Issue: instance and controlled vocabulary -->
         <xf:bind id="placeOfIssue" ref="instance('tablet')/tei:teiHeader/tei:profileDesc/tei:creation/tei:origPlace/tei:placeName"/>
-        <xf:bind id="currentPlaceOfIssue" ref="instance('currentPlaceOfIssue')/tei:placeName" constraint="not(normalize-space(.) = instance('places')//tei:listPlace/tei:place/normalize-space(tei:placeName)) and not(@*[local-name() = 'id'] = instance('places')//tei:listPlace/tei:place/@*[local-name() = 'id'])"/>
+        <xf:bind id="newPlaceOfIssue-bind" ref="instance('newPlaceOfIssue')/tei:placeName" constraint="not(normalize-space(.) = instance('places')//tei:listPlace/tei:place/normalize-space(tei:placeName)) and not(@*[local-name() = 'id'] = instance('places')//tei:listPlace/tei:place/@*[local-name() = 'id'])"/>
         <xf:bind id="placesOfIssue" ref="instance('places')/tei:text/tei:body/tei:listPlace/tei:place"/>
+        <xf:bind id="renamedPlaceOfIssue" ref="instance('renamePlaceOfIssue')/tei:placeName"/>
+        
 
         <!-- Taxonomy for 'ductus' values -->
         <xf:bind id="ductusFDecl" ref="instance('taxonomies')/tei:teiHeader/tei:encodingDesc/tei:fsdDecl/tei:fsDecl[1]/tei:fDecl[1]/tei:vRange/tei:vAlt/tei:symbol"/>
@@ -287,9 +292,6 @@
         <!-- places a HTML view of the tablet into the interface -->
         <xf:submission id="viewTablet" replace="embedHTML" targetid="tabletHTMLContainer" ref="instance('selectedTablet')" resource="exist:/db/apps/@app.name@/api/viewTablet.xql" method="execute"/>
             
-        
-        
-        
         <!-- stores the currently edited tablet in the instance 'tablet' to its corresponding resource in the database -->
         <xf:submission id="saveTablet" method="put" ref="instance('tablet')" replace="instance">
             <xf:resource value="concat('exist:',instance('selectedTablet')/path,'/',instance('selectedTablet')/id,'.xml')"/>
@@ -319,7 +321,32 @@
             <xf:message ev:event="xforms-submit-error" level="ephemeral">image could not be removed</xf:message>
             <xf:message ev:event="xforms-submit-done" level="ephemeral">image removed successfully</xf:message>
         </xf:submission>
-        
+        <xf:submission id="renamePlacesGlobally" method="execute" ref="instance('renamePlaceOfIssue')" replace="instance" resource="exist:/db/apps/cfdb/api/renamePlacesGlobally.xql" includenamespaceprefixes="#default" mediatype="application/xml" indent="false">
+            <xf:message ev:event="xforms-submit-error" level="ephemeral">(error-type: <xf:output value="event('error-type')"/>, status-code: <xf:output value="event('response-status-code')"/>)</xf:message>
+            <xf:message ev:event="xforms-submit-done" level="ephemeral">Renamed </xf:message>
+            <xf:action ev:event="xforms-submit-done">
+                <xf:send submission="loadTablet"/>
+                <!-- set the new place name on the first placeName element which matches the old name  -->
+                <xf:setvalue ref="instance('places')//tei:listPlace/tei:place/tei:placeName[. = instance('renamePlaceOfIssue')/@oldName]" value="instance('renamePlaceOfIssue')//tei:placeName/text()"/>
+                <!-- delete all other placeName elements matching the old name - just to make sure to not have any duplicates. -->
+                <xf:delete nodeset="instance('places')//tei:listPlace/tei:place[tei:placeName = instance('renamePlaceOfIssue')/@oldName]"/>
+                <!-- delete all other placeName elements with the new name - this is to handle cases where two place names should merged into one. -->
+                <xf:delete nodeset="instance('places')//tei:listPlace/tei:place[tei:placeName = instance('renamePlaceOfIssue')/tei:placeName/text()][position() gt 1]"/>
+                <xf:delete nodeset="instance('places')//tei:listPlace/tei:place/tei:placeName[. = instance('renamePlaceOfIssue')/@oldName]"/>
+                <xf:send submission="storePlaces"/>
+            </xf:action>
+        </xf:submission>
+        <xf:submission id="renameScribes" method="execute" ref="instance('currentScribe')" replace="instance" resource="exist:/db/apps/cfdb/api/renameScribesGlobally.xql" includenamespaceprefixes="#default" mediatype="application/xml" indent="false">
+            <xf:action ev:event="xforms-submit-done">
+                <xf:setvalue ref="instance('persons')//tei:person[@role='scribe']/tei:persName[. = instance('tablet')//tei:handDesc/tei:handNote/tei:persName[@role='scribe']]" value="instance('currentScribe')/@newName"/>
+                <xf:delete nodeset="instance('persons')//tei:person[@role='scribe'][tei:persName = instance('currentScribe')/@newName][position() gt 1]"/>
+                <xf:delete nodeset="instance('persons')//tei:person[@role='scribe'][tei:persName = instance('tablet')//tei:handDesc/tei:handNote/tei:persName[@role='scribe']][position() gt 1]"/>
+                <xf:send submission="storePersons"/>
+                <xf:send submission="loadTablet"/>
+            </xf:action>
+            <xf:message ev:event="xforms-submit-error" level="ephemeral">renaming person has failed </xf:message>
+            <xf:message ev:event="xforms-submit-done" level="ephemeral" ref="instance('currentScribe')//tei:note"/>
+        </xf:submission>
         
         <!-- deletes the selected sign from the tablet and its corresponding annotation from the surface-->
         <xf:submission id="removeGlyph" method="execute" ref="instance('envelope')" replace="instance" resource="exist:/db/apps/@app.name@/api/removeGlyph.xql">
@@ -359,16 +386,11 @@
             <xf:message ev:event="xforms-submit-error" level="ephemeral" ref="instance('currentGenre')//tei:catDesc/text()"/>
             <xf:message ev:event="xforms-submit-done" level="ephemeral" ref="instance('currentGenre')//tei:catDesc/text()"/>
         </xf:submission>
-        <xf:submission id="renameScribes" method="execute" ref="instance('currentScribe')" replace="instance" resource="exist:/db/apps/cfdb/api/renameScribesGlobally.xql" includenamespaceprefixes="#default" mediatype="application/xml" indent="false">
-            <xf:action ev:event="xforms-submit-done">
-                <xf:setvalue ref="instance('persons')//tei:person[@role='scribe']/tei:persName[. = instance('tablet')//tei:handDesc/tei:handNote/tei:persName[@role='scribe']]" value="instance('currentScribe')/@newName"/>
-                <xf:delete nodeset="instance('persons')//tei:person[@role='scribe'][tei:persName = instance('currentScribe')/@newName][position() gt 1]"/>
-                <xf:send submission="storePersons"/>
-                <xf:send submission="loadTablet"/>
-            </xf:action>
-            <xf:message ev:event="xforms-submit-error" level="ephemeral">renaming person has failed </xf:message>
-            <xf:message ev:event="xforms-submit-done" level="ephemeral" ref="instance('currentScribe')//tei:note"/>
-        </xf:submission>
+        
+       
+        
+        
+        
         
         <!-- ** Global resets for controlled vocabularies ** -->
         <xf:submission id="removePeriodGlobally" method="execute" ref="instance('currentPeriod')" replace="instance" includenamespaceprefixes="#default" resource="exist:/db/apps/@app.name@/api/removePeriodGlobally.xql">
@@ -384,17 +406,17 @@
             <xf:action ev:event="xforms-submit">
                 <!-- put the currentPlace into the envelope -->
                 <xf:delete ref="instance('envelope')/*[*]/*"/>
-                <xf:insert context="instance('envelope')/data" origin="instance('currentPlaceOfIssue')"/>
+                <xf:insert context="instance('envelope')/data" origin="instance('newPlaceOfIssue')"/>
             </xf:action>
             <xf:action ev:event="xforms-submit-done" if="@status='success'">
                 <!-- remove its corresponding tei:place element from  data/etc/places.xml  ... -->
-                <xf:delete ref="instance('places')//tei:listPlace/tei:place[tei:placeName = instance('currentPlaceOfIssue')/tei:placeName]"/>
+                <xf:delete ref="instance('places')//tei:listPlace/tei:place[tei:placeName = instance('newPlaceOfIssue')/tei:placeName]"/>
                 <xf:send submission="storePlaces"/>
                 <xf:setvalue bind="placeOfIssue" value="''"/>
-                <!-- reset "currentPlaceOfIssue" -->
-                <xf:delete ref="instance('currentPlaceOfIssue')/tei:placeName"/>
-                <xf:setvalue ref="instance('currentPlaceOfIssue')" value="instance('prototypes')/tei:place/@xml:id"/>
-                <xf:insert context="instance('currentPlaceOfIssue')" origin="instance('prototypes')/tei:place/tei:placeName"/>
+                <!-- reset "newPlaceOfIssue" -->
+                <xf:delete ref="instance('newPlaceOfIssue')/tei:placeName"/>
+                <xf:setvalue ref="instance('newPlaceOfIssue')" value="instance('prototypes')/tei:place/@xml:id"/>
+                <xf:insert context="instance('newPlaceOfIssue')" origin="instance('prototypes')/tei:place/tei:placeName"/>
             </xf:action>
             <xf:message ev:event="xforms-submit-error" level="ephemeral">removing place of issue has failed (error-type: <xf:output value="event('error-type')"/>, status-code: <xf:output value="event('response-status-code')"/>)</xf:message>
             <xf:message ev:event="xforms-submit-done" level="ephemeral" ref="msg">removing place of issue succeeded</xf:message>
@@ -965,6 +987,12 @@
                                                                 <xf:label>Remove Place</xf:label>
                                                                 <bfc:show dialog="removePlaceConfirmDialog" ev:event="DOMActivate"/>
                                                             </xf:trigger>
+                                                            <xf:trigger>
+                                                                <xf:label>Rename Place</xf:label>
+                                                                <xf:setvalue ref="instance('renamePlaceOfIssue')/tei:placeName" value="instance('tablet')//tei:origPlace/tei:placeName"/>
+                                                                <xf:setvalue ref="instance('renamePlaceOfIssue')/@oldName" value="instance('tablet')/tei:teiHeader/tei:profileDesc/tei:creation/tei:origPlace/tei:placeName"/>
+                                                                <xf:toggle case="renamePlace"/>
+                                                            </xf:trigger>
                                                             <bfc:dialog id="removePlaceConfirmDialog">
                                                                 <xf:group appearance="minimal">
                                                                     <xf:label>This will remove the selected place from the list of places and <b>delete any reference to it from all tablets.</b>
@@ -973,8 +1001,8 @@
                                                                         <xf:label>Yes</xf:label>
                                                                         <bfc:hide dialog="removePlaceConfirmDialog" ev:event="DOMActivate"/>
                                                                         <xf:action>
-                                                                    <!-- update instance 'currentPlaceOfIssue' with the current placeName -->
-                                                                            <xf:setvalue ref="instance('currentPlaceOfIssue')/tei:placeName" value="instance('tablet')/tei:teiHeader/tei:profileDesc/tei:creation/tei:origPlace/tei:placeName"/>
+                                                                    <!-- update instance 'newPlaceOfIssue' with the current placeName -->
+                                                                            <xf:setvalue ref="instance('newPlaceOfIssue')/tei:placeName" value="instance('tablet')/tei:teiHeader/tei:profileDesc/tei:creation/tei:origPlace/tei:placeName"/>
                                                                     <!--  remove this place from all tablets -->
                                                                             <xf:send submission="removePlaceGlobally"/>
                                                                         </xf:action>
@@ -991,30 +1019,50 @@
                                         <!-- Input for new place of issue -->
                                                 <xf:case id="newPlaceInputShown">
                                                     <xf:group appearance="bf:horizontalTable">
-                                                        <xf:input bind="currentPlaceOfIssue" incremental="true">
+                                                        <xf:input bind="newPlaceOfIssue-bind" incremental="true">
                                                             <xf:alert>Place already defined</xf:alert>
                                                         </xf:input>
                                                         <xf:trigger>
                                                             <xf:label>OK</xf:label>
                                                             <xf:action ev:event="DOMActivate">
-                                                                <xf:setvalue ref="instance('currentPlaceOfIssue')/@xml:id" value="concat('place_',lower-case(replace(../tei:placeName,'\C','')))"/>
-                                                                <xf:insert context="instance('places')//tei:listPlace" origin="instance('currentPlaceOfIssue')" nodeset="tei:head" position="after"/>
+                                                                <xf:setvalue ref="instance('newPlaceOfIssue')/@xml:id" value="concat('place_',lower-case(replace(../tei:placeName,'\C','')))"/>
+                                                                <xf:insert context="instance('places')//tei:listPlace" origin="instance('newPlaceOfIssue')" nodeset="tei:head" position="after"/>
                                                                 <xf:send submission="storePlaces"/>
                                                         <!-- set value of drop down list -->
-                                                                <xf:setvalue bind="placeOfIssue" value="instance('currentPlaceOfIssue')/tei:placeName"/>
-                                                        <!-- reset "currentPlaceOfIssue" -->
-                                                                <xf:delete ref="instance('currentPlaceOfIssue')/tei:placeName"/>
-                                                                <xf:setvalue ref="instance('currentPlaceOfIssue')/@xml:id" value="instance('prototypes')/tei:place/@xml:id"/>
-                                                                <xf:insert context="instance('currentPlaceOfIssue')" origin="instance('prototypes')/tei:place/tei:placeName"/>
+                                                                <xf:setvalue bind="placeOfIssue" value="instance('newPlaceOfIssue')/tei:placeName"/>
+                                                        <!-- reset "newPlaceOfIssue" -->
+                                                                <xf:delete ref="instance('newPlaceOfIssue')/tei:placeName"/>
+                                                                <xf:setvalue ref="instance('newPlaceOfIssue')/@xml:id" value="instance('prototypes')/tei:place/@xml:id"/>
+                                                                <xf:insert context="instance('newPlaceOfIssue')" origin="instance('prototypes')/tei:place/tei:placeName"/>
                                                                 <xf:toggle case="newPlaceInputHidden"/>
                                                             </xf:action>
                                                         </xf:trigger>
                                                         <xf:trigger>
                                                             <xf:label>abort</xf:label>
-                                                    <!-- reset "currentPlaceOfIssue" -->
-                                                            <xf:delete ref="instance('currentPlaceOfIssue')/tei:placeName"/>
-                                                            <xf:insert context="instance('currentPlaceOfIssue')" origin="instance('prototypes')/tei:place/tei:placeName"/>
-                                                            <xf:setvalue ref="instance('currentPlaceOfIssue')/@xml:id" value="instance('prototypes')/tei:place/@xml:id"/>
+                                                    <!-- reset "newPlaceOfIssue" -->
+                                                            <xf:delete ref="instance('newPlaceOfIssue')/tei:placeName"/>
+                                                            <xf:insert context="instance('newPlaceOfIssue')" origin="instance('prototypes')/tei:place/tei:placeName"/>
+                                                            <xf:setvalue ref="instance('newPlaceOfIssue')/@xml:id" value="instance('prototypes')/tei:place/@xml:id"/>
+                                                            <xf:toggle case="newPlaceInputHidden"/>
+                                                        </xf:trigger>
+                                                    </xf:group>
+                                                </xf:case>
+                                                <xf:case id="renamePlace">
+                                                    <xf:group appearance="bf:horizontalTable">
+                                                        <xf:input bind="renamedPlaceOfIssue" incremental="true">
+                                                            <xf:alert>Place already exists</xf:alert>
+                                                        </xf:input>
+                                                        <xf:trigger>
+                                                            <xf:label>OK</xf:label>
+                                                            <xf:action ev:event="DOMActivate">
+                                                                <!-- renames all scribes in the database and, if successfull, replaces the name in the person list.  -->
+                                                               <!-- <xf:setvalue ref="instance('tablet')//tei:origPlace/tei:placeName" value="instance('renamePlaceOfIssue')//tei:placeName"/>-->
+                                                                <xf:send submission="renamePlacesGlobally"/>
+                                                                <xf:toggle case="newPlaceInputHidden"/>
+                                                            </xf:action>
+                                                        </xf:trigger>
+                                                        <xf:trigger>
+                                                            <xf:label>abort</xf:label>
                                                             <xf:toggle case="newPlaceInputHidden"/>
                                                         </xf:trigger>
                                                     </xf:group>
@@ -1063,7 +1111,7 @@
                                                                     <xf:label>Yes</xf:label>
                                                                     <bfc:hide dialog="removeGenreConfirmDialog" ev:event="DOMActivate"/>
                                                                     <xf:action>
-                                                                        <xf:setvalue bind="currentGenre" value="context()"/>
+                                                                        <xf:setvalue bind="currentGenre-bind" value="context()"/>
                                                                         <xf:send submission="removeGenreGlobally"/>
                                                                     </xf:action>
                                                                 </xf:trigger>
@@ -1086,7 +1134,7 @@
                                     <!-- Input für neue Textklasse -->
                                             <xf:case id="newGenreInputShown">
                                                 <xf:group appearance="bf:horizontalTable">
-                                                    <xf:input bind="currentGenre" incremental="true">
+                                                    <xf:input bind="currentGenre-bind" incremental="true">
                                                         <xf:alert>Genre already defined</xf:alert>
                                                     </xf:input>
                                                     <xf:trigger>

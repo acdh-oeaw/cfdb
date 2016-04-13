@@ -216,10 +216,14 @@ declare function tablet:get-attributes($id as xs:string) as map() {
  : @param $attributes 1-n names of attributes  
  : @return a map with one key for each attribute value
  :)
-declare function tablet:get-attributes($id as xs:string, $attributes as xs:string+) as map() {
+declare function tablet:get-attributes($id as xs:string, $attributes as xs:string+) as map()? {
     let $tablet := tablet:get($id)
-    let $data := for $a in $attributes return map:entry($a, tablet:index2data($tablet, $a))
-    return map:new($data)
+    return 
+        if (count($tablet) gt 0)
+        then 
+            let $data := for $a in $attributes return map:entry($a, tablet:index2data($tablet, $a))
+            return map:new($data)
+        else util:log-app("ERROR", $config:app-name, "tablet "||$id||" not found")
 };
 
 (:~ updates the value of a given attribute on a given tablet
@@ -241,7 +245,8 @@ declare function tablet:set-attribute($id as xs:string, $attribute as xs:string,
  : @return the node containing the attribute value  
  :)
 declare %private function tablet:index2node($node as node(), $attribute as xs:string) as node()? {
-    let $tablet := $node/ancestor-or-self::tei:TEI
+    let $tablet := $node/ancestor-or-self::tei:TEI,
+        $taxonomies := doc($config:etc-root||"/taxonomies.xml")
     return
     if (not(exists($tablet)))
     then ()
@@ -249,7 +254,7 @@ declare %private function tablet:index2node($node as node(), $attribute as xs:st
         switch($attribute)
             case "id" return $tablet/@xml:id 
             case "text" return $tablet//tei:sourceDesc/tei:msDesc/tei:msIdentifier/tei:idno[1]
-            case "period" return $tablet//tei:origDate/tei:date/@period
+            case "period" return $taxonomies//tei:taxonomy[@xml:id = 'periods']/tei:category[@xml:id = $tablet//tei:origDate/tei:date/@period]/tei:catDesc
             case "date-babylonian" return $tablet//tei:origDate/tei:date[@calendar = '#babylonian']
             case "date" return $tablet//tei:origDate/tei:date[@calendar = '#gregorian']
             case "postQuem" return $tablet//tei:origDate/tei:date[@calendar = '#gregorian']/@notBefore
