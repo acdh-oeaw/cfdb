@@ -1,6 +1,6 @@
 xquery version "3.0";
 
-module namespace app="@app.uri@/templates";
+module namespace app="http://www.oeaw.ac.at/acdh/cfdb2/templates";
 
 declare namespace tei = "http://www.tei-c.org/ns/1.0";
 declare namespace dc = "http://purl.org/dc/elements/1.1/";
@@ -378,11 +378,11 @@ declare function app:menu-administration($node, $model) {
                         <a href="stats.html"><i class="fa fa-area-chart"/>&#160;Statistics</a>
                     </li>
                     <li>
-                        <a href="administration.html"><i class="fa fa-wrench"/>&#160;General Configuration</a>
+                        <a href="charts.html"><i class="fa fa fa-bar-chart"/>&#160;Charts</a>
                     </li>
                     <li>
-                        <a href="charts.html"><i class="fa fa-bar-chart"></i>&#160;Charts</a>
-                    </li>  
+                        <a href="administration.html"><i class="fa fa-wrench"/>&#160;General Configuration</a>
+                    </li>
                 </ul>
         </li>
     else ()
