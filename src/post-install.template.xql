@@ -110,12 +110,14 @@ sm:chmod(xs:anyURI($config:app-root||"/modules/api.xqm"), "rwxr-xr--"),
 
 (: make configuration file $app-root/conf.xml owned by editors group:)
 sm:chgrp(xs:anyURI($config:app-root||"/config.xml"), "cfdbEditors"),
-sm:chmod(xs:anyURI($config:app-root||"/config.xml"), "rwxrwxr-x")
+sm:chmod(xs:anyURI($config:app-root||"/config.xml"), "rwxrwxr-x"),
 
 (: grant 'read' and execute' permission on xql-scripts in api-collection:)
 for $resource in xmldb:get-child-resources($config:app-root||"/api")
 return (
     sm:add-group-ace(xs:anyURI($config:app-root||"/api/"||$resource), "cfdbAnnotators", true(), "r-x"),
-    sm:add-group-ace(xs:anyURI($config:app-root||"/api/"||$resource), "cfdbEditors", true(), "r-x")),
+    sm:add-group-ace(xs:anyURI($config:app-root||"/api/"||$resource), "cfdbEditors", true(), "r-x")
+),
 
-,(: FOR TESTING PURPOSES ONLY Create default editor user :)sm:create-account("edi", "pwd", "cfdbEditors")
+
+(: FOR TESTING PURPOSES ONLY Create default editor user :)sm:create-account("edi", "pwd", "cfdbEditors")

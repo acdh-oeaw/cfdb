@@ -84,10 +84,9 @@ declare
     %graph:provides-data-for("a graph showing the distribution of tablets over periods in the corpus.") 
  function graph:periodDistribution() {     
     let $tablets := cfdb:tablets()
-    let $taxonomies := doc($config:etc-root||"/taxonomies.xml"
+    let $taxonomies := doc($config:etc-root||"/taxonomies.xml")
     let $results :=
         for $t in $tablets 
-        let $period := $t//tei:date/@period
         let $period := $taxonomies//tei:taxonomy[@xml:id = 'periods']/tei:category[@xml:id = $t//tei:origDate/tei:date/@period]/tei:catDesc
 
         group by $period
