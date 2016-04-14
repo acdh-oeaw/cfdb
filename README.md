@@ -18,20 +18,20 @@ e.g: https://pandorfer@acdh.oeaw.ac.at/redmine/cfdb.git
 
 1. open command prompt(cmd)
 
-2. change directory to /cfdb
+2. change directory to `/cfdb`
 
 3. copy, paste and rename build.properties.default to build.properties
 
-4. open *build.properties* and adapt to your needs
+4. open `build.properties` and adapt to your needs
 
     1. add an app.name
     2. for building a public instance  make sure that build properties say `app.operationmode=public`
 
-5. back in the command prompt run:  *ant*
+5. back in the command prompt run:  `ant`
 
-6. in your /cfdb directory check if there is a directory  /cfdb/build
+6. in your `/cfdb` directory check if there is a directory  `/cfdb/build`
 
-7. open it and see if you find a *.xar* package. This package should carry the name you set in the *build.properties* 
+7. open it and see if you find a *.xar* package. This package should carry the name you set in the `build.properties`
 
 ## Install it
 
