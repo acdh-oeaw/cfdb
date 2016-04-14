@@ -12,7 +12,7 @@ Setup
 1. git clone https://{USERNAME}@acdh.oeaw.ac.at/redmine/cfdb.git
 e.g: https://pandorfer@acdh.oeaw.ac.at/redmine/cfdb.git 
 
-2. git checkout in-browser-editing
+2. git checkout master
 
 ## Build it
 
@@ -25,6 +25,7 @@ e.g: https://pandorfer@acdh.oeaw.ac.at/redmine/cfdb.git
 4. open *build.properties* and adapt to your needs
 
     1. add an app.name
+    2. for building a public instance  make sure that build properties say `app.operationmode=public`
 
 5. back in the command prompt run:  *ant*
 
