@@ -59,47 +59,35 @@ then sm:create-account("@system.account.user@", "@system.account.pwd@", "@system
 else (),
 sm:add-group-manager("@system.account.user@", "@system.account.user@"),
 
-(: create tablets collection :)
-local:mkcol("/db", "@data.dir@/tablets"),
-
-(: create snapshot repository and set ACL :)
-local:mkcol("/db", "@data.dir@/archive"),
-sm:chgrp(xs:anyURI("@data.dir@/archive"), "cfdbEditors"),
-sm:chmod(xs:anyURI("@data.dir@/archive"), "rwxrwxr-x"),
-
-(: if it does not exist: create data/etc collection and move data from 
-   the application package into it - important to not overwrite existing data:)
-if (not(xmldb:collection-available("@data.dir@/etc"))) 
-then (local:mkcol("/db", "@data.dir@/etc"), 
-      xmldb:move($target||"/data/etc", "/db/@data.dir@"))
-else (),
 
 (: ACL for data collection :)
+local:mkcol("/db", "@data.dir@"),
 sm:chgrp(xs:anyURI("/db/@data.dir@"), "cfdbEditors"),
 sm:chmod(xs:anyURI("/db/@data.dir@"), "rwxrwxr-x"),
 sm:add-group-ace(xs:anyURI("/db/@data.dir@"), "cfdbAnnotators", true(), "r-x"),
+
+
+(: create tablets collection :)
+local:mkcol("/db", "@data.dir@/tablets"),
 
 (: ACL for tablets collection:)
 sm:chgrp(xs:anyURI("/db/@data.dir@/tablets"), "cfdbEditors"),
 sm:chmod(xs:anyURI("/db/@data.dir@/tablets"), "rwxrwxr-x"),
 sm:add-group-ace(xs:anyURI("/db/@data.dir@/tablets"), "cfdbAnnotators", true(), "rwx"),
 
-(: ACL for taxonomies et alt. :)
-sm:add-group-ace(xs:anyURI("/db/@data.dir@/etc"), "cfdbAnnotators", true(), "rwx"),
-for $resource in xmldb:get-child-resources("/db/@data.dir@/etc")
-return 
-    (sm:add-group-ace(xs:anyURI("/db/@data.dir@/etc/"||$resource), "cfdbAnnotators", true(), "rwx"),
-     sm:add-group-ace(xs:anyURI("/db/@data.dir@/etc/"||$resource), "cfdbEditors", true(), "rwx")
-),
 
-(: ACL for STANDARD SIGNS:)
-sm:add-group-ace(xs:anyURI("/db/@data.dir@/etc/stdSigns"), "cfdbAnnotators", true(), "rwx"),
-sm:add-group-ace(xs:anyURI("/db/@data.dir@/etc/stdSigns/imgs"), "cfdbAnnotators", true(), "rwx"),
-for $resource in xmldb:get-child-resources("/db/@data.dir@/etc/stdSigns")
-return (
-    sm:add-group-ace(xs:anyURI("/db/cfdb-data/etc/stdSigns/"||$resource), "cfdbAnnotators", true(), "rwx"),
-    sm:add-group-ace(xs:anyURI("/db/cfdb-data/etc/stdSigns/"||$resource), "cfdbEditors", true(), "rwx")
-),
+
+local:mkcol("/db", "@data.dir@/etc/stdSigns/imgs"),
+sm:chgrp(xs:anyURI("/db/@data.dir@/etc"), "cfdbEditors"), sm:chmod(xs:anyURI("/db/@data.dir@/etc"), "rwxrwxr-x"), sm:add-group-ace(xs:anyURI("/db/@data.dir@/etc"), "cfdbAnnotators", true(), "rwx"),
+sm:chgrp(xs:anyURI("/db/@data.dir@/etc/stdSigns"), "cfdbEditors"), sm:chmod(xs:anyURI("/db/@data.dir@/etc/stdSigns"), "rwxrwxr-x"), sm:add-group-ace(xs:anyURI("/db/@data.dir@/etc/stdSigns"), "cfdbAnnotators", true(), "rwx"),
+sm:chgrp(xs:anyURI("/db/@data.dir@/etc/stdSigns/imgs"), "cfdbEditors"), sm:chmod(xs:anyURI("/db/@data.dir@/etc/stdSigns/imgs"), "rwxrwxr-x"), sm:add-group-ace(xs:anyURI("/db/@data.dir@/etc/stdSigns/imgs"), "cfdbAnnotators", true(), "rwx"),
+
+
+(: create snapshot repository and set ACL :)
+local:mkcol("/db", "@data.dir@/archive"),
+sm:chgrp(xs:anyURI("@data.dir@/archive"), "cfdbEditors"),
+sm:chmod(xs:anyURI("@data.dir@/archive"), "rwxrwxr-x"),
+
 
 
 (: grant 'read' and 'execute' permissions on restxq endpoint module to editors and annotators :)
@@ -120,4 +108,5 @@ return (
 ),
 
 
-(: FOR TESTING PURPOSES ONLY Create default editor user :)sm:create-account("edi", "pwd", "cfdbEditors")
+(: FOR TESTING PURPOSES ONLY Create default editor user :)
+sm:create-account("edi", "pwd", "cfdbEditors")
