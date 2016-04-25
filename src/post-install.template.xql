@@ -77,16 +77,16 @@ sm:add-group-ace(xs:anyURI("/db/@data.dir@/tablets"), "cfdbAnnotators", true(), 
 
 local:mkcol("/db", "@data.dir@/etc/stdSigns/imgs"),
 if (not(doc-available("/db/@data.dir@/etc/persons.xml")))
-then xmldb:store("/db/@data.dir@/etc", "persons.xml", doc($dir||"/data/etc/persons.xml"))
+then xmldb:store("/db/@data.dir@/etc", "persons.xml", doc($target||"/data/etc/persons.xml"))
 else (),
 if (not(doc-available("/db/@data.dir@/etc/places.xml")))
-then xmldb:store("/db/@data.dir@/etc", "places.xml", doc($dir||"/data/etc/places.xml"))
+then xmldb:store("/db/@data.dir@/etc", "places.xml", doc($target||"/data/etc/places.xml"))
 else (),
 if (not(doc-available("/db/@data.dir@/etc/taxonomies.xml")))
-then xmldb:store("/db/@data.dir@/etc", "taxonomies.xml", doc($dir||"/data/etc/taxonomies.xml"))
+then xmldb:store("/db/@data.dir@/etc", "taxonomies.xml", doc($target||"/data/etc/taxonomies.xml"))
 else (),
 if (not(doc-available("/db/@data.dir@/etc/stdSigns/stdSigns.xml")))
-then xmldb:store("/db/@data.dir@/etc/stdSigns", "stdSigns.xml", doc($dir||"/data/etc/stdSigns/stdSigns.xml"))
+then xmldb:store("/db/@data.dir@/etc/stdSigns", "stdSigns.xml", doc($target||"/data/etc/stdSigns/stdSigns.xml"))
 else (),
 
 for $file in xmldb:get-child-resources("/db/@data.dir@/etc")
