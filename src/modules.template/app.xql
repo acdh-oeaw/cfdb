@@ -1,6 +1,6 @@
 xquery version "3.0";
 
-module namespace app="http://www.oeaw.ac.at/acdh/cfdb2/templates";
+module namespace app="@app.uri@/templates";
 
 declare namespace tei = "http://www.tei-c.org/ns/1.0";
 declare namespace dc = "http://purl.org/dc/elements/1.1/";

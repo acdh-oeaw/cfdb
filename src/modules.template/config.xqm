@@ -4,7 +4,7 @@ xquery version "3.0";
  : A set of helper functions to access the application context from
  : within a module.
  :)
-module namespace config="http://www.oeaw.ac.at/acdh/cfdb2/config";
+module namespace config="@app.uri@/config";
 
 declare namespace templates="http://exist-db.org/xquery/templates";
 
