@@ -1,0 +1,36 @@
+<TEI xmlns="http://www.tei-c.org/ns/1.0">
+    <teiHeader>
+        <fileDesc>
+            <titleStmt>
+                <title>Places</title>
+            </titleStmt>
+            <publicationStmt>
+                <p>Publication Information</p>
+            </publicationStmt>
+            <sourceDesc>
+                <p>Information about the source</p>
+            </sourceDesc>
+        </fileDesc>
+    </teiHeader>
+    <text>
+        <body>
+            <list n="Regions" xml:id="regions">
+                <item xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cfdb2/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" xml:id="region_btdakkuri_w0aaaa">
+                    <placeName>Bīt Dakkuri </placeName>
+                    <list n="Archives">
+                        <item xml:id="archive_nineveh_w0aaab3aa">
+                            <name>Nineveh</name>
+                            <list n="Dossiers"/>
+                        </item>
+                    </list>
+                </item>
+            </list>
+            <listPlace>
+                <head>Places</head>
+                <place xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cuneidb/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" xml:id="place_bīt-ṣilla">
+                    <placeName>Bīt-Ṣilla</placeName>
+                </place>
+            </listPlace>
+        </body>
+    </text>
+</TEI>

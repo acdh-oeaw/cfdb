@@ -1,0 +1,30 @@
+<TEI xmlns="http://www.tei-c.org/ns/1.0">
+    <teiHeader>
+        <fileDesc>
+            <titleStmt>
+                <title>Title</title>
+            </titleStmt>
+            <publicationStmt>
+                <p>Publication Information</p>
+            </publicationStmt>
+            <sourceDesc>
+                <p>Information about the source</p>
+            </sourceDesc>
+        </fileDesc>
+        <encodingDesc>
+            <charDecl>
+                <char xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cuneidb/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" n="373" xml:id="sign_373">
+                    <charName>SUD</charName>
+                    <figure>
+                        <graphic url="imgs/sign_373.bmp"/>
+                    </figure>
+                </char>
+            </charDecl>
+        </encodingDesc>
+    </teiHeader>
+    <text>
+        <body>
+            <ab>this document contains a list of standard signs.</ab>
+        </body>
+    </text>
+</TEI>

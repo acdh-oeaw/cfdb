@@ -1,0 +1,46 @@
+<TEI xmlns="http://www.tei-c.org/ns/1.0">
+    <teiHeader>
+        <fileDesc>
+            <titleStmt>
+                <title>Title</title>
+            </titleStmt>
+            <publicationStmt>
+                <p>Publication Information</p>
+            </publicationStmt>
+            <sourceDesc>
+                <p>Information about the source</p>
+            </sourceDesc>
+        </fileDesc>
+        <encodingDesc>
+            <classDecl>
+                <taxonomy xml:id="periods">
+                    <tei:category xmlns:tei="http://www.tei-c.org/ns/1.0" xml:id="peri_earlyhellenistic">
+                        <tei:catDesc>Early Hellenistic</tei:catDesc>
+                    </tei:category>
+                </taxonomy>
+                <taxonomy xml:id="genres">
+                    <category xmlns:bf="http://betterform.sourceforge.net/xforms" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:api="http://www.oeaw.ac.at/acdh/cuneidb/api" xmlns:bfc="http://betterform.sourceforge.net/xforms/controls" xmlns:xf="http://www.w3.org/2002/xforms" xml:id="genre_manumission">
+                        <catDesc>Manumission</catDesc>
+                    </category>
+                </taxonomy>
+            </classDecl>
+            <fsdDecl>
+                <fsDecl type="scriptProperties">
+                    <fDecl name="ductus">
+                        <vRange>
+                            <vAlt>
+                                <symbol value="slanting"/>
+                                <symbol value="normal"/>
+                            </vAlt>
+                        </vRange>
+                    </fDecl>
+                </fsDecl>
+            </fsdDecl>
+        </encodingDesc>
+    </teiHeader>
+    <text>
+        <body>
+            <p>This TEI document contains taxonomies of various kinds for the CuneiformDB project.</p>
+        </body>
+    </text>
+</TEI>
