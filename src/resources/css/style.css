@@ -29,6 +29,7 @@ body { background: none!important; }
 #tabletHTMLContainer .gThumbnail > a:hover { position: relative; }
 #tabletHTMLContainer .gThumbnail a:hover > .attributes { background: none repeat scroll 0 0 black; border: 1px solid black; bottom: 0; color: white; display: block; left: 0; position: absolute; width: auto; padding: 2px 0; }
 #tabletHTMLContainer .gThumbnail .attributes { display: none; }
+#lsTablets {max-height: 50em; overflow: scroll; }
 
 /* index.html */
 #signlist-nav { position: fixed; right: 25px; }
