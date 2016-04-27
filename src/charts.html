@@ -18,7 +18,10 @@
         $('html, body').css("cursor", "wait");
         var which_chart = $("#chartselector option:selected").val();
         var header = $("#chartselector option:selected").text();
-        var url = "http://localhost:8080/exist/restxq/cfdb/graphs/"+which_chart
+        var actualURL = window.location.href;
+        var endPointURL = actualURL.replace("exist/apps", "exist/restxq");
+        var endPointURL = endPointURL.replace("charts.html", "graphs/");
+        var url = endPointURL+which_chart
         console.log(url)
         $("h1").text(header);
         $.getJSON( url, function( data ) {
