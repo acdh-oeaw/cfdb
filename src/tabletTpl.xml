@@ -65,12 +65,13 @@
     <profileDesc>
       <creation>
         <origPlace>
-          <placeName/>
+          <placeName evidence=""/>
         </origPlace>
         <origDate>
           <date calendar="#gregorian" period="" notAfter="" notBefore=""/>
-        <date calendar="#babylonian"/>
-                </origDate>
+          <date calendar="#babylonian"/>
+          <note/>  
+        </origDate>
       </creation>
       <particDesc>
         
