@@ -68,7 +68,9 @@
                 <td>
                     <xsl:for-each select="(tei:msIdentifier/*[self::tei:region or self::tei:collection])">
                         <xsl:apply-templates select="."/>
-                        <xsl:text> | </xsl:text>
+                        <xsl:if test="position() lt count(tei:msIdentifier/*[self::tei:region or self::tei:collection])">
+                            <xsl:text> | </xsl:text>
+                        </xsl:if>
                     </xsl:for-each>
                 </td>
             </tr>
@@ -97,35 +99,36 @@
 
     <xsl:template match="tei:profileDesc">
         <xsl:variable name="periodID" select="tei:creation/tei:origDate/tei:date/@period"/>
+        <xsl:variable name="values" select="(
+            tei:creation/tei:origPlace/tei:placeName,
+            $taxonomies//tei:catDesc[parent::tei:category/@xml:id = $periodID],
+            tei:creation/tei:origDate/tei:date[@calendar='#gregorian'],
+            tei:creation/tei:origDate/tei:date[@calendar='#babylonian'],
+            tei:creation/tei:origDate/tei:note)[.!='']"/>
         <xsl:if test="(tei:creation/tei:origPlace/tei:placeName|$taxonomies//tei:catDesc[parent::tei:category/@xml:id = $periodID]|tei:creation/tei:origDate/tei:date[@calendar='#gregorian']|tei:creation/tei:origDate/tei:date[@calendar='#babylonian'])[.!='']">
             <tr>
                 <td>
-                    <xsl:if test="tei:creation/tei:origPlace/tei:placeName[.!='']">
-                        <xsl:text>Place</xsl:text>
-                    </xsl:if>
-                    <xsl:if test="$periodID!=''">
-                        <xsl:if test="tei:creation/tei:origPlace/tei:placeName[.!='']">
+                    <xsl:for-each select="$values">
+                        <xsl:variable name="pos" as="xs:integer" select="position()"/>
+                        <xsl:choose>
+                            <xsl:when test="self::tei:placeName">Place</xsl:when>
+                            <xsl:when test="self::tei:catDesc">Period</xsl:when>
+                            <xsl:when test="self::tei:date[@calendar='#gregorian']">Date</xsl:when>
+                            <xsl:when test="self::tei:date[@calendar='#babylonian']">Date (Babylonian)</xsl:when>
+                            <xsl:when test="self::tei:note">Note</xsl:when>
+                        </xsl:choose>
+                        <xsl:if test="$pos lt count($values)">
                             <xsl:text> | </xsl:text>
                         </xsl:if>
-                        <xsl:text>Period</xsl:text>
-                    </xsl:if>
-                    <xsl:if test="tei:creation/tei:origDate/tei:date[@calendar='#gregorian']!=''">
-                        <xsl:if test="$periodID!=''">
-                            <xsl:text> | </xsl:text>
-                        </xsl:if>
-                        <xsl:text>Date</xsl:text>
-                    </xsl:if>
-                    <xsl:if test="tei:creation/tei:origDate/tei:date[@calendar='#babylonian']!=''">
-                        <xsl:if test="tei:creation/tei:origDate/tei:date[@calendar='#gregorian']!=''">
-                            <xsl:text> | </xsl:text>
-                        </xsl:if>
-                        <xsl:text>Date (Babylonian)</xsl:text>
-                    </xsl:if>
+                    </xsl:for-each>
                 </td>
                 <td>
-                    <xsl:for-each select="(tei:creation/tei:origPlace/tei:placeName|$taxonomies//tei:catDesc[parent::tei:category/@xml:id = $periodID]|tei:creation/tei:origDate/tei:date[@calendar='#gregorian']|tei:creation/tei:origDate/tei:date[@calendar='#babylonian'])[.!='']">
+                    <xsl:for-each select="$values">
+                        <xsl:variable name="pos" as="xs:integer" select="position()"/>
                         <xsl:value-of select="(.,'n/a')[1]"/>
-                        <xsl:text> | </xsl:text>
+                        <xsl:if test="$pos lt count($values)">
+                            <xsl:text> | </xsl:text>
+                        </xsl:if>
                     </xsl:for-each>
                 </td>
             </tr>
