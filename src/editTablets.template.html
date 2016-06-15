@@ -515,26 +515,26 @@
                     <xf:group appearance="minimal">
                         <xf:trigger id="viewTabletTrigger">
                             <xf:label>show</xf:label>
-                            <xf:setvalue ref="instance('selectedTablet')/path" value="instance('tablets')/tablet[contains(title,instance('tabletListFilter'))][index('lsTablets')]/path"/>
-                            <xf:setvalue ref="instance('selectedTablet')/id" value="instance('tablets')/tablet[contains(title,instance('tabletListFilter'))][index('lsTablets')]/id"/>
+                            <xf:setvalue ref="instance('selectedTablet')/path" value="instance('tablets')/tablet[contains(idno,instance('tabletListFilter'))][index('lsTablets')]/path"/>
+                            <xf:setvalue ref="instance('selectedTablet')/id" value="instance('tablets')/tablet[contains(idno,instance('tabletListFilter'))][index('lsTablets')]/id"/>
                             <xf:send submission="viewTablet"/>
                             <xf:toggle case="viewTabletCase"/>
                         </xf:trigger>
-                        <xf:trigger id="editTrigger" ref="instance('tablets')/tablet[contains(title,instance('tabletListFilter'))][index('lsTablets')][@editable='1']">
+                        <xf:trigger id="editTrigger" ref="instance('tablets')/tablet[contains(idno,instance('tabletListFilter'))][index('lsTablets')][@editable='1']">
                             <xf:label>edit</xf:label>
                             <xf:action>
-                                <xf:setvalue ref="instance('selectedTablet')/path" value="instance('tablets')/tablet[contains(title,instance('tabletListFilter'))][index('lsTablets')]/path"/>
-                                <xf:setvalue ref="instance('selectedTablet')/id" value="instance('tablets')/tablet[contains(title,instance('tabletListFilter'))][index('lsTablets')]/id"/>
-                                <xf:setvalue ref="instance('selectedTablet')/title" value="instance('tablets')/tablet[contains(title,instance('tabletListFilter'))][index('lsTablets')]/title"/>
+                                <xf:setvalue ref="instance('selectedTablet')/path" value="instance('tablets')/tablet[contains(idno,instance('tabletListFilter'))][index('lsTablets')]/path"/>
+                                <xf:setvalue ref="instance('selectedTablet')/id" value="instance('tablets')/tablet[contains(idno,instance('tabletListFilter'))][index('lsTablets')]/id"/>
+                                <xf:setvalue ref="instance('selectedTablet')/title" value="instance('tablets')/tablet[contains(idno,instance('tabletListFilter'))][index('lsTablets')]/title"/>
                                 <xf:send submission="loadTablet"/>
                                 <xf:toggle case="editTabletCase"/>
                             </xf:action>
                         </xf:trigger>
-                        <xf:trigger ref="instance('tablets')/tablet[contains(title,instance('tabletListFilter'))][index('lsTablets')][@editable='1']">
+                        <xf:trigger ref="instance('tablets')/tablet[contains(idno,instance('tabletListFilter'))][index('lsTablets')][@editable='1']">
                             <xf:label>remove</xf:label>
-                            <xf:setvalue ref="instance('selectedTablet')/path" value="instance('tablets')/tablet[contains(title,instance('tabletListFilter'))][index('lsTablets')]/path"/>
-                            <xf:setvalue ref="instance('selectedTablet')/id" value="instance('tablets')/tablet[contains(title,instance('tabletListFilter'))][index('lsTablets')]/id"/>
-                            <xf:setvalue ref="instance('selectedTablet')/title" value="instance('tablets')/tablet[contains(title,instance('tabletListFilter'))][index('lsTablets')]/title"/>
+                            <xf:setvalue ref="instance('selectedTablet')/path" value="instance('tablets')/tablet[contains(idno,instance('tabletListFilter'))][index('lsTablets')]/path"/>
+                            <xf:setvalue ref="instance('selectedTablet')/id" value="instance('tablets')/tablet[contains(idno,instance('tabletListFilter'))][index('lsTablets')]/id"/>
+                            <xf:setvalue ref="instance('selectedTablet')/title" value="instance('tablets')/tablet[contains(idno,instance('tabletListFilter'))][index('lsTablets')]/title"/>
                             <bfc:show dialog="removeTabletConfirmDialog" ev:event="DOMActivate"/>
                         </xf:trigger>
                         <bfc:dialog id="removeTabletConfirmDialog">
