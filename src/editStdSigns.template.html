@@ -189,7 +189,8 @@
                                             <xf:label>Yes</xf:label>
                                             <bfc:hide dialog="removeSignConfirmDialog" ev:event="DOMActivate"/>
                                             <xf:action ev:event="DOMActivate">
-                                                <xf:delete ref="instance('stdSigns')//tei:char[@xml:id = context()/@xml:id]"/>
+                                                <!--<xf:delete ref="instance('stdSigns')//tei:char[@xml:id = context()/@xml:id]"/>-->
+                                                <xf:delete ref="instance('stdSigns')//tei:char[some $x in (@n,tei:charName) satisfies contains($x,instance('listFilter'))][position() eq index('lsSigns')]"/>
                                                 <xf:delete ref="context()"/>
                                                 <xf:send submission="saveStdSigns"/>
                                             </xf:action>
