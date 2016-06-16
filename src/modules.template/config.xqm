@@ -76,14 +76,16 @@ declare variable $config:app-name := "@app.name@";
 
 declare variable $config:domain := "@app.name@.acdh.oeaw.ac.at";
 
-declare variable $config:data-root := "/db/@data.dir@";
+declare variable $config:data-root-static := "/db/@data.dir@";
+
+declare variable $config:data-root := 
+    if ($config:isPublicInstance and config:get("deployed-snapshot") != '') 
+    then $config:data-root-static||"/archive/"||config:get("deployed-snapshot")
+    else $config:data-root-static;
+
+declare variable $config:tablets-root := $config:data-root || "/tablets";
 
 declare variable $config:etc-root := concat($config:data-root,"/","etc");
-
-declare variable $config:tablets-root := 
-    if ($config:isPublicInstance) 
-    then $config:data-root||"/archive/"||config:get("deployed-snapshot")||"/tablets"
-    else $config:data-root || "/tablets";
 
 declare variable $config:repo-descriptor := doc(concat($config:app-root, "/repo.xml"))/repo:meta;
 
