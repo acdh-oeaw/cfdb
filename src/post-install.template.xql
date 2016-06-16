@@ -121,7 +121,4 @@ for $resource in xmldb:get-child-resources($config:app-root||"/api")
 return (
     sm:add-group-ace(xs:anyURI($config:app-root||"/api/"||$resource), "cfdbAnnotators", true(), "r-x"),
     sm:add-group-ace(xs:anyURI($config:app-root||"/api/"||$resource), "cfdbEditors", true(), "r-x")
-),
-
-(: FOR TESTING PURPOSES ONLY Create default editor user :)
-sm:create-account("edi", "pwd", "cfdbEditors")
+)
