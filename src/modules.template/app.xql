@@ -154,7 +154,7 @@ return
     <div class="pagination">
       <ul>
         {if (exists($prev)) then <li><a data-s="{$prev/tei:charName}" href="{concat('?',string-join((for $g in $groupby return concat("groupby=", $g)),'&amp;='),'&amp;s=',$prev/tei:charName)}{if (exists($before)) then '&amp;before='||$before else ''}{if (exists($after)) then '&amp;after='||$after else ''}">« {$prev/tei:charName}</a></li> else ()}
-        <li class="disabled"><a href="#">{if (count($current-signs) gt 5) then concat($current-signs[1], " &#8230; ", $current-signs[last()]) else string-join($current-signs, " ")}</a></li>
+        <li class="disabled"><a href="#">{if (count($current-signs) gt 5) then concat($current-signs[1]/tei:charName, " &#8230; ", $current-signs[last()]/tei:charName) else string-join($current-signs/tei:charName, " ")}</a></li>
         {if (exists($next)) then <li><a data-s="{$next/tei:charName}" href="{concat('?',string-join((for $g in $groupby return concat("groupby=", $g)),'&amp;='),'&amp;s=',$next/tei:charName)}{if (exists($before)) then '&amp;before='||$before else ''}{if (exists($after)) then '&amp;after='||$after else ''}">{$next/tei:charName} »</a></li> else ()}
       </ul>
     </div>
