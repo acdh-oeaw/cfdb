@@ -207,7 +207,7 @@ function app:signlist($node as node(), $model as map(), $s as xs:string*, $order
         for $ss at $spos in $s 
             let $annotations := if ($collapse-signs = "true") then $annotations else cfdb:list-annotations("sign-type", $ss, $after, $before, $groupby, false())
             let $stdSign := $stdSigns[tei:charName = $ss],
-                $signNumber := xs:integer(replace($stdSign/@n, '\P{N}', '')),
+                $signNumber := try { xs:integer(replace($stdSign/@n, '\P{N}', '')) } catch * { 0 },
                 $annotations-of-sign-type := $annotations//annotation[sign = $ss],
                 $annotations-groups := $annotations/group
             order by $signNumber
