@@ -364,6 +364,9 @@ declare function app:menu-edit($node, $model) {
                 <li>
                     <a href="editArchives.html">Regions, Archives and Dossiers</a>
                 </li>
+                <li>
+                    <a href="glyphsMatchPngs.xql"><i class="fa fa-wrench"/>Glyphs and matching images</a>
+                </li>
             </ul>
         </li>
 };

@@ -16,3 +16,4 @@ sync
 /build.properties
 /src/config.xml
 /src/sync.xql
+/src/glyphsMatchPngs.xql
