@@ -23,11 +23,11 @@
         
         <!-- template for new signs -->
         <xf:instance xmlns="http://www.tei-c.org/ns/1.0" id="charTemplate">
-            <char n="[Borger no]" xml:id="id">
+            <char n="[ABZ no]" xml:id="id">
                 <charName>[sign name]</charName>
                 <tei:charProp>
-                    <tei:localName>KL number</tei:localName>
-                    <tei:value>[KL number]</tei:value>
+                    <tei:localName>MesZL</tei:localName>
+                    <tei:value>[MesZL]</tei:value>
                 </tei:charProp>
                 <figure>
                     <graphic url="img"/>
@@ -227,11 +227,11 @@
                         <xf:alert>name must be set</xf:alert>
                     </xf:input>
                     <xf:input incremental="true" ref="@n">
-                        <xf:label>Borger Number</xf:label>
+                        <xf:label>ABZ Number</xf:label>
                         <xf:alert>number must be set</xf:alert>
                     </xf:input>
                     <xf:input incremental="true" ref="tei:charProp/tei:value">
-                        <xf:label>KL Number</xf:label>
+                        <xf:label>MesZL</xf:label>
                     </xf:input>
                     <xf:group ref="tei:figure/tei:graphic/@url[. != instance('charTemplate')/tei:figure/tei:graphic/@url]">
                         <xf:output mediatype="image/jpg" value="concat('$app-root/data/etc/stdSigns/',.)">
