@@ -42,19 +42,19 @@ declare function cfdb:listStdSigns() as element(tei:char)* {
 
 (: lists all annotations in the database :)
 declare function cfdb:list-annotations() {
-    cfdb:list-annotations((), (), (), (), (), ())
+    cfdb:list-annotations((), (), (), (), (), (), ()
 };
 
 declare function cfdb:list-annotations($category as xs:string?, $value as xs:string*) {
-    cfdb:list-annotations($category, $value, (), (), (), () )
+    cfdb:list-annotations($category, $value, (), (), (), () ) )
 };
 
 declare function cfdb:list-annotations($category as xs:string?, $value as xs:string*, $after as xs:integer, $before as xs:integer) {
-    cfdb:list-annotations($category, $value, $after, $before, (), ())
+    cfdb:list-annotations($category, $value, $after, $before,(), (), ())
 };
 
 (: lists all annotations in the database, optionally filtering by a given $category and value, grouped by one or more group clasuses and with a min/max date border applied :)
-declare function cfdb:list-annotations($category as xs:string?, $value as xs:string*, $after as xs:integer?, $before as xs:integer?, $groupby-input as xs:string*, $collapse-signs as xs:boolean?) {
+declare function cfdb:list-annotations($category as xs:string?, $value as xs:string*, $after as xs:integer?, $before as xs:integer?, $groupby-input as xs:string*, $collapse-signs as xs:boolean?, $undated as xs:string?) {
     let $groupby := $groupby-input[. = $config:valid-grouping-keys]
     let $glyphs := 
         if ($category = "sign-type") then collection($config:tablets-root)//tei:g[@type = $value] else

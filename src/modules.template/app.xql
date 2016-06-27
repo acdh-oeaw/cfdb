@@ -162,6 +162,11 @@ return
         <input type="hidden" name="groupby" value="{$groupby}"/>
         <div>
             <div class="control-group">
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="undated" value="yes">Display undated signs?</input>
+                    </label>
+                </div>
                 <div id="slider-range">
                     <span id="slider-range-min"></span>
                     <span id="slider-range-max"></span>
@@ -202,7 +207,7 @@ function app:signlist($node as node(), $model as map(), $s as xs:string*, $order
                             "?",
                             string-join(for $si in $s return concat('s=',$si),'&amp;s=')
                         )
-    let $annotations := if ($collapse-signs = "true") then cfdb:list-annotations("sign-type", $s, $after, $before, $groupby, true()) else ()
+    let $annotations := if ($collapse-signs = "true") then cfdb:list-annotations("sign-type", $s, $after, $before, $groupby, true(), "") else ()
     return
         for $ss at $spos in $s 
             let $annotations := if ($collapse-signs = "true") then $annotations else cfdb:list-annotations("sign-type", $ss, $after, $before, $groupby, false())
