@@ -9,7 +9,7 @@ cfdb.dateRange.min = -800;
 
 $(document).ready(function(){
     // select sign and autoload
-    $('select[name = s]').on("change",function(e){
+    $('select[name = s], select[name = undated]').on("change",function(e){
         if (submitTimeout) {
             clearTimeout(submitTimeout);
         }

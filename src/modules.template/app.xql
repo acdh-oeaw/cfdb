@@ -130,7 +130,7 @@ declare function app:renderAttributes($g as element(tei:g)) as element(span) {
 };
 
 (:~ The function app:signlistNav displays the navigation and filter controls for the sign list (used in index.html) :)
-declare function app:signlistNav($node as node(), $model as map(), $s as xs:string*, $order as xs:string*, $groupby as xs:string*, $after as xs:integer*, $before as xs:integer*) {
+declare function app:signlistNav($node as node(), $model as map(), $s as xs:string*, $order as xs:string*, $groupby as xs:string*, $after as xs:integer*, $before as xs:integer*, $undated as xs:string?) {
 let $groupby := $groupby[. = $config:valid-grouping-keys]
 let $current-signs := 
         if ($s != '')
@@ -164,7 +164,7 @@ return
             <div class="control-group">
                 <div class="checkbox">
                     <label>
-                        <input type="checkbox" name="undated" value="yes">Display undated signs?</input>
+                        <input type="checkbox" name="undated" value="yes"> {if ($undated eq 'yes') then attribute checked{'checked'} else ()}Display undated signs?</input>
                     </label>
                 </div>
                 <div id="slider-range">
@@ -210,7 +210,7 @@ function app:signlist($node as node(), $model as map(), $s as xs:string*, $order
     let $annotations := if ($collapse-signs = "true") then cfdb:list-annotations("sign-type", $s, $after, $before, $groupby, true(), "") else ()
     return
         for $ss at $spos in $s 
-            let $annotations := if ($collapse-signs = "true") then $annotations else cfdb:list-annotations("sign-type", $ss, $after, $before, $groupby, false())
+            let $annotations := if ($collapse-signs = "true") then $annotations else cfdb:list-annotations("sign-type", $ss, $after, $before, $groupby, false(), "")
             let $stdSign := $stdSigns[tei:charName = $ss],
                 $signNumber := try { xs:integer(replace($stdSign/@n, '\P{N}', '')) } catch * { 0 },
                 $annotations-of-sign-type := $annotations//annotation[sign = $ss],

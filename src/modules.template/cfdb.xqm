@@ -42,11 +42,11 @@ declare function cfdb:listStdSigns() as element(tei:char)* {
 
 (: lists all annotations in the database :)
 declare function cfdb:list-annotations() {
-    cfdb:list-annotations((), (), (), (), (), (), ()
+    cfdb:list-annotations((), (), (), (), (), (), ())
 };
 
 declare function cfdb:list-annotations($category as xs:string?, $value as xs:string*) {
-    cfdb:list-annotations($category, $value, (), (), (), () ) )
+    cfdb:list-annotations($category, $value, (), (), (), (), () )
 };
 
 declare function cfdb:list-annotations($category as xs:string?, $value as xs:string*, $after as xs:integer, $before as xs:integer) {
@@ -72,8 +72,9 @@ declare function cfdb:list-annotations($category as xs:string?, $value as xs:str
         let $include-before := if (exists($before)) then $before lt $date-min else true(),
             $include-after := if (exists($after)) then $after gt $date-max else true()
         order by ($date-min, $date-max)[1] descending
-        return 
-            if (not(exists($date-max) or exists($date-min))) then ()
+        return
+            if ($undated eq "yes") then $a
+            else if (not(exists($date-max) or exists($date-min))) then ()
             else if (every $i in ($include-before, $include-after) satisfies $i eq true())
             then $a
             else ()
